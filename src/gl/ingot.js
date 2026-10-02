@@ -2,15 +2,23 @@ import * as THREE from 'three';
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import studioHDR from '@pmndrs/assets/hdri/studio.exr.js';
+import { LOGO_GLYPH, LOGO_CIRCLE } from '../icons.js';
+
+// draws the brand mark (ring + glyph) as an engraving mask
+function drawMark(g, cx, cy, size) {
+  g.save(); g.translate(cx - size / 2, cy - size / 2); g.scale(size / 150, size / 150);
+  g.lineWidth = 6; g.stroke(new Path2D(LOGO_CIRCLE)); g.fill(new Path2D(LOGO_GLYPH));
+  g.restore();
+}
 
 // Real polished gold: pure metal, no clearcoat (clearcoat is what reads as "plastic").
-export function goldMaterial(color = 0xffc35a, rough = 0.1, extra = {}) {
+export function goldMaterial(color = 0xf2b84b, rough = 0.1, extra = {}) {
   return new THREE.MeshPhysicalMaterial({ color, metalness: 1, roughness: rough, envMapIntensity: 1.9, ...extra });
 }
 
 export function makeRenderer(canvas) {
   const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
-  r.setPixelRatio(Math.min(devicePixelRatio, 2));
+  r.setPixelRatio(Math.min(Math.max(devicePixelRatio, 1.5), 2));
   r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1.15;
   r.outputColorSpace = THREE.SRGBColorSpace;
   return r;
@@ -55,11 +63,11 @@ function stampTexture() {
     g.fillStyle = '#000'; g.fillRect(0, 0, 1024, 512);
     g.strokeStyle = '#fff'; g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle';
     g.lineWidth = 5; g.strokeRect(36, 36, 952, 440);
-    g.font = '800 64px Meem'; g.fillText('طلای عقیق', 512, 140);
-    g.font = '300 32px "Cormorant Garamond", Georgia, serif'; g.fillText('A G H I G H   G O L D', 512, 210);
-    g.fillRect(372, 248, 280, 2);
-    g.font = '800 118px Meem'; g.fillText('999.9', 512, 330);
-    g.font = '500 32px Meem'; g.fillText('FINE GOLD  ·  1000 g  ·  YAZD', 512, 428);
+    drawMark(g, 512, 118, 120);
+    g.font = '800 54px Meem'; g.fillText('طلای عقیق', 512, 222);
+    g.fillRect(392, 258, 240, 2);
+    g.font = '800 104px Meem'; g.fillText('999.9', 512, 334);
+    g.font = '500 30px Meem'; g.fillText('FINE GOLD  ·  1000 g  ·  YAZD', 512, 428);
     t.needsUpdate = true;
   };
   draw(); fontReady().then(draw);
@@ -75,9 +83,9 @@ function coinTexture() {
     g.strokeStyle = '#fff'; g.lineWidth = 8; g.beginPath(); g.arc(256, 256, 236, 0, 7); g.stroke();
     g.lineWidth = 2; g.beginPath(); g.arc(256, 256, 212, 0, 7); g.stroke();
     for (let i = 0; i < 160; i++) { const a = (i / 160) * Math.PI * 2; g.beginPath(); g.moveTo(256 + Math.cos(a) * 218, 256 + Math.sin(a) * 218); g.lineTo(256 + Math.cos(a) * 230, 256 + Math.sin(a) * 230); g.stroke(); }
-    g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.font = '800 120px Meem'; g.fillText('عقیق', 256, 230);
-    g.font = '500 30px Meem'; g.fillText('AGHIGH · 750', 256, 340);
+    g.fillStyle = '#fff'; g.strokeStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    drawMark(g, 256, 232, 230);
+    g.font = '500 28px Meem'; g.fillText('AGHIGH · 750', 256, 392);
     t.needsUpdate = true;
   };
   draw(); fontReady().then(draw);
@@ -85,7 +93,7 @@ function coinTexture() {
 }
 
 // stamped face: frosted lettering (rough) recessed into a mirror surface
-export function stampedGold(map, base = 0.08, frost = 0.5, color = 0xffc35a) {
+export function stampedGold(map, base = 0.08, frost = 0.5, color = 0xf2b84b) {
   const m = goldMaterial(color, 1, { bumpMap: map, bumpScale: -3, roughnessMap: map });
   m.onBeforeCompile = (sh) => {
     sh.fragmentShader = sh.fragmentShader.replace('#include <roughnessmap_fragment>', `
@@ -120,17 +128,17 @@ export function createIngotScene(canvas) {
   const root = new THREE.Group(); scene.add(root);
   const bar = new THREE.Group(); root.add(bar);
   const W = 3.4, H = 0.62, D = 1.6, T = 0.84;
-  bar.add(new THREE.Mesh(ingotGeometry(W, H, D, T), goldMaterial(0xffc35a, 0.1)));
+  bar.add(new THREE.Mesh(ingotGeometry(W, H, D, T), goldMaterial(0xf2b84b, 0.1)));
   const face = new THREE.Mesh(new THREE.PlaneGeometry(W * T - 0.14, D * T - 0.12), stampedGold(stampTexture()));
   face.rotation.x = -Math.PI / 2; face.position.y = H / 2 + 0.002; bar.add(face);
   bar.rotation.set(0.42, -0.6, 0.04);
 
-  const bar2 = new THREE.Mesh(ingotGeometry(2.2, 0.42, 1.05, 0.84), goldMaterial(0xf7bd57, 0.14));
+  const bar2 = new THREE.Mesh(ingotGeometry(2.2, 0.42, 1.05, 0.84), goldMaterial(0xeab04a, 0.14));
   bar2.position.set(0.9, -0.75, -1.6); bar2.rotation.set(0.25, 0.4, -0.05); root.add(bar2);
 
   const coinGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.06, 128);
   const coinFace = coinTexture();
-  const edge = goldMaterial(0xffc35a, 0.22);
+  const edge = goldMaterial(0xf2b84b, 0.22);
   const coins = [];
   for (let i = 0; i < 5; i++) {
     const f = stampedGold(coinFace, 0.07, 0.42);

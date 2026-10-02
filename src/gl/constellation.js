@@ -64,7 +64,7 @@ export function createConstellation(wrap, agents, { onPulse } = {}) {
     // nodes
     nodes.forEach((n) => {
       const crit = n.a.st === 'crit', warn = n.a.st === 'warn';
-      const r = 6 + n.hot * 4 + (n === hover ? 4 : 0);
+      const r = 5 + n.hot * 2.5 + (n === hover ? 3 : 0);
       const rg = g.createRadialGradient(n.x - r * 0.3, n.y - r * 0.4, 0, n.x, n.y, r);
       rg.addColorStop(0, '#fff6dc'); rg.addColorStop(0.45, crit ? '#e0553f' : '#e2bb6c'); rg.addColorStop(1, crit ? '#6a140c' : '#6b4614');
       g.fillStyle = rg; g.beginPath(); g.arc(n.x, n.y, r, 0, 7); g.fill();

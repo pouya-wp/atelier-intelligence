@@ -18,7 +18,7 @@ float snoise(vec3 v){ const vec2 C=vec2(1./6.,1./3.); const vec4 D=vec4(0.,.5,1.
 
 export function createOrb(canvas) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setPixelRatio(Math.min(Math.max(devicePixelRatio, 1.5), 2));
   const scene = new THREE.Scene();
   const cam = new THREE.PerspectiveCamera(35, 1, 0.1, 10); cam.position.z = 3.6;
   const mat = new THREE.ShaderMaterial({

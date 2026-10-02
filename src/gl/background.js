@@ -70,7 +70,7 @@ export function createBackground(canvas) {
   const uRes = u('uRes'), uTime = u('uTime'), uMouse = u('uMouse'), uInt = u('uIntensity'), uPulse = u('uPulse');
 
   // render at reduced resolution — it's a soft surface, and this keeps it buttery
-  const scale = 0.5;
+  const scale = Math.min(1, 0.75 * Math.max(1, devicePixelRatio)); // sharper glints, still cheap
   function resize() {
     const w = Math.floor(innerWidth * scale), h = Math.floor(innerHeight * scale);
     canvas.width = w; canvas.height = h; gl.viewport(0, 0, w, h); gl.uniform2f(uRes, w, h);

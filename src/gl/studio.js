@@ -10,7 +10,7 @@ export function createStudio(canvas) {
   const cam = new THREE.PerspectiveCamera(32, 1, 0.1, 100); cam.position.set(0, 1.4, 7.2); cam.lookAt(0, 0.2, 0);
 
   const ringG = new THREE.Group(); scene.add(ringG);
-  const metal = goldMaterial(0xffc35a, 0.07);
+  const metal = goldMaterial(0xf2b84b, 0.07);
 
   // band: lathe profile so it reads as a real comfort-fit band
   const prof = [];

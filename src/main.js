@@ -2,15 +2,15 @@ import './styles.css';
 import { createBackground } from './gl/background.js';
 import { createOrb } from './gl/orb.js';
 import * as sfx from './sfx.js';
-import { I, LOGO } from './icons.js';
+import { I, logo } from './icons.js';
 import { NAV, ROLES, OWNER, ORDERS_ANOMALY } from './data.js';
 import { VIEWS, reportText } from './views.js';
 import { live, onPrice } from './price.js';
 import { fa, $, $$ } from './util.js';
 
 const bg = createBackground($('#bg'));
-$$('.brand .mark, .mbrand .mark').forEach((m) => (m.innerHTML = LOGO));
-$('#seal').innerHTML = LOGO;
+$$('.brand .mark, .mbrand .mark').forEach((m) => (m.innerHTML = logo()));
+$('#seal').innerHTML = logo();
 
 /* ------------------------------------------------ Midas dust: the cursor sheds gold */
 (function dust() {

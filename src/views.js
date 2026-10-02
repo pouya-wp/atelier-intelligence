@@ -1,4 +1,4 @@
-import { I } from './icons.js';
+import { I, logo } from './icons.js';
 import { fa, toman, sparkline, areaChart, donut, bars, countUp, rand } from './util.js';
 import { OWNER, AGENTS, STATIONS, ADMIN_UNITS, STAFF, DUE, TODOS, NEWS, STOCK, MAKERS, RETURNS, DEFECTS, ORDERS_ANOMALY, CODES, ORDER_CHECK, FINDINGS, DEFECT_RATE } from './data.js';
 import { live, onPrice } from './price.js';
@@ -263,7 +263,7 @@ function invoice() {
       </div>
     </section>`,
     mount(root) {
-      root.querySelector('.rlogo').innerHTML = document.querySelector('.brand .mark').innerHTML;
+      root.querySelector('.rlogo').innerHTML = logo();
       const rc = root.querySelector('#rcpt');
       rc.addEventListener('pointermove', (e) => { const r = rc.getBoundingClientRect(); rc.style.setProperty('--mx', `${e.clientX - r.left}px`); rc.style.setProperty('--my', `${e.clientY - r.top}px`); });
       const $ = (id) => root.querySelector(id);
@@ -462,7 +462,7 @@ function studio() {
         <div class="card studio c8" id="studioCard">
           <canvas class="gl" id="studio"></canvas><div class="scan"></div>
           <div class="overlay"><span class="caps gold-text">AGHIGH · AGATE SIGNET</span><b style="font-size:20px;font-weight:300">انگشتر عقیق یمنی — طلای ۱۸</b><span class="muted" style="font-size:12px">۸٫۴ گرم · نگین کابوشن · ۸ برلیان</span></div>
-          <div class="bottom"><div class="swatches"><button class="on" data-c="#ffc35a" data-r=".07" style="background:linear-gradient(135deg,#ffe7a8,#c9953d)" title="زرد"></button><button data-c="#f6b195" data-r=".08" style="background:linear-gradient(135deg,#ffd6c4,#c27a5c)" title="رزگلد"></button><button data-c="#eeeeee" data-r=".06" style="background:linear-gradient(135deg,#fff,#9a9a9a)" title="سفید"></button></div>
+          <div class="bottom"><div class="swatches"><button class="on" data-c="#f2b84b" data-r=".07" style="background:linear-gradient(135deg,#ffe7a8,#c9953d)" title="زرد"></button><button data-c="#f6b195" data-r=".08" style="background:linear-gradient(135deg,#ffd6c4,#c27a5c)" title="رزگلد"></button><button data-c="#eeeeee" data-r=".06" style="background:linear-gradient(135deg,#fff,#9a9a9a)" title="سفید"></button></div>
           <span class="caps muted">DRAG · TO · ROTATE</span></div>
         </div>
         <div class="card c4" style="display:grid;gap:18px;align-content:start">

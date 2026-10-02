@@ -44,11 +44,20 @@ export const I = {
   menu: s('<path d="M4 7h16M4 12h16M4 17h16"/>'),
 };
 
-// Placeholder monogram — swap with the official Aghigh Gold logo SVG.
-export const LOGO = `<svg viewBox="0 0 64 64" fill="none">
-  <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f7e4b5"/><stop offset=".45" stop-color="#d4af6a"/><stop offset="1" stop-color="#6e5022"/></linearGradient></defs>
-  <path d="M32 3 57 18v28L32 61 7 46V18z" stroke="url(#lg)" stroke-width="1.6"/>
-  <path d="M32 9 52 21v22L32 55 12 43V21z" stroke="url(#lg)" stroke-width=".7" opacity=".6"/>
-  <path d="M40.5 25.5c-1.8-2.6-4.8-3.8-7.6-3.2-3.6.8-5.5 4.4-4.2 7.4 1.4 3.1 5.6 3.4 8.4 1.6M36.8 31.4c-5.6 2.6-9.8 6.4-9.8 10.6 0 3.3 3.1 5.4 7.2 5.4 3.3 0 6.4-1.3 8.6-3.3" stroke="url(#lg)" stroke-width="2.4" stroke-linecap="round"/>
-  <circle cx="32" cy="16.5" r="1.6" fill="#b23a2e"/>
+// Official Aghigh Gold mark (brand gold #CB9B2D) — circle rendered as polished metal, glyph in ivory.
+export const LOGO_GLYPH = 'M49.2,33.9c4.2-0.9,7,0.2,8.2,6.3c1.7,8.6,10.5,14.1,19.6,13.9c9.1-0.1,16.9-5.9,18.9-14.8 c1-4.5,2.7-5.6,7.2-5.5c11.3,0.4,11.5,0.4,7.9,11.4C105.8,60.6,92.1,70.1,75,70c-13-0.1-22.1,8.5-22,20.6 c0.1,10.2,7.8,18.5,18.7,20c8.9,1.2,19.2-5.4,21-14.7c1-5.2,3.3-6,7.9-5.8c10.3,0.4,10.3,0.1,7.4,10.2 c-4.1,14.4-16.7,24.8-31.4,25.9c-16.2,1.2-30-6.9-36.6-21.5c-6.1-13.6-3-30,8.2-40.3c3.2-2.9,3.4-4.3,0.4-7.5 c-4.6-4.9-6.9-11.1-8-17.9c-0.7-4,0-5.6,4.2-5.1C46,34.1,47.2,33.9,49.2,33.9z';
+export const LOGO_CIRCLE = 'M75.1,3c39.8,0,71.9,32.3,71.8,72.2c-0.1,39.8-32.4,71.8-72.4,71.7C34.8,146.9,2.8,114.5,3,74.5C3.1,35,35.4,3,75.1,3z';
+let lid = 0;
+export const logo = () => {
+  const id = `lg${lid++}`;
+  return `<svg viewBox="1 1 148 148" fill="none" aria-label="طلای عقیق">
+  <defs>
+    <linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6dc8e"/><stop offset=".38" stop-color="#cb9b2d"/><stop offset=".5" stop-color="#8a6516"/><stop offset=".62" stop-color="#b98a26"/><stop offset="1" stop-color="#f1d184"/></linearGradient>
+    <radialGradient id="${id}h" cx=".32" cy=".22" r=".6"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+  </defs>
+  <path d="${LOGO_CIRCLE}" fill="url(#${id})"/>
+  <path d="${LOGO_CIRCLE}" fill="url(#${id}h)"/>
+  <path d="${LOGO_CIRCLE}" stroke="#fff3cf" stroke-opacity=".5" stroke-width="1.2"/>
+  <path d="${LOGO_GLYPH}" fill="#fdf8ec"/>
 </svg>`;
+};
