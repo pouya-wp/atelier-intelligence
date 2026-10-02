@@ -1,96 +1,146 @@
 import * as THREE from 'three';
-import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
+import studioHDR from '@pmndrs/assets/hdri/studio.exr.js';
 
-export function goldMaterial(color = 0xf2c46d, rough = 0.2, extra = {}) {
-  return new THREE.MeshPhysicalMaterial({ color, metalness: 1, roughness: rough, clearcoat: 0.35, clearcoatRoughness: 0.25, envMapIntensity: 1.25, ...extra });
+// Real polished gold: pure metal, no clearcoat (clearcoat is what reads as "plastic").
+export function goldMaterial(color = 0xffc35a, rough = 0.1, extra = {}) {
+  return new THREE.MeshPhysicalMaterial({ color, metalness: 1, roughness: rough, envMapIntensity: 1.9, ...extra });
 }
 
 export function makeRenderer(canvas) {
   const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
   r.setPixelRatio(Math.min(devicePixelRatio, 2));
-  r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1.05;
+  r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1.15;
   r.outputColorSpace = THREE.SRGBColorSpace;
   return r;
 }
 
+// Studio HDRI + hard-edged softbox strips → crisp, high-contrast jewellery reflections.
+let hdrPromise;
+function loadHDR() {
+  hdrPromise ||= new EXRLoader().loadAsync(studioHDR).then((t) => { t.mapping = THREE.EquirectangularReflectionMapping; return t; });
+  return hdrPromise;
+}
 export function studioEnv(renderer, scene) {
-  const pm = new THREE.PMREMGenerator(renderer);
-  const env = pm.fromScene(new RoomEnvironment(), 0.04).texture;
-  scene.environment = env; pm.dispose();
-  return env;
+  loadHDR().then((hdr) => {
+    const pm = new THREE.PMREMGenerator(renderer);
+    const envScene = new THREE.Scene();
+    const sky = new THREE.Mesh(new THREE.SphereGeometry(30, 48, 24), new THREE.MeshBasicMaterial({ map: hdr, side: THREE.BackSide }));
+    sky.material.color.setScalar(1.1); envScene.add(sky);
+    // softboxes: big key above/behind (lights top faces), strip lights for razor edges, warm bounce below
+    const box = (w, h, x, y, z, i, c = [1, 0.95, 0.85]) => {
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(...c).multiplyScalar(i), side: THREE.DoubleSide }));
+      m.position.set(x, y, z); m.lookAt(0, 0, 0); envScene.add(m);
+    };
+    box(14, 5, 0, 9, -6, 3.2);
+    box(10, 4, 0, 8, 6, 2.2);
+    box(1.4, 14, -9, 2, 1, 5);
+    box(1.4, 14, 9, 2, -1, 4);
+    box(16, 0.6, 0, 1.5, -11, 6);
+    box(18, 6, 0, -8, 0, 0.6, [1, 0.7, 0.35]);
+    scene.environment = pm.fromScene(envScene, 0.015).texture;
+    pm.dispose();
+  });
 }
 
+const fontReady = () => (document.fonts ? Promise.all([document.fonts.load('800 70px Doran'), document.fonts.load('500 40px Doran')]).catch(() => {}) : Promise.resolve());
+
+// stamp: white = engraved & frosted, black = mirror polish
 function stampTexture() {
   const c = document.createElement('canvas'); c.width = 1024; c.height = 512;
-  const g = c.getContext('2d');
-  g.fillStyle = '#000'; g.fillRect(0, 0, 1024, 512);
-  g.strokeStyle = '#fff'; g.fillStyle = '#fff';
-  g.lineWidth = 6; g.strokeRect(40, 40, 944, 432);
-  g.lineWidth = 2; g.strokeRect(60, 60, 904, 392);
-  g.textAlign = 'center';
-  g.font = '300 96px "Cormorant Garamond", Georgia, serif'; g.fillText('AGHIGH  GOLD', 512, 200);
-  g.font = '700 70px Vazirmatn, sans-serif'; g.fillText('طلای عقیق', 512, 300);
-  g.font = '400 40px Georgia, serif'; g.fillText('FINE GOLD   999.9   ·   1000 g   ·   YAZD', 512, 395);
-  // diamond mark
-  g.save(); g.translate(512, 105); g.rotate(Math.PI / 4); g.strokeRect(-16, -16, 32, 32); g.restore();
-  const t = new THREE.CanvasTexture(c); t.anisotropy = 8; return t;
+  const t = new THREE.CanvasTexture(c); t.anisotropy = 8;
+  const draw = () => {
+    const g = c.getContext('2d');
+    g.fillStyle = '#000'; g.fillRect(0, 0, 1024, 512);
+    g.strokeStyle = '#fff'; g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.lineWidth = 5; g.strokeRect(36, 36, 952, 440);
+    g.font = '800 64px Doran'; g.fillText('طلای عقیق', 512, 140);
+    g.font = '300 32px "Cormorant Garamond", Georgia, serif'; g.fillText('A G H I G H   G O L D', 512, 210);
+    g.fillRect(372, 248, 280, 2);
+    g.font = '800 118px Doran'; g.fillText('999.9', 512, 330);
+    g.font = '500 32px Doran'; g.fillText('FINE GOLD  ·  1000 g  ·  YAZD', 512, 428);
+    t.needsUpdate = true;
+  };
+  draw(); fontReady().then(draw);
+  return t;
 }
 
 function coinTexture() {
   const c = document.createElement('canvas'); c.width = c.height = 512;
-  const g = c.getContext('2d');
-  g.fillStyle = '#444'; g.fillRect(0, 0, 512, 512);
-  g.strokeStyle = '#fff'; g.lineWidth = 10; g.beginPath(); g.arc(256, 256, 238, 0, 7); g.stroke();
-  g.lineWidth = 3; g.beginPath(); g.arc(256, 256, 214, 0, 7); g.stroke();
-  for (let i = 0; i < 120; i++) { const a = (i / 120) * Math.PI * 2; g.beginPath(); g.moveTo(256 + Math.cos(a) * 222, 256 + Math.sin(a) * 222); g.lineTo(256 + Math.cos(a) * 232, 256 + Math.sin(a) * 232); g.stroke(); }
-  g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle';
-  g.font = '700 150px Vazirmatn, sans-serif'; g.fillText('ع', 256, 236);
-  g.font = '500 34px Georgia, serif'; g.fillText('AGHIGH · 750', 256, 360);
-  const t = new THREE.CanvasTexture(c); t.anisotropy = 8; return t;
+  const t = new THREE.CanvasTexture(c); t.anisotropy = 8;
+  const draw = () => {
+    const g = c.getContext('2d');
+    g.fillStyle = '#000'; g.fillRect(0, 0, 512, 512);
+    g.strokeStyle = '#fff'; g.lineWidth = 8; g.beginPath(); g.arc(256, 256, 236, 0, 7); g.stroke();
+    g.lineWidth = 2; g.beginPath(); g.arc(256, 256, 212, 0, 7); g.stroke();
+    for (let i = 0; i < 160; i++) { const a = (i / 160) * Math.PI * 2; g.beginPath(); g.moveTo(256 + Math.cos(a) * 218, 256 + Math.sin(a) * 218); g.lineTo(256 + Math.cos(a) * 230, 256 + Math.sin(a) * 230); g.stroke(); }
+    g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = '800 120px Doran'; g.fillText('عقیق', 256, 230);
+    g.font = '500 30px Doran'; g.fillText('AGHIGH · 750', 256, 340);
+    t.needsUpdate = true;
+  };
+  draw(); fontReady().then(draw);
+  return t;
+}
+
+// stamped face: frosted lettering (rough) recessed into a mirror surface
+export function stampedGold(map, base = 0.08, frost = 0.5, color = 0xffc35a) {
+  const m = goldMaterial(color, 1, { bumpMap: map, bumpScale: -3, roughnessMap: map });
+  m.onBeforeCompile = (sh) => {
+    sh.fragmentShader = sh.fragmentShader.replace('#include <roughnessmap_fragment>', `
+      float roughnessFactor = roughness;
+      #ifdef USE_ROUGHNESSMAP
+        vec4 texelRoughness = texture2D( roughnessMap, vRoughnessMapUv );
+        roughnessFactor = mix(${base.toFixed(3)}, ${frost.toFixed(3)}, texelRoughness.g);
+      #endif`);
+  };
+  return m;
+}
+
+// ingot: tapered prism with tight bevels so edges catch thin highlight lines
+function ingotGeometry(w, h, d, taper = 0.84, r = 0.035) {
+  const geo = new RoundedBoxGeometry(w, h, d, 4, r);
+  const p = geo.attributes.position;
+  for (let i = 0; i < p.count; i++) {
+    const k = THREE.MathUtils.lerp(1, taper, (p.getY(i) + h / 2) / h);
+    p.setX(i, p.getX(i) * k); p.setZ(i, p.getZ(i) * k);
+  }
+  geo.computeVertexNormals();
+  return geo;
 }
 
 export function createIngotScene(canvas) {
   const renderer = makeRenderer(canvas);
   const scene = new THREE.Scene();
   studioEnv(renderer, scene);
-  const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
-  cam.position.set(0, 1.6, 9); cam.lookAt(0, 0, 0);
+  const cam = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
+  cam.position.set(0, 2.2, 9.5); cam.lookAt(0, 0, 0);
 
   const root = new THREE.Group(); scene.add(root);
-
-  // the bar
   const bar = new THREE.Group(); root.add(bar);
-  const gold = goldMaterial(0xf0c062, 0.17);
-  const body = new THREE.Mesh(new RoundedBoxGeometry(3.4, 0.62, 1.6, 6, 0.16), gold);
-  bar.add(body);
-  const stamp = stampTexture();
-  const face = new THREE.Mesh(
-    new THREE.PlaneGeometry(2.9, 1.42),
-    goldMaterial(0xe9b65a, 0.32, { bumpMap: stamp, bumpScale: 2.2, alphaMap: stamp, transparent: true, roughnessMap: stamp })
-  );
-  face.rotation.x = -Math.PI / 2; face.position.y = 0.312; bar.add(face);
-  bar.rotation.set(0.32, -0.55, 0.06);
-  bar.position.set(0, 0, 0);
+  const W = 3.4, H = 0.62, D = 1.6, T = 0.84;
+  bar.add(new THREE.Mesh(ingotGeometry(W, H, D, T), goldMaterial(0xffc35a, 0.1)));
+  const face = new THREE.Mesh(new THREE.PlaneGeometry(W * T - 0.14, D * T - 0.12), stampedGold(stampTexture()));
+  face.rotation.x = -Math.PI / 2; face.position.y = H / 2 + 0.002; bar.add(face);
+  bar.rotation.set(0.42, -0.6, 0.04);
 
-  // second, smaller bar stacked behind
-  const bar2 = new THREE.Mesh(new RoundedBoxGeometry(2.2, 0.42, 1.05, 5, 0.12), goldMaterial(0xe8b55a, 0.24));
-  bar2.position.set(0.9, -0.95, -1.6); bar2.rotation.set(0.25, 0.4, -0.05); root.add(bar2);
+  const bar2 = new THREE.Mesh(ingotGeometry(2.2, 0.42, 1.05, 0.84), goldMaterial(0xf7bd57, 0.14));
+  bar2.position.set(0.9, -0.75, -1.6); bar2.rotation.set(0.25, 0.4, -0.05); root.add(bar2);
 
-  // coins orbiting
-  const coinGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.06, 96);
+  const coinGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.06, 128);
   const coinFace = coinTexture();
-  const coinSide = goldMaterial(0xe9b860, 0.35);
+  const edge = goldMaterial(0xffc35a, 0.22);
   const coins = [];
   for (let i = 0; i < 5; i++) {
-    const face = goldMaterial(0xf5cc78, 0.2, { bumpMap: coinFace, bumpScale: 3, roughnessMap: coinFace });
-    const m = new THREE.Mesh(coinGeo, [coinSide, face, face]);
+    const f = stampedGold(coinFace, 0.07, 0.42);
+    const m = new THREE.Mesh(coinGeo, [edge, f, f]);
     m.userData = { a: (i / 5) * Math.PI * 2, r: 2.4 + (i % 2) * 0.5, y: (i - 2) * 0.35, s: 0.18 + i * 0.03 };
     root.add(m); coins.push(m);
   }
 
-  // gold dust
-  const N = 900, pos = new Float32Array(N * 3), seeds = new Float32Array(N);
+  // sparse gold dust
+  const N = 380, pos = new Float32Array(N * 3), seeds = new Float32Array(N);
   for (let i = 0; i < N; i++) { pos[i * 3] = (Math.random() - .5) * 12; pos[i * 3 + 1] = (Math.random() - .5) * 6; pos[i * 3 + 2] = (Math.random() - .5) * 6; seeds[i] = Math.random(); }
   const dg = new THREE.BufferGeometry(); dg.setAttribute('position', new THREE.BufferAttribute(pos, 3)); dg.setAttribute('seed', new THREE.BufferAttribute(seeds, 1));
   const dm = new THREE.ShaderMaterial({
@@ -99,15 +149,13 @@ export function createIngotScene(canvas) {
     vertexShader: `attribute float seed; uniform float uTime; uniform float uPx; varying float vA;
       void main(){ vec3 p = position; p.y += mod(uTime*.12*(.3+seed) + seed*6., 6.) - 3.; p.x += sin(uTime*.3+seed*20.)*.2;
       vec4 mv = modelViewMatrix*vec4(p,1.); gl_Position = projectionMatrix*mv;
-      gl_PointSize = (1.5+seed*3.5)*uPx*(6./-mv.z); vA = .25+.75*abs(sin(uTime*1.5+seed*40.)); }`,
-    fragmentShader: `varying float vA; void main(){ float d = length(gl_PointCoord-.5); if(d>.5) discard; gl_FragColor = vec4(1.,.85,.55, vA*smoothstep(.5,0.,d)); }`,
+      gl_PointSize = (1.+seed*2.5)*uPx*(6./-mv.z); vA = .2+.8*pow(abs(sin(uTime*1.5+seed*40.)),4.); }`,
+    fragmentShader: `varying float vA; void main(){ float d = length(gl_PointCoord-.5); if(d>.5) discard; gl_FragColor = vec4(1.,.86,.55, vA*smoothstep(.5,0.,d)); }`,
   });
   scene.add(new THREE.Points(dg, dm));
 
-  // lights: a key that follows the cursor + warm rim
-  const key = new THREE.SpotLight(0xfff1d0, 220, 30, 0.5, 0.6, 1.4); key.position.set(3, 5, 6); scene.add(key); scene.add(key.target);
-  const rim = new THREE.PointLight(0xff9a4a, 30, 20); rim.position.set(-5, 1, -4); scene.add(rim);
-  const fill = new THREE.PointLight(0xb23a2e, 12, 20); fill.position.set(4, -3, 2); scene.add(fill);
+  // one hard key that follows the cursor — the highlight you "move to light"
+  const key = new THREE.SpotLight(0xfff4e0, 260, 30, 0.35, 0.35, 1.4); key.position.set(3, 5, 6); scene.add(key); scene.add(key.target);
 
   const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   const onMove = (e) => {
@@ -123,21 +171,20 @@ export function createIngotScene(canvas) {
     if (r.width === w && r.height === h) return;
     w = r.width; h = r.height; renderer.setSize(w, h, false);
     cam.aspect = w / h; cam.updateProjectionMatrix();
-    // keep the bars on the "end" (left in RTL) side, scale for narrow cards
     const narrow = w < 700;
     root.position.set(narrow ? 0 : -3.3, narrow ? -1.3 : 0.1, 0);
     root.scale.setScalar(narrow ? 0.72 : 1);
   }
-  const clock = new THREE.Clock(); let raf, alive = true;
-  function loop() {
+  const timer = new THREE.Timer(); let raf, alive = true;
+  function loop(ts) {
     if (!alive) return;
-    resize();
-    const t = clock.getElapsedTime();
+    resize(); timer.update(ts);
+    const t = timer.getElapsed();
     mouse.x += (mouse.tx - mouse.x) * 0.05; mouse.y += (mouse.ty - mouse.y) * 0.05;
-    root.rotation.y = mouse.x * 0.35 + Math.sin(t * 0.25) * 0.08;
-    root.rotation.x = -mouse.y * 0.15;
-    bar.position.y = Math.sin(t * 0.8) * 0.08;
-    bar2.position.y = -0.75 + Math.sin(t * 0.7 + 1) * 0.06;
+    root.rotation.y = mouse.x * 0.4 + Math.sin(t * 0.25) * 0.06;
+    root.rotation.x = -mouse.y * 0.18;
+    bar.position.y = Math.sin(t * 0.8) * 0.06;
+    bar2.position.y = -0.75 + Math.sin(t * 0.7 + 1) * 0.05;
     coins.forEach((c) => {
       const u = c.userData, a = u.a + t * u.s;
       c.position.set(Math.cos(a) * u.r, u.y + Math.sin(t + u.a) * 0.15, Math.sin(a) * u.r * 0.6);
@@ -148,6 +195,6 @@ export function createIngotScene(canvas) {
     renderer.render(scene, cam);
     raf = requestAnimationFrame(loop);
   }
-  loop();
+  raf = requestAnimationFrame(loop);
   return { dispose() { alive = false; cancelAnimationFrame(raf); removeEventListener('pointermove', onMove); renderer.dispose(); } };
 }

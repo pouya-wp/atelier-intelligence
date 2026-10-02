@@ -4,13 +4,13 @@ import { makeRenderer, studioEnv, goldMaterial } from './ingot.js';
 // Photo → 3D render studio: a ring "reconstructed" from a sketch, on a turntable.
 export function createStudio(canvas) {
   const renderer = makeRenderer(canvas);
-  renderer.toneMappingExposure = 1.15;
+  renderer.toneMappingExposure = 1.2;
   const scene = new THREE.Scene();
   studioEnv(renderer, scene);
   const cam = new THREE.PerspectiveCamera(32, 1, 0.1, 100); cam.position.set(0, 1.4, 7.2); cam.lookAt(0, 0.2, 0);
 
   const ringG = new THREE.Group(); scene.add(ringG);
-  const metal = goldMaterial(0xf2c063, 0.14);
+  const metal = goldMaterial(0xffc35a, 0.07);
 
   // band: lathe profile so it reads as a real comfort-fit band
   const prof = [];
@@ -29,7 +29,7 @@ export function createStudio(canvas) {
   // agate cabochon (the brand's namesake stone)
   const gem = new THREE.Mesh(
     new THREE.SphereGeometry(0.36, 96, 64, 0, Math.PI * 2, 0, Math.PI / 2),
-    new THREE.MeshPhysicalMaterial({ color: 0x8e1d12, roughness: 0.03, metalness: 0, transmission: 0.35, thickness: 1.2, ior: 1.54, clearcoat: 1, clearcoatRoughness: 0.02, attenuationColor: new THREE.Color(0x6a0d06), attenuationDistance: 0.4, sheen: 0.3, sheenColor: new THREE.Color(0xff6a4a) })
+    new THREE.MeshPhysicalMaterial({ color: 0x5c0904, roughness: 0.03, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.02, ior: 1.54, specularIntensity: 1, attenuationColor: new THREE.Color(0x8a1206), attenuationDistance: 0.25, envMapIntensity: 2.2 })
   );
   gem.scale.set(1, 0.5, 1); gem.position.y = 0.1; head.add(gem);
   // pavé side stones

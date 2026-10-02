@@ -46,7 +46,7 @@ const vaultSvg = $('#vaultSvg');
   // r2: numerals (karats & station names)
   const words = ['۷۵۰', 'ریخته‌گری', '۹۹۹٫۹', 'ساخت', '۷۰۵', 'تراش', '۸۷۵', 'آبکاری', '۹۱۶', 'خزانه'];
   s += `<g class="ring r2"><circle cx="${C}" cy="${C}" r="158" fill="none" stroke="rgba(212,175,106,.25)"/>`;
-  words.forEach((w, i) => { const a = (i / words.length) * 360; s += `<text x="${C}" y="${C - 164}" transform="rotate(${a} ${C} ${C})" fill="#d4af6a" font-size="10" text-anchor="middle" opacity=".75" font-family="Vazirmatn">${w}</text>`; });
+  words.forEach((w, i) => { const a = (i / words.length) * 360; s += `<text x="${C}" y="${C - 164}" transform="rotate(${a} ${C} ${C})" fill="#d4af6a" font-size="10" text-anchor="middle" opacity=".75" font-family="Doran">${w}</text>`; });
   s += `<circle cx="${C}" cy="${C}" r="140" fill="none" stroke="rgba(212,175,106,.18)" stroke-dasharray="1 5"/></g>`;
   // r3: bolts
   s += `<g class="ring r3">`; for (let i = 0; i < 12; i++) { const a = (i / 12) * Math.PI * 2; s += `<circle cx="${C + Math.cos(a) * 124}" cy="${C + Math.sin(a) * 124}" r="4" fill="url(#vg)" opacity=".8"/>`; } s += `</g>`;

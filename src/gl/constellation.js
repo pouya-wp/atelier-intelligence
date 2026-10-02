@@ -69,7 +69,7 @@ export function createConstellation(wrap, agents, { onPulse } = {}) {
       rg.addColorStop(0, '#fff6dc'); rg.addColorStop(0.45, crit ? '#e0553f' : '#e2bb6c'); rg.addColorStop(1, crit ? '#6a140c' : '#6b4614');
       g.fillStyle = rg; g.beginPath(); g.arc(n.x, n.y, r, 0, 7); g.fill();
       if (crit || warn) { g.strokeStyle = crit ? 'rgba(224,85,63,.6)' : 'rgba(230,182,92,.45)'; g.lineWidth = 1; g.beginPath(); g.arc(n.x, n.y, r + 5 + Math.sin(t / 300) * 2, 0, 7); g.stroke(); }
-      g.font = `${n === hover ? 600 : 400} 12px Vazirmatn`; g.textAlign = 'center';
+      g.font = `${n === hover ? 600 : 400} 12px Doran`; g.textAlign = 'center';
       g.fillStyle = n === hover ? '#fbe7b6' : 'rgba(247,242,232,.62)';
       g.fillText(n.a.name, n.x, n.y + r + 16);
     });
