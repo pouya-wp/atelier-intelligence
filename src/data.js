@@ -29,7 +29,8 @@ export const NAV = [
   { id: 'people', label: 'پرسنل و شیفت', icon: 'people', roles: ['owner', 'hr'] },
   { id: 'calendar', label: 'سررسیدها و کارها', icon: 'cal', roles: ['owner', 'acc', 'wh', 'hr'], badge: '۵' },
   { id: 'studio', label: 'استودیو سه‌بعدی', icon: 'cube', roles: ['owner', 'wh'] },
-  { id: 'market', label: 'بازار و گزارش روزانه', icon: 'globe', roles: ['owner', 'acc'] },
+  { id: 'report', label: 'گزارش روزانه مدیریتی', icon: 'report', roles: ['owner', 'acc'], badge: 'نو', g: true },
+  { id: 'market', label: 'بازار و اخبار', icon: 'globe', roles: ['owner', 'acc'] },
 ];
 
 export const AGENTS = [

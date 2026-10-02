@@ -515,4 +515,66 @@ export function reportText() {
   فردا یک چک دریافتی <b>۱٫۸۵ میلیارد تومانی</b> از گالری ارغوان دارید؛ معادل حدود <span class="hl num">${fa(goldEq(1_850_000_000))} گرم طلا</span>. سفارش چهار برابری نمایندگی کرمان منتظر تأیید شماست.`;
 }
 
-export const VIEWS = { overview, agents, line, invoice, treasury, accounting, warehouse, people, calendar, studio, market };
+// ---------------------------------------------------------------- daily report (editorial)
+function report() {
+  const d = new Date();
+  const date = d.toLocaleDateString('fa-IR-u-ca-persian', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  return {
+    html: `<section class="view">
+      ${head('THE DAILY LEDGER', 'گزارش روزانه <b>مدیریتی</b>', 'هر شب ساعت ۲۱ ایجنت گزارش‌نویس این برگه را خودکار می‌نویسد و برای مدیر می‌فرستد؛ با قیمت‌ها، فروش، تولید، خزانه، پرسنل و هشدارها.', `<button class="btn ghost" data-sfx data-toast="نسخه PDF آماده دانلود است">${I.report} دریافت PDF</button><button class="btn" data-speak>${I.sound} بخوان برایم</button>`)}
+      <article class="ledger card">
+        <header class="lg-mast">
+          <span class="en">VOL. XXXI · AGHIGH GOLD · YAZD</span>
+          <h1 class="metal">برگ روزانه عقیق</h1>
+          <span>${date} · محرمانه — فقط برای آقای ${OWNER.short}</span>
+        </header>
+        <div class="lg-strip">
+          <div><span>هر گرم ۱۸ عیار</span><b class="num" data-live="g18">${fa(live.g18)}</b><small>تومان</small></div>
+          <div><span>انس جهانی</span><b class="num" data-live="ounce">${fa(live.ounce, 1)}</b><small>دلار</small></div>
+          <div><span>سکه امامی</span><b class="num" data-live="coin">${fa(live.coin / 1e6, 1)}</b><small>میلیون</small></div>
+          <div><span>دلار آزاد</span><b class="num" data-live="usd">${fa(live.usd)}</b><small>تومان</small></div>
+        </div>
+        <div class="lg-body">
+          <div class="lg-lead">
+            <span class="lg-kicker">سرمقاله ایجنت</span>
+            <h2>فروش ۹٪ بالاتر از دیروز؛ واحد ساخت زیر ذره‌بین</h2>
+            <p class="lg-drop">امروز ۷٫۸۴ کیلوگرم طلا فروخته شد که بیشترین رقم این هفته است. ارزش کل طلای در گردش به ${fa((186420 * live.g18) / 1e12, 3)} هزار میلیارد تومان رسید. افت کل خط ۰٫۶۶٪ بود، اما واحد ساخت با ۰٫۲۱٪ برای سومین روز پیاپی بالاتر از استاندارد است و پیشنهاد می‌شود فرایند لحیم‌کاری بازبینی شود.</p>
+            <p>سفارش ۴٫۸ کیلویی نمایندگی کرمان چهار برابر میانگین ۳۰ روزه آن است و تا تأیید شما در صف نگه داشته شده. موجودی کد AG-BN-118-F برای پوشش این سفارش ۱۶۸ عدد کسری دارد.</p>
+          </div>
+          <div class="lg-col">
+            <span class="lg-kicker">اعداد روز</span>
+            <dl>
+              <div><dt>فروش</dt><dd class="num">۷٫۸۴ کیلو · ۹۲٫۸ میلیارد</dd></div>
+              <div><dt>تولید وارد خزانه</dt><dd class="num">۶٫۱ کیلو</dd></div>
+              <div><dt>افت کل خط</dt><dd class="num">۰٫۶۶٪</dd></div>
+              <div><dt>هزینه امروز</dt><dd class="num">۱۴۲ میلیون</dd></div>
+              <div><dt>حاضر / کل پرسنل</dt><dd class="num">۱۴۲ / ۱۵۰</dd></div>
+              <div><dt>غذای اضافه‌کاری</dt><dd class="num">۲۳ پرس</dd></div>
+              <div><dt>اسناد رایورز</dt><dd class="num">۴۱۲ سند</dd></div>
+            </dl>
+          </div>
+          <div class="lg-col">
+            <span class="lg-kicker">فردا روی میز شما</span>
+            <ol class="lg-list">
+              <li><b>چک دریافتی ۱٫۸۵ میلیارد</b> — گالری ارغوان<br><small class="metal" data-goldeq="1850000000">≈ ${fa(1_850_000_000 / live.g18)} گرم طلا</small></li>
+              <li><b>تحویل ۲٫۴ کیلو</b> — نمایندگی شیراز</li>
+              <li><b>تأیید سفارش غیرعادی</b> — نمایندگی کرمان</li>
+              <li><b>کمبود قفل و اتصالات</b> — پیشنهاد خرید آماده است</li>
+            </ol>
+            <span class="lg-kicker" style="margin-top:22px">بازار</span>
+            <p class="lg-small">انس جهانی پس از داده‌های اشتغال آمریکا رشد کرد؛ ایجنت رصد بازار برای فردا روند ملایم صعودی پیش‌بینی می‌کند.</p>
+          </div>
+        </div>
+        <footer class="lg-foot"><span>نوشته‌شده توسط ایجنت گزارش‌نویس · ارسال خودکار ۲۱:۰۰</span><span class="en">— Aghigh Atelier Intelligence —</span></footer>
+      </article>
+    </section>`,
+    mount(root) {
+      return onPrice(() => {
+        root.querySelectorAll('[data-live]').forEach((el) => { const k = el.dataset.live; el.textContent = k === 'coin' ? fa(live.coin / 1e6, 1) : fa(live[k], k === 'ounce' ? 1 : 0); });
+        root.querySelectorAll('[data-goldeq]').forEach((el) => { el.textContent = `≈ ${fa(goldEq(+el.dataset.goldeq))} گرم طلا`; });
+      });
+    },
+  };
+}
+
+export const VIEWS = { report, overview, agents, line, invoice, treasury, accounting, warehouse, people, calendar, studio, market };
