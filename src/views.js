@@ -1,6 +1,6 @@
 import { I } from './icons.js';
 import { fa, toman, sparkline, areaChart, donut, bars, countUp, rand } from './util.js';
-import { OWNER, AGENTS, STATIONS, ADMIN_UNITS, STAFF, DUE, TODOS, NEWS, STOCK, MAKERS, RETURNS, DEFECTS, ORDERS_ANOMALY, CODES, ORDER_CHECK, FINDINGS } from './data.js';
+import { OWNER, AGENTS, STATIONS, ADMIN_UNITS, STAFF, DUE, TODOS, NEWS, STOCK, MAKERS, RETURNS, DEFECTS, ORDERS_ANOMALY, CODES, ORDER_CHECK, FINDINGS, DEFECT_RATE } from './data.js';
 import { live, onPrice } from './price.js';
 import { createIngotScene } from './gl/ingot.js';
 import { createStudio } from './gl/studio.js';
@@ -199,6 +199,13 @@ function line() {
           </div>
         </div>
       </div>
+      <div class="card mt"><div class="ch"><h3>آمار خرابی هر واحد <small>در هر ۱۰۰ قطعه — امروز در برابر دیروز و میانگین ماه قبل</small></h3><div class="legend"><span><i style="background:var(--gold-hi)"></i>امروز</span><span><i style="background:var(--blue-hi)"></i>دیروز</span><span><i style="background:rgba(198,200,207,.35)"></i>ماه قبل</span></div></div>
+        <div class="dfx">${DEFECT_RATE.map((r) => { const better = r.d <= r.y; const vsM = ((r.d - r.m) / r.m) * 100; const mx = 4; return `<div class="dfx-r">
+          <b>${r.u}</b>
+          <div class="dfx-bars"><i style="width:${(r.d / mx) * 100}%;background:linear-gradient(270deg,#b98532,#fbe7b6)"></i><i style="width:${(r.y / mx) * 100}%;background:var(--blue-hi);opacity:.7"></i><i style="width:${(r.m / mx) * 100}%;background:rgba(198,200,207,.3)"></i></div>
+          <span class="num">${fa(r.d, 1)}</span>
+          ${chip(better ? 'ok' : 'crit', `${better ? '▼ بهبود' : '▲ بدتر'} ${fa(Math.abs(vsM), 0)}٪ نسبت به ماه قبل`)}
+        </div>`; }).join('')}</div></div>
       <div class="card mt"><div class="ch"><h3>جدول مراکز هزینه</h3><small class="muted">مبالغ به میلیون تومان · ماه جاری</small></div>
         <div class="scroll-x"><table class="tbl"><thead><tr><th>ایستگاه</th><th>پرسنل</th><th>طلای در جریان</th><th>افت</th><th>هزینه ماه</th><th>بهره‌وری</th><th style="width:22%"></th></tr></thead><tbody>
         ${STATIONS.map((s) => `<tr><td><div class="who"><div class="av">${I[s.icon].replace('<svg', '<svg width="14" height="14"')}</div>${s.name}</div></td><td class="num">${fa(s.staff)}</td><td class="num">${fa(s.wip, 1)} کیلو</td><td class="num ${s.loss > 0.15 ? 'down' : ''}">${fa(s.loss, 2)}٪</td><td class="num">${fa(s.cost)}</td><td class="num">${fa(s.util)}٪</td><td><div class="meter"><i style="width:${s.util}%"></i></div></td></tr>`).join('')}
@@ -304,9 +311,9 @@ function treasury() {
             ${[['۰۸:۱۲', 'تحویل آب‌شده به ریخته‌گری', 'خروج', -4.2], ['۰۹:۴۰', 'ورود محصول از آبکاری', 'ورود', 2.41], ['۱۰:۵۵', 'فروش — گالری ارغوان', 'خروج', -0.482], ['۱۱:۲۰', 'خرید طلای آب‌شده — بانک', 'ورود', 5], ['۱۲:۰۵', 'برگشت از نمایندگی مشهد', 'ورود', 0.049], ['۱۳:۳۰', 'تحویل به تراش CNC', 'خروج', -1.8]].map(([h, t, k, w]) => `<tr><td class="num muted">${h}</td><td>${t}</td><td>${chip(w > 0 ? 'ok' : 'gold', k)}</td><td class="end num ${w > 0 ? 'up' : ''}"><span dir="ltr">${w > 0 ? '+' : '−'}${fa(Math.abs(w), 3)}</span> کیلو</td></tr>`).join('')}
           </tbody></table></div></div>
       </div>
-      <div class="card mt"><div class="ch"><h3>موجودی بر اساس کد کالا <small>هر مدل در هر مرحله یک کد دارد</small></h3><div class="tabs"><button class="on">همه مراحل</button><button>ریخته‌گری</button><button>ساخت</button><button>آماده فروش</button></div></div>
-        <div class="scroll-x"><table class="tbl"><thead><tr><th>کد کالا</th><th>شرح</th><th>مرحله</th><th>تعداد</th><th>وزن</th><th class="end">ارزش لحظه‌ای</th></tr></thead><tbody>
-        ${CODES.map((c) => `<tr><td><span class="chip gold en" style="font-family:ui-monospace,monospace;letter-spacing:.04em">${c.c}</span></td><td>${c.n}</td><td class="muted">${c.st}</td><td class="num">${fa(c.q)}</td><td class="num">${fa(c.kg, 2)} کیلو</td><td class="end num" data-kg="${c.kg}">${fa((c.kg * 1000 * live.g18) / 1e9, 2)} میلیارد</td></tr>`).join('')}
+      <div class="card mt"><div class="ch"><h3>گردش خزانه بر اساس کد کالا <small>ورود، خروج و مرجوعی هر کد — امروز</small></h3><div class="tabs"><button class="on">همه مراحل</button><button>ریخته‌گری</button><button>ساخت</button><button>آماده فروش</button></div></div>
+        <div class="scroll-x"><table class="tbl"><thead><tr><th>کد کالا</th><th>شرح</th><th>مرحله</th><th>ورود</th><th>خروج</th><th>مرجوعی</th><th>مانده</th><th>وزن</th><th class="end">ارزش لحظه‌ای</th></tr></thead><tbody>
+        ${CODES.map((c) => `<tr><td><span class="chip gold en" style="font-family:ui-monospace,monospace;letter-spacing:.04em">${c.c}</span></td><td>${c.n}</td><td class="muted">${c.st}</td><td class="num up">+${fa(c.in)}</td><td class="num">−${fa(c.out)}</td><td class="num" style="color:var(--warn)">${c.ret ? fa(c.ret) : '—'}</td><td class="num"><b>${fa(c.q)}</b></td><td class="num">${fa(c.kg, 2)} کیلو</td><td class="end num" data-kg="${c.kg}">${fa((c.kg * 1000 * live.g18) / 1e9, 2)} میلیارد</td></tr>`).join('')}
         </tbody></table></div></div>
     </section>`,
     mount(root) {

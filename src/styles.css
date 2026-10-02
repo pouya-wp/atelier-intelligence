@@ -720,3 +720,12 @@ body { background: var(--ink); font-weight: 500; }
 .agent p, .feed .it, .report, .lg-lead p { font-weight: 500; }
 .kpi .val, .hero .big, .lg-strip b, .hero .stats b, .agent .metric b, .receipt .tot b { font-weight: 500; }
 .head h2 { font-weight: 500; }
+
+.dfx { display: grid; gap: 6px; }
+.dfx-r { display: grid; grid-template-columns: 110px 1fr 46px 210px; gap: 16px; align-items: center; padding: 10px 4px; border-bottom: 1px solid var(--line); font-size: 13px; }
+.dfx-r:last-child { border: 0; }
+.dfx-bars { display: grid; gap: 3px; }
+.dfx-bars i { display: block; height: 5px; border-radius: 3px; transform-origin: right; animation: grow 1.3s var(--ease) both; }
+.dfx-r .num { font-size: 18px; font-weight: 500; }
+.dfx-r .chip { justify-self: end; }
+@media (max-width: 900px) { .dfx-r { grid-template-columns: 1fr auto; } .dfx-bars { grid-column: span 2; } .dfx-r .chip { grid-column: span 2; justify-self: start; } }
