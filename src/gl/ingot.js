@@ -27,7 +27,16 @@ export function makeRenderer(canvas) {
 // Studio HDRI + hard-edged softbox strips → crisp, high-contrast jewellery reflections.
 let hdrPromise;
 function loadHDR() {
-  hdrPromise ||= new EXRLoader().loadAsync(studioHDR).then((t) => { t.mapping = THREE.EquirectangularReflectionMapping; return t; });
+  // decode the embedded EXR directly (no fetch — works inside sandboxed frames)
+  hdrPromise ||= Promise.resolve().then(() => {
+    const bin = atob(studioHDR.slice(studioHDR.indexOf(',') + 1));
+    const buf = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+    const loader = new EXRLoader(), d = loader.parse(buf.buffer);
+    const t = new THREE.DataTexture(d.data, d.width, d.height, d.format, d.type);
+    t.colorSpace = THREE.LinearSRGBColorSpace; t.minFilter = t.magFilter = THREE.LinearFilter; t.generateMipmaps = false; t.flipY = false;
+    t.mapping = THREE.EquirectangularReflectionMapping; t.needsUpdate = true;
+    return t;
+  });
   return hdrPromise;
 }
 export function studioEnv(renderer, scene) {

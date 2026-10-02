@@ -177,7 +177,7 @@ function go(id, force) {
   });
   const sw = $('#sweep'); sw.classList.remove('go'); void sw.offsetWidth; sw.classList.add('go');
   cleanup = v.mount ? v.mount(main) : null;
-  if (location.hash !== `#${id}`) history.replaceState(null, '', `#${id}`);
+  if (location.hash !== `#${id}`) { try { history.replaceState(null, '', `#${id}`); } catch { /* sandboxed frame */ } }
 }
 addEventListener('hashchange', () => { go(location.hash.slice(1)); sfx.whoosh(0.6, true); });
 
