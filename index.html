@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aghigh Gold Atelier</title>
+  <meta name="description" content="Aghigh Gold — AI agent command center (demo)" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><path d='M32 3 57 18v28L32 61 7 46V18z' fill='%23d4af6a'/></svg>" />
+</head>
+<body>
+  <canvas id="bg"></canvas>
+  <div class="vignette"></div>
+  <div class="grain"></div>
+  <canvas id="dust"></canvas>
+
+  <!-- vault intro -->
+  <div id="boot">
+    <div class="boot-inner">
+      <div class="boot-brand">
+        <span class="caps muted en">Est. Yazd · Three decades of gold</span>
+        <h1 class="gold-text">طلای عقیق</h1>
+        <span class="sub en">AGHIGH GOLD · ATELIER INTELLIGENCE</span>
+      </div>
+      <div class="vault" id="vault">
+        <svg viewBox="0 0 400 400" id="vaultSvg"></svg>
+        <button class="seal" id="seal" aria-label="ورود"></button>
+      </div>
+      <div class="boot-hint" id="bootHint">مهر طلایی را <b class="gold-text">نگه دارید</b> تا خزانه باز شود</div>
+      <div class="boot-log" id="bootLog"></div>
+    </div>
+  </div>
+
+  <div class="flash" id="flash"></div>
+  <div class="iris" id="iris"></div>
+  <div class="curtain" id="curtain"><div class="bar"></div><div class="lbl" id="curtainLbl"></div></div>
+  <div class="toasts" id="toasts"></div>
+
+  <div id="app">
+    <aside class="side">
+      <div class="brand"><div class="mark"></div><div><div class="t1 gold-text">طلای عقیق</div><div class="t2 en">ATELIER · AI</div></div></div>
+      <nav class="nav" id="nav"></nav>
+      <div class="side-foot">
+        <div class="agent-pulse">
+          <div class="row"><span>ایجنت‌ها</span><span><span class="dot"></span> ۱۴ فعال</span></div>
+          <div class="row"><span>رایورز</span><span class="up">همگام</span></div>
+          <div class="row"><span>بار پردازش</span><span class="num" id="load">۳۸٪</span></div>
+        </div>
+      </div>
+    </aside>
+    <header class="top">
+      <div class="ticker"><div class="ticker-track" id="ticker"></div></div>
+      <div class="top-actions">
+        <div class="roles" id="roles"><span class="pill"></span></div>
+        <div class="clock"><div class="t num" id="clockT"></div><div class="d" id="clockD"></div></div>
+        <button class="iconbtn" id="muteBtn" title="صدا"></button>
+        <button class="iconbtn" id="bellBtn" title="اعلان‌ها"></button>
+        <div class="me"><div class="avatar">م</div></div>
+      </div>
+    </header>
+    <main id="main"></main>
+  </div>
+  <nav class="mobile-nav" id="mnav"></nav>
+
+  <div class="dock" id="dock">
+    <div class="orbwrap" id="orbBtn" title="دستیار سخنگو (Space)"><canvas id="orb"></canvas></div>
+    <div class="say" id="say">«عقیق» گوش می‌دهد — روی گوی طلایی بزنید یا <kbd>Space</kbd></div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
