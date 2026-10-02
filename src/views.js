@@ -1,6 +1,6 @@
 import { I } from './icons.js';
 import { fa, toman, sparkline, areaChart, donut, bars, countUp, rand } from './util.js';
-import { OWNER, AGENTS, STATIONS, ADMIN_UNITS, STAFF, DUE, TODOS, NEWS, STOCK, MAKERS, RETURNS, DEFECTS, ORDERS_ANOMALY, CODES } from './data.js';
+import { OWNER, AGENTS, STATIONS, ADMIN_UNITS, STAFF, DUE, TODOS, NEWS, STOCK, MAKERS, RETURNS, DEFECTS, ORDERS_ANOMALY, CODES, ORDER_CHECK } from './data.js';
 import { live, onPrice } from './price.js';
 import { createIngotScene } from './gl/ingot.js';
 import { createStudio } from './gl/studio.js';
@@ -349,6 +349,11 @@ function warehouse() {
   return {
     html: `<section class="view">
       ${head('INVENTORY', 'انبار، تولیدی‌ها، <b>مرجوعی و خرابی</b>', 'ایجنت موجودی، کمبود را قبل از توقف خط پیش‌بینی می‌کند.', `<button class="btn" data-sfx data-toast="درخواست خرید برای ۳ قلم ارسال شد">${I.cart} سفارش خودکار کمبودها</button>`)}
+      <div class="card" style="margin-bottom:18px"><div class="ch"><h3>${I.alert.replace('<svg', '<svg width="16"')} تطبیق سفارش با موجودی <small>سفارش بیشتر از موجودی انبار = اطلاع فوری به مدیر</small></h3>${chip('crit', `${fa(ORDER_CHECK.filter((x) => x.o > x.st).length)} سفارش بیش از موجودی`)}</div>
+        <div>${ORDER_CHECK.map((x) => `<div class="ovs ${x.o > x.st ? 'over' : ''}">
+          <div class="ovs-t"><b>${x.who}</b><span class="muted">${x.n} · <span style="font-family:ui-monospace,monospace;font-size:11px" dir="ltr">${x.code}</span></span></div>
+          <div class="ovs-m"><div class="meter"><i style="width:${Math.min(100, (x.o / x.st) * 100)}%"></i></div><span class="num">${fa(x.o)} سفارش از ${fa(x.st)} موجود</span></div>
+          ${x.o > x.st ? chip('crit', `کسری ${fa(x.o - x.st)} عدد`) : chip('ok', 'پوشش کامل')}</div>`).join('')}</div></div>
       <div class="grid">
         <div class="card c7"><div class="ch"><h3>موجودی انبار</h3>${chip('warn', '۳ قلم زیر حد')}</div>
           <div style="display:grid;gap:16px">${STOCK.map((s) => `<div style="display:grid;grid-template-columns:1fr auto;gap:8px 14px;align-items:center"><span style="font-size:13px">${s.n}</span><span class="num" style="font-size:12.5px">${s.q} ${chip(s.st, s.st === 'ok' ? 'کافی' : s.st === 'warn' ? 'رو به اتمام' : 'بحرانی')}</span><div class="meter" style="grid-column:span 2"><i style="width:${s.lvl}%;${s.st === 'crit' ? 'background:linear-gradient(90deg,#7a1f16,#e2664f)' : ''}"></i></div></div>`).join('')}</div></div>

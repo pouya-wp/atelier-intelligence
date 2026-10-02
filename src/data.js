@@ -143,3 +143,11 @@ export const CODES = [
   { c: 'AG-ST-310-P', n: 'سرویس عروس «کویر»', st: 'آبکاری', q: 14, kg: 1.12 },
   { c: 'AG-PD-055-F', n: 'پلاک CNC «نقش جهان»', st: 'آماده فروش', q: 430, kg: 1.94 },
 ];
+
+// orders checked against warehouse stock — anything above stock alerts the owner
+export const ORDER_CHECK = [
+  { who: 'گالری ماهان — کرمان', code: 'AG-BN-118-F', n: 'النگو ماشینی ۱۸ گرمی', o: 480, st: 312 },
+  { who: 'نمایندگی شیراز', code: 'AG-CH-042-M', n: 'زنجیر کارتیه ۴۲', o: 220, st: 520 },
+  { who: 'طلای پارسیان — مشهد', code: 'AG-PD-055-F', n: 'پلاک «نقش جهان»', o: 150, st: 430 },
+  { who: 'گالری ارغوان', code: 'AG-ST-310-P', n: 'سرویس عروس «کویر»', o: 20, st: 14 },
+];
