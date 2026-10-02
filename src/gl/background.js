@@ -43,15 +43,16 @@ void main(){
   // faint top-left rim so folds read even far from the cursor
   vec3 K = normalize(vec3(-.6,.8,.7));
   col += gold*pow(max(dot(n,normalize(K+V)),0.),90.)*.10*ridge;
-  col += vec3(.38,.06,.03)*smoothstep(.42,.2,h)*.03;
+  col += vec3(.10,.22,.48)*smoothstep(.5,.15,h)*.10;
+  col += vec3(.05,.09,.18)*diff*.35;
   col *= uIntensity;
   col += goldHi*uPulse*fall*.6;
   // vignette + tone
   float vg = smoothstep(1.25,.25,length(uv-.5));
-  col *= mix(.35,1.,vg);
+  col *= mix(.55,1.,vg);
   col = col/(1.+col);
   col = pow(col, vec3(.92));
-  gl_FragColor = vec4(col + vec3(.006,.005,.005), 1.);
+  gl_FragColor = vec4(col + vec3(.022,.034,.062), 1.);
 }`;
 
 export function createBackground(canvas) {

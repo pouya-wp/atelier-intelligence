@@ -1,6 +1,6 @@
 import { I } from './icons.js';
 import { fa, toman, sparkline, areaChart, donut, bars, countUp, rand } from './util.js';
-import { OWNER, AGENTS, STATIONS, ADMIN_UNITS, STAFF, DUE, TODOS, NEWS, STOCK, MAKERS, RETURNS, DEFECTS, ORDERS_ANOMALY, CODES, ORDER_CHECK } from './data.js';
+import { OWNER, AGENTS, STATIONS, ADMIN_UNITS, STAFF, DUE, TODOS, NEWS, STOCK, MAKERS, RETURNS, DEFECTS, ORDERS_ANOMALY, CODES, ORDER_CHECK, FINDINGS } from './data.js';
 import { live, onPrice } from './price.js';
 import { createIngotScene } from './gl/ingot.js';
 import { createStudio } from './gl/studio.js';
@@ -30,7 +30,7 @@ function overview(role) {
       <div class="card hero gold" data-tilt="0">
         <canvas class="gl" id="ingot"></canvas>
         <div class="hero-copy">
-          <div class="greet">${greet}، آقای ${OWNER.short} — امروز ${new Date().toLocaleDateString('fa-IR-u-ca-persian', { weekday: 'long', day: 'numeric', month: 'long' })}</div>
+          <div class="greet">${greet} ${OWNER.call} — امروز ${new Date().toLocaleDateString('fa-IR-u-ca-persian', { weekday: 'long', day: 'numeric', month: 'long' })}</div>
           <div class="caps muted" style="margin-top:6px">ارزش لحظه‌ای کل طلای در گردش</div>
           <div class="big num gold-text" id="heroVal">—</div>
           <div class="stats">
@@ -79,9 +79,10 @@ function overview(role) {
           <div class="ch"><h3>جریان زنده ایجنت‌ها</h3>${chip('ok', 'زنده')}</div>
           <div class="feed" id="feed"></div>
         </div>
-        <div class="card c4">
-          <div class="ch"><h3>فروش هفته <small>کیلوگرم</small></h3></div>
-          ${bars([6.2, 7.1, 5.4, 8.8, 7.9, 9.6, 7.84], days, { hi: 5, fmt: (v) => fa(v, 1) })}
+        <div class="card c4 inspector">
+          <div class="ch"><h3>${I.lock.replace('<svg', '<svg width="15"')} بازرس ویژه <small>نسخه اختصاصی ${OWNER.call}</small></h3>${chip('warn', `${fa(FINDINGS.length)} یافته`)}</div>
+          <div class="finds">${FINDINGS.map((f) => `<div class="fd ${f.lvl}"><b>${f.t}</b><span>${f.d}</span></div>`).join('')}</div>
+          <button class="btn ghost" data-speak style="margin-top:14px;width:100%;justify-content:center">${I.sound} گزارش بازرس را بشنو</button>
         </div>
         <div class="card c3">
           <div class="ch"><h3>ترکیب خزانه</h3></div>
@@ -90,7 +91,7 @@ function overview(role) {
             <div><i style="background:#f7e4b5"></i><span>محصول ساخته</span><b class="num">۸۲٫۱</b></div>
             <div><i style="background:#d4af6a"></i><span>آب‌شده</span><b class="num">۶۱٫۲</b></div>
             <div><i style="background:#8a6a2f"></i><span>در جریان تولید</span><b class="num">۳۲٫۷</b></div>
-            <div><i style="background:#b23a2e"></i><span>سکه و شمش</span><b class="num">۱۰٫۴</b></div>
+            <div><i style="background:#4f7fc9"></i><span>سکه و شمش</span><b class="num">۱۰٫۴</b></div>
           </div>
         </div>
       </div>
@@ -100,7 +101,7 @@ function overview(role) {
       const gl = createIngotScene(root.querySelector('#ingot'));
       areaChart(root.querySelector('#priceChart'), series(48, live.g18 * 0.985, 22000, 0.08).map((v) => Math.round(v)), hoursLbl, { fmt: (v) => `${fa(v)} تومان` });
       donut(root.querySelector('#vaultDonut'), [
-        { l: 'محصول ساخته', v: 82.1, c: '#f7e4b5' }, { l: 'آب‌شده', v: 61.2, c: '#d4af6a' }, { l: 'در جریان تولید', v: 32.7, c: '#8a6a2f' }, { l: 'سکه و شمش', v: 10.4, c: '#b23a2e' },
+        { l: 'محصول ساخته', v: 82.1, c: '#f7e4b5' }, { l: 'آب‌شده', v: 61.2, c: '#d4af6a' }, { l: 'در جریان تولید', v: 32.7, c: '#8a6a2f' }, { l: 'سکه و شمش', v: 10.4, c: '#4f7fc9' },
       ], { size: 170, center: '۱۸۶٫۴' });
       const heroVal = root.querySelector('#heroVal');
       const setHero = () => { heroVal.innerHTML = `${fa((186420 * live.g18) / 1e12, 3)} <small>هزار میلیارد تومان</small>`; };
@@ -296,7 +297,7 @@ function treasury() {
             <div><i style="background:#f7e4b5"></i><span>محصول ساخته</span><b class="num">۸۲٫۱ کیلو</b></div>
             <div><i style="background:#d4af6a"></i><span>آب‌شده ۷۵۰</span><b class="num">۶۱٫۲ کیلو</b></div>
             <div><i style="background:#8a6a2f"></i><span>در جریان تولید</span><b class="num">۳۲٫۷ کیلو</b></div>
-            <div><i style="background:#b23a2e"></i><span>سکه و شمش</span><b class="num">۱۰٫۴ کیلو</b></div>
+            <div><i style="background:#4f7fc9"></i><span>سکه و شمش</span><b class="num">۱۰٫۴ کیلو</b></div>
           </div></div>
         <div class="card c7"><div class="ch"><h3>ورود و خروج امروز</h3>${chip('ok', 'تراز')}</div>
           <div class="scroll-x"><table class="tbl"><thead><tr><th>ساعت</th><th>شرح</th><th>نوع</th><th class="end">وزن</th></tr></thead><tbody>
@@ -310,7 +311,7 @@ function treasury() {
     </section>`,
     mount(root) {
       countUp(root);
-      donut(root.querySelector('#d2'), [{ l: 'محصول ساخته', v: 82.1, c: '#f7e4b5' }, { l: 'آب‌شده', v: 61.2, c: '#d4af6a' }, { l: 'در جریان تولید', v: 32.7, c: '#8a6a2f' }, { l: 'سکه و شمش', v: 10.4, c: '#b23a2e' }], { size: 200, center: '۱۸۶٫۴' });
+      donut(root.querySelector('#d2'), [{ l: 'محصول ساخته', v: 82.1, c: '#f7e4b5' }, { l: 'آب‌شده', v: 61.2, c: '#d4af6a' }, { l: 'در جریان تولید', v: 32.7, c: '#8a6a2f' }, { l: 'سکه و شمش', v: 10.4, c: '#4f7fc9' }], { size: 200, center: '۱۸۶٫۴' });
       const set = () => {
         root.querySelector('#tv').textContent = `${fa((186420 * live.g18) / 1e9, 1)} میلیارد تومان`;
         root.querySelectorAll('[data-kg]').forEach((el) => { el.textContent = `${fa((+el.dataset.kg * 1000 * live.g18) / 1e9, 2)} میلیارد`; });
@@ -509,10 +510,10 @@ function market() {
 }
 
 export function reportText() {
-  return `<b>جمع‌بندی امروز، آقای ${OWNER.short}:</b> قیمت هر گرم طلای ۱۸ عیار به <span class="hl num">${fa(live.g18)} تومان</span> رسید و انس جهانی روی <span class="hl num">${fa(live.ounce, 1)} دلار</span> است.
+  return `<b>${OWNER.call}، گزارش بازرس امروز:</b> قیمت هر گرم طلای ۱۸ عیار به <span class="hl num">${fa(live.g18)} تومان</span> رسید و انس جهانی روی <span class="hl num">${fa(live.ounce, 1)} دلار</span> است.
   فروش امروز <b>۷٫۸۴ کیلوگرم</b> بود؛ <span class="hl">۹٪ بیشتر</span> از دیروز. ارزش کل طلای در گردش <span class="hl num">${fa((186420 * live.g18) / 1e12, 3)} هزار میلیارد تومان</span> است.
   افت کل خط <b>۰٫۶۶٪</b> بود و واحد <b>ساخت</b> با ۰٫۲۱٪ بالاتر از استاندارد است. ۱۴۲ نفر از ۱۵۰ نفر حاضر بودند و ۲۳ نفر غذای اضافه‌کاری دریافت می‌کنند.
-  فردا یک چک دریافتی <b>۱٫۸۵ میلیارد تومانی</b> از گالری ارغوان دارید؛ معادل حدود <span class="hl num">${fa(goldEq(1_850_000_000))} گرم طلا</span>. سفارش چهار برابری نمایندگی کرمان منتظر تأیید شماست.`;
+  فردا یک چک دریافتی <b>۱٫۸۵ میلیارد تومانی</b> از گالری ارغوان دارید؛ معادل حدود <span class="hl num">${fa(goldEq(1_850_000_000))} گرم طلا</span>. سفارش چهار برابری نمایندگی کرمان منتظر تأیید شماست. از نظر نظارتی: در تحویل خزانه به تراش CNC اختلاف ۱۲ گرمی دیدم که باید بررسی شود.`;
 }
 
 // ---------------------------------------------------------------- daily report (editorial)
@@ -521,12 +522,12 @@ function report() {
   const date = d.toLocaleDateString('fa-IR-u-ca-persian', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   return {
     html: `<section class="view">
-      ${head('THE DAILY LEDGER', 'گزارش روزانه <b>مدیریتی</b>', 'هر شب ساعت ۲۱ ایجنت گزارش‌نویس این برگه را خودکار می‌نویسد و برای مدیر می‌فرستد؛ با قیمت‌ها، فروش، تولید، خزانه، پرسنل و هشدارها.', `<button class="btn ghost" data-sfx data-toast="نسخه PDF آماده دانلود است">${I.report} دریافت PDF</button><button class="btn" data-speak>${I.sound} بخوان برایم</button>`)}
+      ${head('THE DAILY LEDGER', 'گزارش روزانه <b>مدیریتی</b>', `هر شب ساعت ۲۱ بازرس ویژه این برگه را خودکار می‌نویسد و با صدای خودش برای ${OWNER.call} می‌خواند؛ قیمت‌ها، فروش، تولید، خزانه، پرسنل و یافته‌های نظارتی.`, `<button class="btn ghost" data-sfx data-toast="نسخه PDF آماده دانلود است">${I.report} دریافت PDF</button><button class="btn" data-speak>${I.sound} بخوان برایم</button>`)}
       <article class="ledger card">
         <header class="lg-mast">
           <span class="en">VOL. XXXI · AGHIGH GOLD · YAZD</span>
           <h1 class="metal">برگ روزانه عقیق</h1>
-          <span>${date} · محرمانه — فقط برای آقای ${OWNER.short}</span>
+          <span>${date} · نسخه اختصاصی ${OWNER.call} — محرمانه</span>
         </header>
         <div class="lg-strip">
           <div><span>هر گرم ۱۸ عیار</span><b class="num" data-live="g18">${fa(live.g18)}</b><small>تومان</small></div>
@@ -536,7 +537,7 @@ function report() {
         </div>
         <div class="lg-body">
           <div class="lg-lead">
-            <span class="lg-kicker">سرمقاله ایجنت</span>
+            <span class="lg-kicker">سرمقاله بازرس ویژه</span>
             <h2>فروش ۹٪ بالاتر از دیروز؛ واحد ساخت زیر ذره‌بین</h2>
             <p class="lg-drop">امروز ۷٫۸۴ کیلوگرم طلا فروخته شد که بیشترین رقم این هفته است. ارزش کل طلای در گردش به ${fa((186420 * live.g18) / 1e12, 3)} هزار میلیارد تومان رسید. افت کل خط ۰٫۶۶٪ بود، اما واحد ساخت با ۰٫۲۱٪ برای سومین روز پیاپی بالاتر از استاندارد است و پیشنهاد می‌شود فرایند لحیم‌کاری بازبینی شود.</p>
             <p>سفارش ۴٫۸ کیلویی نمایندگی کرمان چهار برابر میانگین ۳۰ روزه آن است و تا تأیید شما در صف نگه داشته شده. موجودی کد AG-BN-118-F برای پوشش این سفارش ۱۶۸ عدد کسری دارد.</p>
@@ -565,7 +566,7 @@ function report() {
             <p class="lg-small">انس جهانی پس از داده‌های اشتغال آمریکا رشد کرد؛ ایجنت رصد بازار برای فردا روند ملایم صعودی پیش‌بینی می‌کند.</p>
           </div>
         </div>
-        <footer class="lg-foot"><span>نوشته‌شده توسط ایجنت گزارش‌نویس · ارسال خودکار ۲۱:۰۰</span><span class="en">— Aghigh Atelier Intelligence —</span></footer>
+        <footer class="lg-foot"><span>نوشته و خوانده‌شده توسط بازرس ویژه · ارسال خودکار ۲۱:۰۰</span><span class="en">— Aghigh Atelier Intelligence —</span></footer>
       </article>
     </section>`,
     mount(root) {

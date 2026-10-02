@@ -33,7 +33,7 @@ export function createConstellation(wrap, agents, { onPulse } = {}) {
     // orbits
     rings.forEach((k, i) => {
       g.beginPath(); g.ellipse(cx, cy, rx * k, ry * k, 0, 0, Math.PI * 2);
-      g.strokeStyle = `rgba(214,178,110,${0.10 + i * 0.03})`; g.lineWidth = 1; g.setLineDash(i === 1 ? [2, 6] : []); g.stroke();
+      g.strokeStyle = i === 1 ? 'rgba(143,178,234,.22)' : `rgba(214,178,110,${0.12 + i * 0.03})`; g.lineWidth = 1; g.setLineDash(i === 1 ? [2, 6] : []); g.stroke();
     });
     g.setLineDash([]);
     const prev = hover; hover = null;

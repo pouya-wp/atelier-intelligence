@@ -1,5 +1,5 @@
 // Demo data — numbers are illustrative, prices are simulated live.
-export const OWNER = { name: 'محمدرضا قدیرزاده', short: 'قدیرزاده', initials: 'م‌ق' };
+export const OWNER = { name: 'محمدرضا قدیرزاده', short: 'قدیرزاده', call: 'آقا رضا', initials: 'م‌ق' };
 
 export const PRICE = {
   g18: 11_840_000, // per gram 18k, toman
@@ -47,7 +47,7 @@ export const AGENTS = [
   { id: 'proc', name: 'خرید و تأمین', icon: 'cart', desc: 'نیاز خرید را از موجودی و برنامه تولید استخراج و پیشنهاد سفارش می‌دهد.', metric: 'پیشنهاد باز', val: '۶', st: 'ok' },
   { id: 'cost', name: 'هزینه و نگهداری', icon: 'wrench', desc: 'هزینه‌های نگهداری، مصرفی و سربار را به مراکز هزینه تسهیم می‌کند.', metric: 'این ماه', val: '۱٫۸ میلیارد', st: 'ok' },
   { id: 'rayvarz', name: 'پل رایورز', icon: 'sync', desc: 'اسناد را با نرم‌افزار حسابداری رایورز همگام می‌کند؛ بدون ورود دستی.', metric: 'آخرین همگام‌سازی', val: '۲ دقیقه پیش', st: 'ok' },
-  { id: 'voice', name: 'دستیار سخنگو', icon: 'mic', desc: 'با مدیر صحبت می‌کند؛ گزارش می‌دهد، می‌پرسد و دستور می‌گیرد.', metric: 'وضعیت', val: 'آماده', st: 'ok' },
+  { id: 'voice', name: 'بازرس ویژه', icon: 'mic', desc: 'دست راست آقا رضا؛ کل سازمان را نظارت می‌کند و هر روز گزارش خلاصه را با صدا می‌دهد. نسخه اختصاصی مدیر کل.', metric: 'یافته‌های امروز', val: '۳ مورد', st: 'warn' },
 ];
 
 // production line = cost centers, in flow order (from the owner's voice notes)
@@ -151,4 +151,11 @@ export const ORDER_CHECK = [
   { who: 'نمایندگی شیراز', code: 'AG-CH-042-M', n: 'زنجیر کارتیه ۴۲', o: 220, st: 520 },
   { who: 'طلای پارسیان — مشهد', code: 'AG-PD-055-F', n: 'پلاک «نقش جهان»', o: 150, st: 430 },
   { who: 'گالری ارغوان', code: 'AG-ST-310-P', n: 'سرویس عروس «کویر»', o: 20, st: 14 },
+];
+
+// the owner-only inspector agent — oversight findings across the organization
+export const FINDINGS = [
+  { lvl: 'crit', t: 'اختلاف ۱۲ گرمی در تحویل خزانه به تراش CNC', d: 'ساعت ۱۳:۳۰ — وزن تحویلی و دریافتی هم‌خوان نیست؛ ترازوی ایستگاه ۴ بررسی شود.' },
+  { lvl: 'warn', t: 'افت واحد ساخت، سومین روز پیاپی بالاتر از استاندارد', d: '۰٫۲۱٪ در برابر حد ۰٫۱۵٪ — بیشترین افت در شیفت عصر.' },
+  { lvl: 'warn', t: '۳ ورود دیرهنگام تکراری در واحد پرداخت', d: 'الگوی هفتگی؛ پیشنهاد گفت‌وگو با سرپرست واحد.' },
 ];

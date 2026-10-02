@@ -103,7 +103,7 @@ let lastT = performance.now();
 
 function openVault() {
   unlocked = true; holding = false;
-  sfx.unlock(); bg.pulse(2.5); bg.setIntensity(1);
+  sfx.unlock(); bg.pulse(2.5); bg.setIntensity(1.25);
   const fl = $('#flash'); fl.classList.add('go');
   const iris = $('#iris'); iris.classList.add('on');
   iris.innerHTML = Array.from({ length: 10 }, () => '<i></i>').join('');
@@ -115,7 +115,7 @@ function openVault() {
   });
   setTimeout(() => { $('#app').classList.add('in'); document.body.classList.add('unlocked'); }, 450);
   setTimeout(() => { iris.remove(); sfx.startDrone(); }, 1900);
-  setTimeout(() => toast('خوش آمدید، آقای ' + OWNER.short, 'خزانه باز شد. ۱۴ ایجنت گزارش آماده دارند.', 'vault'), 1600);
+  setTimeout(() => toast(`خوش آمدید ${OWNER.call}`, 'خزانه باز شد. بازرس ویژه گزارش امروز را آماده کرده است.', 'vault'), 1600);
   setTimeout(() => { sfx.alarm(); toast('نگهبان سفارش — هشدار', `سفارش ${ORDERS_ANOMALY.who}: ${fa(ORDERS_ANOMALY.x)} برابر حد نرمال`, 'alert', 'crit'); }, 7000);
 }
 
@@ -294,7 +294,7 @@ function stopTalk() {
   talking = false; clearInterval(talkTimer); orb.setEnergy(0);
   if ('speechSynthesis' in window) speechSynthesis.cancel();
   $('#dock').classList.remove('talking');
-  $('#say').innerHTML = 'دستیار سخنگو <kbd>Space</kbd>';
+  $('#say').innerHTML = 'بازرس ویژه <kbd>Space</kbd>';
 }
 $('#orbBtn').addEventListener('click', () => { sfx.click(); speak(); });
 addEventListener('keydown', (e) => { if (unlocked && e.code === 'Space' && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); speak(); } });
@@ -302,7 +302,7 @@ addEventListener('keydown', (e) => { if (unlocked && e.code === 'Space' && !/INP
 /* ------------------------------------------------ Boot */
 renderRoles(); renderNav(); ticker(); clock();
 if (new URLSearchParams(location.search).has('open')) { // skip the vault (handy for presenting a specific page)
-  unlocked = true; $('#boot').remove(); $('#iris').remove(); bg.setIntensity(1);
+  unlocked = true; $('#boot').remove(); $('#iris').remove(); bg.setIntensity(1.25);
   $('#app').classList.add('in'); document.body.classList.add('unlocked');
 }
 go(location.hash.slice(1) || 'overview', true);
