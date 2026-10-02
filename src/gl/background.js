@@ -43,8 +43,8 @@ void main(){
   // faint top-left rim so folds read even far from the cursor
   vec3 K = normalize(vec3(-.6,.8,.7));
   col += gold*pow(max(dot(n,normalize(K+V)),0.),90.)*.10*ridge;
-  col += vec3(.16,.36,.62)*smoothstep(.5,.15,h)*.09;
-  col += vec3(.04,.12,.21)*diff*.45;
+  col += vec3(.04,.12,.21)*smoothstep(.45,.15,h)*.35; // brand navy, troughs only
+  col += vec3(.06,.055,.05)*diff*.5;
   col *= uIntensity;
   col += goldHi*uPulse*fall*.6;
   // vignette + tone
@@ -52,7 +52,7 @@ void main(){
   col *= mix(.55,1.,vg);
   col = col/(1.+col);
   col = pow(col, vec3(.92));
-  gl_FragColor = vec4(col + vec3(.026,.078,.137), 1.); // brand navy #0A1E35 floor
+  gl_FragColor = vec4(col + vec3(.045,.045,.05), 1.);
 }`;
 
 export function createBackground(canvas) {

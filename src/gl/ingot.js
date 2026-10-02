@@ -44,7 +44,7 @@ export function studioEnv(renderer, scene) {
   });
 }
 
-const fontReady = () => (document.fonts ? Promise.all([document.fonts.load('800 70px Doran'), document.fonts.load('500 40px Doran')]).catch(() => {}) : Promise.resolve());
+const fontReady = () => (document.fonts ? Promise.all([document.fonts.load('800 70px Meem'), document.fonts.load('500 40px Meem')]).catch(() => {}) : Promise.resolve());
 
 // stamp: white = engraved & frosted, black = mirror polish
 function stampTexture() {
@@ -55,11 +55,11 @@ function stampTexture() {
     g.fillStyle = '#000'; g.fillRect(0, 0, 1024, 512);
     g.strokeStyle = '#fff'; g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle';
     g.lineWidth = 5; g.strokeRect(36, 36, 952, 440);
-    g.font = '800 64px Doran'; g.fillText('طلای عقیق', 512, 140);
+    g.font = '800 64px Meem'; g.fillText('طلای عقیق', 512, 140);
     g.font = '300 32px "Cormorant Garamond", Georgia, serif'; g.fillText('A G H I G H   G O L D', 512, 210);
     g.fillRect(372, 248, 280, 2);
-    g.font = '800 118px Doran'; g.fillText('999.9', 512, 330);
-    g.font = '500 32px Doran'; g.fillText('FINE GOLD  ·  1000 g  ·  YAZD', 512, 428);
+    g.font = '800 118px Meem'; g.fillText('999.9', 512, 330);
+    g.font = '500 32px Meem'; g.fillText('FINE GOLD  ·  1000 g  ·  YAZD', 512, 428);
     t.needsUpdate = true;
   };
   draw(); fontReady().then(draw);
@@ -76,8 +76,8 @@ function coinTexture() {
     g.lineWidth = 2; g.beginPath(); g.arc(256, 256, 212, 0, 7); g.stroke();
     for (let i = 0; i < 160; i++) { const a = (i / 160) * Math.PI * 2; g.beginPath(); g.moveTo(256 + Math.cos(a) * 218, 256 + Math.sin(a) * 218); g.lineTo(256 + Math.cos(a) * 230, 256 + Math.sin(a) * 230); g.stroke(); }
     g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.font = '800 120px Doran'; g.fillText('عقیق', 256, 230);
-    g.font = '500 30px Doran'; g.fillText('AGHIGH · 750', 256, 340);
+    g.font = '800 120px Meem'; g.fillText('عقیق', 256, 230);
+    g.font = '500 30px Meem'; g.fillText('AGHIGH · 750', 256, 340);
     t.needsUpdate = true;
   };
   draw(); fontReady().then(draw);
