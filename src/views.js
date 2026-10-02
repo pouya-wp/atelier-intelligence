@@ -91,7 +91,7 @@ function overview(role) {
             <div><i style="background:#f7e4b5"></i><span>محصول ساخته</span><b class="num">۸۲٫۱</b></div>
             <div><i style="background:#d4af6a"></i><span>آب‌شده</span><b class="num">۶۱٫۲</b></div>
             <div><i style="background:#8a6a2f"></i><span>در جریان تولید</span><b class="num">۳۲٫۷</b></div>
-            <div><i style="background:#4f7fc9"></i><span>سکه و شمش</span><b class="num">۱۰٫۴</b></div>
+            <div><i style="background:#6f97c8"></i><span>سکه و شمش</span><b class="num">۱۰٫۴</b></div>
           </div>
         </div>
       </div>
@@ -101,7 +101,7 @@ function overview(role) {
       const gl = createIngotScene(root.querySelector('#ingot'));
       areaChart(root.querySelector('#priceChart'), series(48, live.g18 * 0.985, 22000, 0.08).map((v) => Math.round(v)), hoursLbl, { fmt: (v) => `${fa(v)} تومان` });
       donut(root.querySelector('#vaultDonut'), [
-        { l: 'محصول ساخته', v: 82.1, c: '#f7e4b5' }, { l: 'آب‌شده', v: 61.2, c: '#d4af6a' }, { l: 'در جریان تولید', v: 32.7, c: '#8a6a2f' }, { l: 'سکه و شمش', v: 10.4, c: '#4f7fc9' },
+        { l: 'محصول ساخته', v: 82.1, c: '#f7e4b5' }, { l: 'آب‌شده', v: 61.2, c: '#d4af6a' }, { l: 'در جریان تولید', v: 32.7, c: '#8a6a2f' }, { l: 'سکه و شمش', v: 10.4, c: '#6f97c8' },
       ], { size: 170, center: '۱۸۶٫۴' });
       const heroVal = root.querySelector('#heroVal');
       const setHero = () => { heroVal.innerHTML = `${fa((186420 * live.g18) / 1e12, 3)} <small>هزار میلیارد تومان</small>`; };
@@ -304,7 +304,7 @@ function treasury() {
             <div><i style="background:#f7e4b5"></i><span>محصول ساخته</span><b class="num">۸۲٫۱ کیلو</b></div>
             <div><i style="background:#d4af6a"></i><span>آب‌شده ۷۵۰</span><b class="num">۶۱٫۲ کیلو</b></div>
             <div><i style="background:#8a6a2f"></i><span>در جریان تولید</span><b class="num">۳۲٫۷ کیلو</b></div>
-            <div><i style="background:#4f7fc9"></i><span>سکه و شمش</span><b class="num">۱۰٫۴ کیلو</b></div>
+            <div><i style="background:#6f97c8"></i><span>سکه و شمش</span><b class="num">۱۰٫۴ کیلو</b></div>
           </div></div>
         <div class="card c7"><div class="ch"><h3>ورود و خروج امروز</h3>${chip('ok', 'تراز')}</div>
           <div class="scroll-x"><table class="tbl"><thead><tr><th>ساعت</th><th>شرح</th><th>نوع</th><th class="end">وزن</th></tr></thead><tbody>
@@ -318,7 +318,7 @@ function treasury() {
     </section>`,
     mount(root) {
       countUp(root);
-      donut(root.querySelector('#d2'), [{ l: 'محصول ساخته', v: 82.1, c: '#f7e4b5' }, { l: 'آب‌شده', v: 61.2, c: '#d4af6a' }, { l: 'در جریان تولید', v: 32.7, c: '#8a6a2f' }, { l: 'سکه و شمش', v: 10.4, c: '#4f7fc9' }], { size: 200, center: '۱۸۶٫۴' });
+      donut(root.querySelector('#d2'), [{ l: 'محصول ساخته', v: 82.1, c: '#f7e4b5' }, { l: 'آب‌شده', v: 61.2, c: '#d4af6a' }, { l: 'در جریان تولید', v: 32.7, c: '#8a6a2f' }, { l: 'سکه و شمش', v: 10.4, c: '#6f97c8' }], { size: 200, center: '۱۸۶٫۴' });
       const set = () => {
         root.querySelector('#tv').textContent = `${fa((186420 * live.g18) / 1e9, 1)} میلیارد تومان`;
         root.querySelectorAll('[data-kg]').forEach((el) => { el.textContent = `${fa((+el.dataset.kg * 1000 * live.g18) / 1e9, 2)} میلیارد`; });
