@@ -346,7 +346,7 @@ main { grid-area: main; overflow-y: auto; overflow-x: hidden; padding: 28px 28px
 @keyframes wv { from { transform: scaleY(.15); } to { transform: scaleY(1); } }
 
 /* feed / timeline */
-.feed { display: grid; gap: 2px; }
+.feed { display: grid; gap: 2px; align-content: start; }
 .feed .it { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: start; padding: 11px 6px; border-bottom: 1px solid rgba(212,175,106,.06); font-size: 12.5px; line-height: 1.7; }
 .feed .it:last-child { border: 0; }
 .feed .it .ico { width: 28px; height: 28px; border-radius: 9px; display: grid; place-items: center; background: rgba(212,175,106,.08); color: var(--gold); flex: none; }
@@ -580,3 +580,40 @@ body.unlocked .dock { opacity: 1; pointer-events: auto; }
 .sweep.go i { animation: sweep 1s var(--ease-io) forwards; }
 @keyframes sweep { to { right: 140%; } }
 .card::selection { background: var(--gold); }
+
+/* ---------- shift timeline ---------- */
+.legend i.stripe { background: repeating-linear-gradient(45deg, var(--gold) 0 3px, transparent 3px 6px); }
+.tl { position: relative; margin-inline-start: 120px; padding-top: 34px; }
+.tl-axis { position: absolute; inset: 0 0 auto 0; height: 20px; }
+.tl-axis span { position: absolute; top: 0; transform: translateX(50%); font-size: 10.5px; color: var(--muted); }
+.tl-zone { position: absolute; top: 26px; bottom: 0; border-radius: 8px; }
+.tl-zone em { position: absolute; top: 4px; inset-inline-start: 10px; font-style: normal; font-size: 10px; color: var(--muted); letter-spacing: .1em; }
+.tl-zone.reg { background: linear-gradient(180deg, rgba(214,178,110,.07), rgba(214,178,110,.02)); border: 1px solid rgba(214,178,110,.1); }
+.tl-zone.ot { background: repeating-linear-gradient(45deg, rgba(214,178,110,.12) 0 2px, transparent 2px 9px); border: 1px dashed rgba(214,178,110,.3); }
+.tl-mark { position: absolute; top: 26px; bottom: 0; width: 0; border-inline-start: 1px solid var(--agate-hi); box-shadow: 0 0 14px var(--agate-hi); z-index: 2; }
+.tl-mark b { position: absolute; top: -24px; transform: translateX(50%); font-size: 11px; color: var(--agate-hi); white-space: nowrap; }
+.tl-mark span { position: absolute; top: 8px; inset-inline-end: 8px; display: inline-flex; gap: 4px; align-items: center; font-size: 10px; color: var(--agate-hi); white-space: nowrap; }
+.tl-now { position: absolute; top: 22px; bottom: -6px; width: 0; border-inline-start: 1px dashed var(--gold-hi); z-index: 3; transition: inset-inline-start 1s var(--ease); }
+.tl-now span { position: absolute; top: -24px; transform: translateX(50%); font-size: 10px; color: var(--ink); background: var(--metal); padding: 1px 8px; border-radius: 99px; white-space: nowrap; font-weight: 700; }
+.tl-row { position: relative; height: 34px; }
+.tl-name { position: absolute; inset-inline-end: calc(100% + 16px); top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--text-2); white-space: nowrap; }
+.tl-bar { position: absolute; top: 12px; height: 10px; border-radius: 10px; background: linear-gradient(270deg, #8a6020, #d1a14b 60%, #f6dc98); box-shadow: inset 0 1px 0 rgba(255,255,255,.35); transform-origin: right; animation: grow 1.4s var(--ease) both; }
+.tl-row:nth-of-type(odd) .tl-bar { animation-delay: .1s; }
+.tl-bar.meal { background: linear-gradient(270deg, #8a6020, #d1a14b 55%, #f6dc98 75%, #e0553f); box-shadow: 0 0 18px rgba(224,85,63,.35), inset 0 1px 0 rgba(255,255,255,.35); }
+.tl-bar i { position: absolute; inset-inline-end: -3px; top: -3px; width: 16px; height: 16px; border-radius: 50%; background: var(--panel-solid); border: 2px solid var(--gold-hi); }
+.tl-bar.meal i { border-color: var(--agate-hi); }
+.tl-meal { position: absolute; top: 9px; color: var(--agate-hi); }
+@media (max-width: 900px) { .tl { margin-inline-start: 0; padding-top: 34px; } .tl-name { position: static; display: block; transform: none; font-size: 11px; padding-top: 2px; } .tl-row { height: 46px; } .tl-bar { top: 24px; } .tl-meal { top: 21px; } .shift .legend { display: none; } }
+
+/* ---------- agent constellation ---------- */
+.cst-card { overflow: hidden; background: radial-gradient(60% 70% at 50% 50%, rgba(214,178,110,.08), transparent 70%), linear-gradient(180deg, #0b0a09, #040404); }
+.cst-wrap { position: relative; height: 470px; }
+.cst-wrap canvas.cst { position: absolute; inset: 0; width: 100%; height: 100%; }
+.cst-wrap canvas.core { position: absolute; left: 50%; top: 50%; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; pointer-events: none; box-shadow: 0 0 80px rgba(214,178,110,.35); }
+.cst-tip { position: absolute; left: 0; top: 0; pointer-events: none; opacity: 0; transition: opacity .2s; margin: -70px 0 0 -80px; width: 160px; text-align: center; padding: 8px 10px; border-radius: 12px; background: rgba(6,6,6,.92); border: 1px solid var(--line-2); display: grid; gap: 2px; font-size: 11.5px; }
+.cst-tip b { color: var(--gold-hi); font-size: 13px; }
+.cst-tip span { color: var(--text-2); }
+.cst-label { position: absolute; top: 22px; inset-inline-start: 24px; display: grid; gap: 4px; pointer-events: none; }
+.cst-label b { font-family: var(--display); font-size: 34px; font-weight: 600; line-height: 1; }
+.cst-label .muted { font-size: 11.5px; }
+@media (max-width: 900px) { .cst-wrap { height: 380px; } }

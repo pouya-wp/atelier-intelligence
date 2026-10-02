@@ -4,6 +4,7 @@ import { OWNER, AGENTS, STATIONS, ADMIN_UNITS, STAFF, DUE, TODOS, NEWS, STOCK, M
 import { live, onPrice } from './price.js';
 import { createIngotScene } from './gl/ingot.js';
 import { createStudio } from './gl/studio.js';
+import { createConstellation } from './gl/constellation.js';
 import * as sfx from './sfx.js';
 
 const series = (n, base, vol, drift = 0) => { let v = base; return Array.from({ length: n }, () => (v += (Math.random() - 0.48 + drift) * vol)); };
@@ -143,6 +144,13 @@ function agents() {
     html: `<section class="view">
       ${head('AGENT CONSTELLATION', '<b>۱۴</b> ایجنت، یک ذهن طلایی', 'هر ایجنت یک بخش از کسب‌وکار را شبانه‌روز پایش می‌کند و فقط وقتی لازم است شما را خبر می‌کند.', `<button class="btn ghost" data-sfx>${I.sync} آموزش مجدد</button><button class="btn" data-sfx data-toast="ایجنت جدید در حال ساخت است">${I.spark} ایجنت جدید</button>`)}
       <div class="grid">
+        <div class="card c8 cst-card" style="padding:0">
+          <div class="cst-wrap"><canvas class="cst"></canvas><canvas class="core"></canvas><div class="cst-tip"></div>
+            <div class="cst-label"><span class="eyebrow" style="margin:0">ATELIER MIND</span><b class="metal">هسته عقیق</b><span class="muted">روی هر ایجنت بزنید</span></div></div>
+        </div>
+        <div class="card c4"><div class="ch"><h3>تپش‌های زنده</h3>${chip('ok', 'جریان داده')}</div><div class="feed" id="pulseLog"></div></div>
+      </div>
+      <div class="grid mt">
         ${AGENTS.map((a, i) => `<div class="card agent c3" data-tilt style="animation-delay:${i * 0.04}s">
           <div class="top-row"><div class="ic">${I[a.icon]}</div>${chip(a.st, a.st === 'ok' ? 'فعال' : a.st === 'warn' ? 'نیاز به توجه' : 'هشدار')}</div>
           <h4>${a.name}</h4><p>${a.desc}</p>
@@ -151,6 +159,20 @@ function agents() {
         </div>`).join('')}
       </div>
     </section>`,
+    mount(root) {
+      const log = root.querySelector('#pulseLog');
+      const msgs = { treasury: 'تطبیق موجودی خزانه', pricing: 'قیمت جدید به فاکتورها رفت', render: 'یک فریم رندر کامل شد', face: 'ورود پرسنل ثبت شد', due: 'سررسید بررسی شد', stock: 'موجودی انبار به‌روز شد', anomaly: 'سفارش‌ها پایش شد', report: 'بخشی به گزارش امشب اضافه شد', news: 'خبر جدید تحلیل شد', meal: 'لیست غذا به‌روز شد', proc: 'پیشنهاد خرید بازبینی شد', cost: 'هزینه به مرکز هزینه تسهیم شد', rayvarz: 'سند به رایورز رفت', voice: 'دستیار آماده پاسخ است' };
+      const c = createConstellation(root.querySelector('.cst-wrap'), AGENTS, {
+        onPulse(a, clicked) {
+          const d = new Date(), it = document.createElement('div');
+          it.className = 'it new';
+          it.innerHTML = `<div class="ico ${a.st === 'crit' ? 'crit' : ''}">${I[a.icon]}</div><div><b>${a.name}</b> <span class="s">${msgs[a.id]}</span></div><time>${d.toLocaleTimeString('fa-IR')}</time>`;
+          log.prepend(it); if (log.children.length > 7) log.lastChild.remove();
+          if (clicked) { sfx.ting(1568, 0.08, 1.4); } else if (Math.random() < 0.35) sfx.blip(true);
+        },
+      });
+      return () => c.dispose();
+    },
   };
 }
 
@@ -356,6 +378,21 @@ function people() {
         ${kpi('مرخصی', 5, 'نفر', '—', '', true)}
         ${kpi('غذای امشب', 23, 'پرس', '۴ پرس', '', true)}
       </div>
+      <div class="card mt shift">
+        <div class="ch"><h3>${I.clock.replace('<svg', '<svg width="16"')} شیفت امروز <small>ساعت کاری ۸ تا ۱۶ · دو ساعت اضافه‌کاری (تا ۱۸) = غذای پرسنلی</small></h3><div class="legend"><span><i style="background:var(--gold-mid)"></i>ساعت کاری</span><span><i class="stripe"></i>اضافه‌کاری</span><span><i style="background:var(--agate-hi)"></i>مشمول غذا</span></div></div>
+        <div class="tl">
+          <div class="tl-axis">${Array.from({ length: 9 }, (_, i) => `<span style="inset-inline-start:${(i * 2 / 16) * 100}%">${fa(6 + i * 2)}:۰۰</span>`).join('')}</div>
+          <div class="tl-zone reg" style="inset-inline-start:${(2 / 16) * 100}%;width:${(8 / 16) * 100}%"><em>ساعت کاری</em></div>
+          <div class="tl-zone ot" style="inset-inline-start:${(10 / 16) * 100}%;width:${(2 / 16) * 100}%"><em>اضافه‌کاری</em></div>
+          <div class="tl-mark" style="inset-inline-start:${(12 / 16) * 100}%"><span>${I.meal.replace('<svg', '<svg width="12"')} ۱۸:۰۰ · آستانه غذا</span></div>
+          <div class="tl-now" id="tlNow"><span></span></div>
+          ${STAFF.slice(0, 8).map((p, i) => { const st = 8 + ((i * 7) % 5) / 10 - 0.2, en = 16 + p.ot; const meal = p.ot >= 2; return `<div class="tl-row">
+            <span class="tl-name">${p.name}</span>
+            <div class="tl-bar ${meal ? 'meal' : ''}" style="inset-inline-start:${((st - 6) / 16) * 100}%;width:${((en - st) / 16) * 100}%"><i></i></div>
+            ${meal ? `<span class="tl-meal" style="inset-inline-start:calc(${((en - 6) / 16) * 100}% + 8px)">${I.meal.replace('<svg', '<svg width="12"')}</span>` : ''}
+          </div>`; }).join('')}
+        </div>
+      </div>
       <div class="grid mt">
         <div class="card c7"><div class="ch"><h3>${I.face.replace('<svg', '<svg width="16"')} دوربین ورودی — زنده</h3>${chip('ok', 'تشخیص فعال')}</div>
           <div class="faces" id="faces">${STAFF.slice(0, 12).map((s) => `<div class="face"><svg class="sil" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="5"/><path d="M2 24a10 10 0 0 1 20 0z"/></svg><div class="bracket"></div><span class="conf">۹۹٫۲٪</span><span style="position:relative">${s.name.split(' ')[1]}</span></div>`).join('')}</div></div>
@@ -368,10 +405,13 @@ function people() {
     </section>`,
     mount(root) {
       countUp(root);
+      const now = root.querySelector('#tlNow');
+      const setNow = () => { const d = new Date(); const h = Math.min(22, Math.max(6, d.getHours() + d.getMinutes() / 60)); now.style.insetInlineStart = `${((h - 6) / 16) * 100}%`; now.querySelector('span').textContent = `اکنون ${d.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' })}`; };
+      setNow(); const nowIv = setInterval(setNow, 30000);
       const faces = [...root.querySelectorAll('.face')];
       let i = 0;
       const iv = setInterval(() => { faces.forEach((f) => f.classList.remove('match')); faces[i++ % faces.length].classList.add('match'); sfx.blip(true); }, 1400);
-      return () => clearInterval(iv);
+      return () => { clearInterval(iv); clearInterval(nowIv); };
     },
   };
 }
