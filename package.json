@@ -1,7 +1,7 @@
 {
   "name": "aghigh-gold-atelier",
   "version": "1.0.0",
-  "description": "",
+  "description": "Aghigh Gold — AI agent command center (demo)",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -29,5 +29,8 @@
     "vite-plugin-singlefile": "^2.3.3"
   },
   "private": true,
-  "type": "module"
+  "type": "module",
+  "engines": {
+    "node": ">=20.19"
+  }
 }
