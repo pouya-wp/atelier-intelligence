@@ -1,11 +1,11 @@
 // Synthesized sound design — no audio files, everything is generated with WebAudio.
-let ctx, master, muted = false, droneNodes = null;
+let ctx, master, muted = false;
 
 export function initAudio() {
   if (ctx) return ctx;
   ctx = new (window.AudioContext || window.webkitAudioContext)();
   master = ctx.createGain();
-  master.gain.value = 0.55;
+  master.gain.value = 0.32;
   const comp = ctx.createDynamicsCompressor();
   comp.threshold.value = -18; comp.ratio.value = 4;
   master.connect(comp).connect(ctx.destination);
@@ -128,24 +128,10 @@ export function unlock() {
   whoosh(1.4, true);
 }
 
-export function startDrone() {
-  if (!ok() || droneNodes) return;
-  const t = now(), out = ctx.createGain(), f = ctx.createBiquadFilter();
-  f.type = 'lowpass'; f.frequency.value = 520; f.Q.value = 0.6;
-  out.gain.setValueAtTime(0.0001, t); out.gain.exponentialRampToValueAtTime(0.05, t + 4);
-  const oscs = [73.42, 110, 146.83, 220.4].map((fr, i) => {
-    const o = ctx.createOscillator(); o.type = i % 2 ? 'triangle' : 'sawtooth'; o.frequency.value = fr;
-    const lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 0.05 + i * 0.03; lg.gain.value = 1.2;
-    lfo.connect(lg).connect(o.detune); lfo.start();
-    o.connect(f); o.start(); return o;
-  });
-  f.connect(out).connect(master);
-  droneNodes = { out, oscs };
-}
-
 export function setMuted(m) {
   muted = m;
-  if (master) master.gain.setTargetAtTime(m ? 0 : 0.55, ctx.currentTime, 0.1);
+  music.muted = m;
+  if (master) master.gain.setTargetAtTime(m ? 0 : 0.32, ctx.currentTime, 0.1);
 }
 export const isMuted = () => muted;
 
@@ -157,4 +143,18 @@ export function voiceChirp() {
   f.type = 'bandpass'; f.Q.value = 6; f.frequency.value = 600 + Math.random() * 1600;
   env(g, t, 0.01, 0.09, 0.025);
   o.connect(f).connect(g).connect(master); o.start(t); o.stop(t + 0.15);
+}
+
+// Background music: drop an instrumental track at public/music/background.mp3.
+// Plays quietly, fades in, loops; silently does nothing if the file is missing.
+const music = new Audio();
+music.loop = true; music.preload = 'none'; music.volume = 0;
+export function startMusic(src = 'music/background.mp3', target = 0.28) {
+  if (!music.src) music.src = src;
+  music.muted = muted;
+  music.play().then(() => {
+    const t0 = performance.now();
+    const fade = () => { const k = Math.min(1, (performance.now() - t0) / 4000); music.volume = target * k; if (k < 1) requestAnimationFrame(fade); };
+    fade();
+  }).catch(() => { /* no file or autoplay refused — stay silent */ });
 }

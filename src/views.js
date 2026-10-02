@@ -3,7 +3,6 @@ import { fa, toman, sparkline, areaChart, donut, bars, countUp, rand } from './u
 import { OWNER, AGENTS, STATIONS, ADMIN_UNITS, STAFF, DUE, TODOS, NEWS, STOCK, MAKERS, RETURNS, DEFECTS, ORDERS_ANOMALY, CODES, ORDER_CHECK, FINDINGS, DEFECT_RATE } from './data.js';
 import { live, onPrice } from './price.js';
 import { createIngotScene } from './gl/ingot.js';
-import { createStudio } from './gl/studio.js';
 import { createConstellation } from './gl/constellation.js';
 import * as sfx from './sfx.js';
 
@@ -40,7 +39,7 @@ function overview(role) {
             <div><span>پرسنل حاضر</span><b class="num"><span data-count="142">۰</span> / ۱۵۰</b></div>
           </div>
         </div>
-        <div class="stamp">${chip('gold', '۱۴ ایجنت فعال')}${chip('ok', 'همگام با رایورز')}${chip('ok', 'خزانه تطبیق شد')}</div>
+        <div class="stamp">${chip('gold', '۱۳ ایجنت فعال')}${chip('ok', 'همگام با رایورز')}${chip('ok', 'خزانه تطبیق شد')}</div>
         <div class="hint3d">MOVE · TO · LIGHT</div>
       </div>
 
@@ -66,33 +65,23 @@ function overview(role) {
           <div class="ch"><h3>سررسید امروز</h3>${chip('crit', 'فوری')}</div>
           <div style="display:grid;gap:14px">
             ${DUE.slice(0, 3).map((d) => `<div style="display:grid;gap:4px;padding-bottom:12px;border-bottom:1px dashed var(--line)">
-              <div style="display:flex;justify-content:space-between;gap:8px;font-size:13px"><span>${d.t}</span><span class="muted" style="white-space:nowrap">${fa(d.d)} روز</span></div>
-              ${d.a ? `<div style="display:flex;justify-content:space-between;font-size:12px"><span class="num">${fa(d.a / 1e6)} میلیون</span><span class="gold-text num" data-goldeq="${d.a}">≈ ${fa(goldEq(d.a), 0)} گرم طلا</span></div>` : '<div class="muted" style="font-size:12px">ارسال فیزیکی</div>'}
+              <div style="display:flex;justify-content:space-between;gap:8px;font-size:15px"><span>${d.t}</span><span class="muted" style="white-space:nowrap">${fa(d.d)} روز</span></div>
+              ${d.a ? `<div style="display:flex;justify-content:space-between;font-size:14px"><span class="num">${fa(d.a / 1e6)} میلیون</span><span class="gold-text num" data-goldeq="${d.a}">≈ ${fa(goldEq(d.a), 0)} گرم طلا</span></div>` : '<div class="muted" style="font-size:14px">ارسال فیزیکی</div>'}
             </div>`).join('')}
-            <div class="muted" style="font-size:11.5px;line-height:1.8">معادل طلایی هر پرداخت با قیمت لحظه‌ای به‌روز می‌شود.</div>
+            <div class="muted" style="font-size:13.5px;line-height:1.8">معادل طلایی هر پرداخت با قیمت لحظه‌ای به‌روز می‌شود.</div>
           </div>
         </div>
       </div>
 
       <div class="grid mt">
-        <div class="card c5">
-          <div class="ch"><h3>جریان زنده ایجنت‌ها</h3>${chip('ok', 'زنده')}</div>
-          <div class="feed" id="feed"></div>
-        </div>
-        <div class="card c4 inspector">
+        <div class="card c5 inspector">
           <div class="ch"><h3>${I.lock.replace('<svg', '<svg width="15"')} بازرس ویژه <small>نسخه اختصاصی ${OWNER.call}</small></h3>${chip('warn', `${fa(FINDINGS.length)} یافته`)}</div>
           <div class="finds">${FINDINGS.map((f) => `<div class="fd ${f.lvl}"><b>${f.t}</b><span>${f.d}</span></div>`).join('')}</div>
           <button class="btn ghost" data-speak style="margin-top:14px;width:100%;justify-content:center">${I.sound} گزارش بازرس را بشنو</button>
         </div>
-        <div class="card c3">
-          <div class="ch"><h3>ترکیب خزانه</h3></div>
-          <div id="vaultDonut"></div>
-          <div class="kv" style="margin-top:14px">
-            <div><i style="background:#f7e4b5"></i><span>محصول ساخته</span><b class="num">۸۲٫۱</b></div>
-            <div><i style="background:#d4af6a"></i><span>آب‌شده</span><b class="num">۶۱٫۲</b></div>
-            <div><i style="background:#8a6a2f"></i><span>در جریان تولید</span><b class="num">۳۲٫۷</b></div>
-            <div><i style="background:#3c6491"></i><span>سکه و شمش</span><b class="num">۱۰٫۴</b></div>
-          </div>
+        <div class="card c7">
+          <div class="ch"><h3>فروش هفته <small>کیلوگرم</small></h3></div>
+          ${bars([6.2, 7.1, 5.4, 8.8, 7.9, 9.6, 7.84], days, { hi: 5, fmt: (v) => fa(v, 1), h: 210 })}
         </div>
       </div>
     </section>`,
@@ -100,9 +89,6 @@ function overview(role) {
       countUp(root);
       const gl = createIngotScene(root.querySelector('#ingot'));
       areaChart(root.querySelector('#priceChart'), series(48, live.g18 * 0.985, 22000, 0.08).map((v) => Math.round(v)), hoursLbl, { fmt: (v) => `${fa(v)} تومان` });
-      donut(root.querySelector('#vaultDonut'), [
-        { l: 'محصول ساخته', v: 82.1, c: '#f7e4b5' }, { l: 'آب‌شده', v: 61.2, c: '#d4af6a' }, { l: 'در جریان تولید', v: 32.7, c: '#8a6a2f' }, { l: 'سکه و شمش', v: 10.4, c: '#3c6491' },
-      ], { size: 170, center: '۱۸۶٫۴' });
       const heroVal = root.querySelector('#heroVal');
       const setHero = () => { heroVal.innerHTML = `${fa((186420 * live.g18) / 1e12, 3)} <small>هزار میلیارد تومان</small>`; };
       setHero();
@@ -110,31 +96,7 @@ function overview(role) {
         setHero();
         root.querySelectorAll('[data-goldeq]').forEach((el) => { el.textContent = `≈ ${fa(goldEq(+el.dataset.goldeq), 0)} گرم طلا`; });
       });
-      const feed = root.querySelector('#feed');
-      const evts = [
-        ['vault', '', 'خزانه‌دار', 'ورود ۲٫۴ کیلو محصول از آبکاری ثبت و تطبیق شد'],
-        ['calc', '', 'قیمت‌گذار', 'فاکتور ۲۱۸ — ۴۸۲ گرم — گالری ارغوان صادر شد'],
-        ['face', 'ok', 'شناسایی', 'حسین موسوی وارد شد — ۰۷:۴۲ — واحد ساخت'],
-        ['meal', '', 'غذای پرسنل', '۲۳ نفر با اضافه‌کاری بالای ۲ ساعت در لیست شام'],
-        ['alert', 'crit', 'نگهبان سفارش', 'سفارش ۴ برابری نمایندگی کرمان متوقف شد'],
-        ['sync', 'ok', 'پل رایورز', '۴۶ سند حسابداری همگام‌سازی شد'],
-        ['news', '', 'رصد بازار', 'انس جهانی ۰٫۸٪ رشد کرد؛ اثر مثبت بر قیمت فردا'],
-        ['box', '', 'موجودی', 'قفل و اتصالات زیر حد سفارش — پیشنهاد خرید ثبت شد'],
-      ];
-      let k = 0;
-      const push = (animate) => {
-        const [ic, cls, who, msg] = evts[k++ % evts.length];
-        const d = new Date();
-        const it = document.createElement('div');
-        it.className = `it${animate ? ' new' : ''}`;
-        it.innerHTML = `<div class="ico ${cls}">${I[ic]}</div><div><b>${who}</b> <span class="s">${msg}</span></div><time>${fa(d.getHours())}:${fa(d.getMinutes()).padStart(2, '۰')}</time>`;
-        feed.prepend(it);
-        if (feed.children.length > 6) feed.lastChild.remove();
-        if (animate) sfx.blip(true);
-      };
-      for (let i = 0; i < 5; i++) push(false);
-      const iv = setInterval(() => push(true), 5200);
-      return () => { gl.dispose(); off(); clearInterval(iv); };
+      return () => { gl.dispose(); off(); };
     },
   };
 }
@@ -143,7 +105,7 @@ function overview(role) {
 function agents() {
   return {
     html: `<section class="view">
-      ${head('AGENT CONSTELLATION', '<b>۱۴</b> ایجنت، یک ذهن طلایی', 'هر ایجنت یک بخش از کسب‌وکار را شبانه‌روز پایش می‌کند و فقط وقتی لازم است شما را خبر می‌کند.', `<button class="btn ghost" data-sfx>${I.sync} آموزش مجدد</button><button class="btn" data-sfx data-toast="ایجنت جدید در حال ساخت است">${I.spark} ایجنت جدید</button>`)}
+      ${head('AGENT CONSTELLATION', '<b>۱۳</b> ایجنت، یک ذهن طلایی', 'هر ایجنت یک بخش از کار را شبانه‌روز زیر نظر دارد.', `<button class="btn ghost" data-sfx>${I.sync} آموزش مجدد</button><button class="btn" data-sfx data-toast="ایجنت جدید در حال ساخت است">${I.spark} ایجنت جدید</button>`)}
       <div class="grid">
         <div class="card c8 cst-card" style="padding:0">
           <div class="cst-wrap"><canvas class="cst"></canvas><canvas class="core"></canvas><div class="cst-tip"></div>
@@ -152,24 +114,23 @@ function agents() {
         <div class="card c4"><div class="ch"><h3>تپش‌های زنده</h3>${chip('ok', 'جریان داده')}</div><div class="feed" id="pulseLog"></div></div>
       </div>
       <div class="grid mt">
-        ${AGENTS.map((a, i) => `<div class="card agent c3" data-tilt style="animation-delay:${i * 0.04}s">
+        ${AGENTS.map((a, i) => `<div class="card agent c3" data-tilt title="${a.desc}" style="animation-delay:${i * 0.04}s">
           <div class="top-row"><div class="ic">${I[a.icon]}</div>${chip(a.st, a.st === 'ok' ? 'فعال' : a.st === 'warn' ? 'نیاز به توجه' : 'هشدار')}</div>
-          <h4>${a.name}</h4><p>${a.desc}</p>
-          <div class="wave">${Array.from({ length: 22 }, (_, j) => `<i style="animation-delay:${(j * 0.07 + i * 0.13) % 1.2}s;animation-duration:${0.8 + ((j * 13 + i * 7) % 10) / 10}s"></i>`).join('')}</div>
+          <h4>${a.name}</h4>
           <div class="metric"><span>${a.metric}</span><b class="num">${a.val}</b></div>
         </div>`).join('')}
       </div>
     </section>`,
     mount(root) {
       const log = root.querySelector('#pulseLog');
-      const msgs = { treasury: 'تطبیق موجودی خزانه', pricing: 'قیمت جدید به فاکتورها رفت', render: 'یک فریم رندر کامل شد', face: 'ورود پرسنل ثبت شد', due: 'سررسید بررسی شد', stock: 'موجودی انبار به‌روز شد', anomaly: 'سفارش‌ها پایش شد', report: 'بخشی به گزارش امشب اضافه شد', news: 'خبر جدید تحلیل شد', meal: 'لیست غذا به‌روز شد', proc: 'پیشنهاد خرید بازبینی شد', cost: 'هزینه به مرکز هزینه تسهیم شد', rayvarz: 'سند به رایورز رفت', voice: 'دستیار آماده پاسخ است' };
+      const msgs = { treasury: 'تطبیق موجودی خزانه', pricing: 'قیمت جدید به فاکتورها رفت', face: 'ورود پرسنل ثبت شد', due: 'سررسید بررسی شد', stock: 'موجودی انبار به‌روز شد', anomaly: 'سفارش‌ها پایش شد', report: 'بخشی به گزارش امشب اضافه شد', news: 'خبر جدید تحلیل شد', meal: 'لیست غذا به‌روز شد', proc: 'پیشنهاد خرید بازبینی شد', cost: 'هزینه به مرکز هزینه تسهیم شد', rayvarz: 'سند به رایورز رفت', voice: 'دستیار آماده پاسخ است' };
       const c = createConstellation(root.querySelector('.cst-wrap'), AGENTS, {
         onPulse(a, clicked) {
           const d = new Date(), it = document.createElement('div');
           it.className = 'it new';
           it.innerHTML = `<div class="ico ${a.st === 'crit' ? 'crit' : ''}">${I[a.icon]}</div><div><b>${a.name}</b> <span class="s">${msgs[a.id]}</span></div><time>${d.toLocaleTimeString('fa-IR')}</time>`;
           log.prepend(it); if (log.children.length > 7) log.lastChild.remove();
-          if (clicked) { sfx.ting(1568, 0.08, 1.4); } else if (Math.random() < 0.35) sfx.blip(true);
+          if (clicked) sfx.ting(1568, 0.08, 1.4);
         },
       });
       return () => c.dispose();
@@ -182,7 +143,7 @@ function line() {
   const totalStaff = STATIONS.reduce((a, s) => a + s.staff, 0) + ADMIN_UNITS.reduce((a, s) => a + s.staff, 0);
   return {
     html: `<section class="view">
-      ${head('COST CENTERS', 'مسیر طلا، از <b>کوره تا ویترین</b>', 'هر واحد یک مرکز هزینه است. وزن در جریان، افت، هزینه و بهره‌وری هر ایستگاه به‌صورت زنده محاسبه می‌شود.', chip('gold', `${fa(totalStaff)} نفر در ${fa(STATIONS.length + ADMIN_UNITS.length)} واحد`))}
+      ${head('COST CENTERS', 'مسیر طلا، از <b>کوره تا ویترین</b>', 'هر واحد یک مرکز هزینه است؛ وزن، افت و هزینه زنده.', chip('gold', `${fa(totalStaff)} نفر در ${fa(STATIONS.length + ADMIN_UNITS.length)} واحد`))}
       <div class="card" style="padding:26px 22px 18px;overflow:hidden">
         <svg id="flow" viewBox="0 0 1200 120" style="width:100%;height:120px;display:block;overflow:visible"></svg>
         <div id="stations" style="display:grid;grid-template-columns:repeat(${STATIONS.length},minmax(0,1fr));gap:10px;margin-top:-8px"></div>
@@ -239,7 +200,22 @@ function line() {
 function invoice() {
   return {
     html: `<section class="view">
-      ${head('LIVE INVOICE', 'فاکتور <b>زنده</b> با قیمت لحظه‌ای', 'قیمت طلا، اجرت، سود و مالیات در لحظه فروش محاسبه و مستقیم در داشبورد شخصی و حسابداری رایورز ثبت می‌شود.')}
+      ${head('GOLD INVOICE', 'فاکتور <b>طلایی</b>', 'مبلغ را بزنید، معادل طلایی‌اش را ببینید.')}
+      <div class="gold-inv" id="goldInv">
+        <div class="gi-top"><div class="gi-logo">${logo()}</div><div><b>فاکتور طلایی</b><span>طلای عقیق · با قیمت لحظه‌ای</span></div><span class="gi-live"><i></i>زنده</span></div>
+        <label class="gi-field" for="giAmount"><span>مبلغ به تومان</span><input id="giAmount" inputmode="numeric" autocomplete="off" value="۱٬۰۰۰٬۰۰۰٬۰۰۰"></label>
+        <div class="gi-quick">${[100e6, 500e6, 1e9, 5e9].map((v) => `<button type="button" data-amt="${v}">${v >= 1e9 ? `${fa(v / 1e9)} میلیارد` : `${fa(v / 1e6)} میلیون`}</button>`).join('')}</div>
+        <div class="gi-result"><span>معادل طلای ۱۸ عیار</span><b id="giGrams">—</b><small id="giKg"></small></div>
+        <div class="gi-eq">
+          <div><span>مثقال</span><b id="giMes">—</b></div>
+          <div><span>سکه امامی</span><b id="giCoin">—</b></div>
+          <div><span>نیم سکه</span><b id="giHalf">—</b></div>
+          <div><span>ربع سکه</span><b id="giQ">—</b></div>
+        </div>
+        <div class="gi-foot"><span id="giRate"></span><span id="giTime"></span></div>
+      </div>
+      <div class="eyebrow" style="margin-top:34px">LIVE INVOICE</div>
+      <h3 class="sub-h">فاکتور فروش با اجرت و سود</h3>
       <div class="grid">
         <div class="card c7">
           <div class="ch"><h3>اقلام فاکتور</h3>${chip('ok', 'قیمت قفل‌نشده — زنده')}</div>
@@ -263,6 +239,22 @@ function invoice() {
       </div>
     </section>`,
     mount(root) {
+      const amt = root.querySelector('#giAmount');
+      const toLatin = (t) => t.replace(/[۰-۹]/g, (c) => '۰۱۲۳۴۵۶۷۸۹'.indexOf(c)).replace(/[٠-٩]/g, (c) => '٠١٢٣٤٥٦٧٨٩'.indexOf(c));
+      const value = () => +toLatin(amt.value).replace(/[^0-9]/g, '') || 0;
+      const gi = (id, v) => { const el = root.querySelector(id); if (el.textContent !== v) { el.textContent = v; el.classList.remove('flashnum'); void el.offsetWidth; el.classList.add('flashnum'); } };
+      const goldCalc = () => {
+        const v = value(), g = v / live.g18;
+        gi('#giGrams', `${fa(g, g < 100 ? 2 : 1)} گرم`);
+        root.querySelector('#giKg').textContent = g >= 1000 ? `${fa(g / 1000, 3)} کیلوگرم` : '';
+        gi('#giMes', fa(v / live.mesghal, 2)); gi('#giCoin', fa(v / live.coin, 2)); gi('#giHalf', fa(v / live.half, 2)); gi('#giQ', fa(v / live.quarter, 2));
+        root.querySelector('#giRate').textContent = `هر گرم ۱۸ عیار: ${fa(live.g18)} تومان`;
+        root.querySelector('#giTime').textContent = new Date().toLocaleTimeString('fa-IR');
+      };
+      amt.addEventListener('input', () => { const v = value(); amt.value = v ? fa(v) : ''; goldCalc(); });
+      root.querySelectorAll('[data-amt]').forEach((b) => b.addEventListener('click', () => { amt.value = fa(+b.dataset.amt); goldCalc(); sfx.ting(1318, 0.07, 0.9); }));
+      goldCalc();
+      const offGold = onPrice(goldCalc);
       root.querySelector('.rlogo').innerHTML = logo();
       const rc = root.querySelector('#rcpt');
       rc.addEventListener('pointermove', (e) => { const r = rc.getBoundingClientRect(); rc.style.setProperty('--mx', `${e.clientX - r.left}px`); rc.style.setProperty('--my', `${e.clientY - r.top}px`); });
@@ -281,9 +273,10 @@ function invoice() {
         last = tot;
         $('#totw').textContent = `قیمت پایه از قیمت‌گذار آنلاین — ${new Date().toLocaleTimeString('fa-IR')}`;
       };
-      root.querySelectorAll('input,select').forEach((el) => el.addEventListener('input', () => { calc(); sfx.blip(true); }));
+      root.querySelectorAll('input,select').forEach((el) => el.addEventListener('input', calc));
       calc();
-      return onPrice(calc);
+      const offCalc = onPrice(calc);
+      return () => { offGold(); offCalc(); };
     },
   };
 }
@@ -292,7 +285,7 @@ function invoice() {
 function treasury() {
   return {
     html: `<section class="view">
-      ${head('THE VAULT', 'خزانه — <b>هر گرم، حسابرسی‌شده</b>', 'موجودی طلا به تفکیک نوع و عیار، نقدینگی و چک‌ها؛ همه با ارزش لحظه‌ای.')}
+      ${head('THE VAULT', 'خزانه — <b>هر گرم، حسابرسی‌شده</b>', 'موجودی طلا، نقدینگی و چک‌ها با ارزش لحظه‌ای.')}
       <div class="grid">
         <div class="card gold c4 kpi"><div class="label">کل طلای خزانه</div><div class="val num gold-text"><span data-count="186.42" data-dec="2">۰</span><small>کیلوگرم</small></div><div class="delta">معادل <span class="num" id="tv"></span></div></div>
         <div class="card c4 kpi"><div class="label">نقدینگی حساب‌ها</div><div class="val num"><span data-count="48.6" data-dec="1">۰</span><small>میلیارد تومان</small></div><div class="delta"><span class="up">▲ ۴٫۲ میلیارد</span> واریز امروز</div></div>
@@ -334,7 +327,7 @@ function accounting() {
   const max = Math.max(...cost.map((c) => c[1]));
   return {
     html: `<section class="view">
-      ${head('LEDGER · RAYVARZ', 'حسابداری <b>بدون ورود دستی</b>', 'اسناد فروش، خرید، هزینه و دستمزد از ایجنت‌ها مستقیم به نرم‌افزار حسابداری رایورز می‌رود.', chip('ok', 'آخرین همگام‌سازی: ۲ دقیقه پیش'))}
+      ${head('LEDGER · RAYVARZ', 'حسابداری <b>بدون ورود دستی</b>', 'اسناد خودکار به رایورز می‌رود.', chip('ok', 'آخرین همگام‌سازی: ۲ دقیقه پیش'))}
       <div class="grid">
         ${kpi('درآمد ماه', 1.92, 'هزار میلیارد', '۱۱٪', sparkline(series(30, 50, 3, 0.06)), true, 2)}
         ${kpi('حاشیه سود ناخالص', 14.6, 'درصد', '۰٫۴٪', sparkline(series(30, 50, 2, 0.02)), true, 1)}
@@ -356,7 +349,7 @@ function accounting() {
 function warehouse() {
   return {
     html: `<section class="view">
-      ${head('INVENTORY', 'انبار، تولیدی‌ها، <b>مرجوعی و خرابی</b>', 'ایجنت موجودی، کمبود را قبل از توقف خط پیش‌بینی می‌کند.', `<button class="btn" data-sfx data-toast="درخواست خرید برای ۳ قلم ارسال شد">${I.cart} سفارش خودکار کمبودها</button>`)}
+      ${head('INVENTORY', 'انبار، تولیدی‌ها، <b>مرجوعی و خرابی</b>', 'کمبود را قبل از توقف کار خبر می‌دهد.', `<button class="btn" data-sfx data-toast="درخواست خرید برای ۳ قلم ارسال شد">${I.cart} سفارش خودکار کمبودها</button>`)}
       <div class="card" style="margin-bottom:18px"><div class="ch"><h3>${I.alert.replace('<svg', '<svg width="16"')} تطبیق سفارش با موجودی <small>سفارش بیشتر از موجودی انبار = اطلاع فوری به مدیر</small></h3>${chip('crit', `${fa(ORDER_CHECK.filter((x) => x.o > x.st).length)} سفارش بیش از موجودی`)}</div>
         <div>${ORDER_CHECK.map((x) => `<div class="ovs ${x.o > x.st ? 'over' : ''}">
           <div class="ovs-t"><b>${x.who}</b><span class="muted">${x.n} · <span style="font-family:ui-monospace,monospace;font-size:11px" dir="ltr">${x.code}</span></span></div>
@@ -384,7 +377,7 @@ function people() {
   const meal = STAFF.filter((s) => s.ot >= 2);
   return {
     html: `<section class="view">
-      ${head('PEOPLE · FACE ID', '<b>۱۵۰</b> نفر، یک نگاه', 'ورود و خروج با تشخیص چهره، شیفت‌ها و اضافه‌کاری. بیش از ۲ ساعت اضافه‌کاری = غذای پرسنلی، خودکار.')}
+      ${head('PEOPLE · FACE ID', '<b>۱۵۰</b> نفر، یک نگاه', 'ساعت کاری ۸ تا ۱۶ · دو ساعت اضافه‌کاری = غذای پرسنلی')}
       <div class="grid">
         ${kpi('حاضر', 142, 'نفر', '۲ نفر', '', true)}
         ${kpi('تأخیر', 3, 'نفر', '۱ نفر', '', false)}
@@ -423,7 +416,7 @@ function people() {
       setNow(); const nowIv = setInterval(setNow, 30000);
       const faces = [...root.querySelectorAll('.face')];
       let i = 0;
-      const iv = setInterval(() => { faces.forEach((f) => f.classList.remove('match')); faces[i++ % faces.length].classList.add('match'); sfx.blip(true); }, 1400);
+      const iv = setInterval(() => { faces.forEach((f) => f.classList.remove('match')); faces[i++ % faces.length].classList.add('match'); }, 1400);
       return () => { clearInterval(iv); clearInterval(nowIv); };
     },
   };
@@ -435,7 +428,7 @@ function calendar() {
   const today = 10;
   return {
     html: `<section class="view">
-      ${head('DUE DATES', 'سررسیدها، چک‌ها و <b>تحویل بار</b>', 'هر پرداخت با معادل طلایی لحظه‌ای نمایش داده می‌شود تا بدانید امروز چند گرم طلا باید آزاد شود.')}
+      ${head('DUE DATES', 'سررسیدها، چک‌ها و <b>تحویل بار</b>', 'هر پرداخت با معادل طلایی آن.')}
       <div class="grid">
         <div class="card c7"><div class="ch"><h3>مهر ۱۴۰۵</h3><div class="legend"><span><i style="background:${kc.in}"></i>دریافتی</span><span><i style="background:${kc.out}"></i>پرداختی</span><span><i style="background:${kc.ship}"></i>تحویل بار</span><span><i style="background:${kc.gold}"></i>طلای امانی</span></div></div>
           <div class="cal">${days.map((d) => `<div class="dh">${d}</div>`).join('')}
@@ -453,44 +446,11 @@ function calendar() {
   };
 }
 
-// ---------------------------------------------------------------- studio
-function studio() {
-  return {
-    html: `<section class="view">
-      ${head('PHOTO → 3D', 'از یک عکس، تا <b>رندر کاتالوگ</b>', 'عکس یا اسکچ طرح را بدهید؛ ایجنت رندر، مدل سه‌بعدی، متریال و نورپردازی استودیویی را می‌سازد.')}
-      <div class="grid">
-        <div class="card studio c8" id="studioCard">
-          <canvas class="gl" id="studio"></canvas><div class="scan"></div>
-          <div class="overlay"><span class="caps gold-text">AGHIGH · AGATE SIGNET</span><b style="font-size:20px;font-weight:300">انگشتر عقیق یمنی — طلای ۱۸</b><span class="muted" style="font-size:12px">۸٫۴ گرم · نگین کابوشن · ۸ برلیان</span></div>
-          <div class="bottom"><div class="swatches"><button class="on" data-c="#f2b84b" data-r=".07" style="background:linear-gradient(135deg,#ffe7a8,#c9953d)" title="زرد"></button><button data-c="#f6b195" data-r=".08" style="background:linear-gradient(135deg,#ffd6c4,#c27a5c)" title="رزگلد"></button><button data-c="#eeeeee" data-r=".06" style="background:linear-gradient(135deg,#fff,#9a9a9a)" title="سفید"></button></div>
-          <span class="caps muted">DRAG · TO · ROTATE</span></div>
-        </div>
-        <div class="card c4" style="display:grid;gap:18px;align-content:start">
-          <div class="drop" id="drop">${I.upload.replace('<svg', '<svg width="30" style="color:var(--gold)"')}<b style="font-size:14px">عکس یا اسکچ را اینجا رها کنید</b><span class="muted" style="font-size:12px">JPG · PNG · HEIC — حداکثر ۲۰ مگابایت</span><button class="btn" id="gen">${I.spark} ساخت مدل سه‌بعدی</button></div>
-          <div class="steps" id="steps">${['تحلیل تصویر و تشخیص فرم', 'بازسازی هندسه سه‌بعدی', 'اعمال متریال طلا و نگین', 'نورپردازی و رندر استودیویی'].map((s, i) => `<div class="on"><i>${fa(i + 1)}</i>${s}</div>`).join('')}</div>
-          <div><div class="muted" style="font-size:12px;margin-bottom:10px">صف رندر</div><div class="thumbs"><div>النگو</div><div>گردنبند</div><div>گوشواره</div></div></div>
-        </div>
-      </div>
-    </section>`,
-    mount(root) {
-      const st = createStudio(root.querySelector('#studio'));
-      root.querySelectorAll('.swatches button').forEach((b) => b.addEventListener('click', () => { root.querySelectorAll('.swatches button').forEach((x) => x.classList.remove('on')); b.classList.add('on'); st.setMetal(b.dataset.c, +b.dataset.r); sfx.ting(1760, 0.08, 1.2); }));
-      const card = root.querySelector('#studioCard'), steps = [...root.querySelectorAll('#steps div')];
-      root.querySelector('#gen').addEventListener('click', () => {
-        card.classList.remove('scanning'); void card.offsetWidth; card.classList.add('scanning');
-        steps.forEach((s) => s.classList.remove('on')); st.rebuild(); sfx.whoosh(2.2, true);
-        steps.forEach((s, i) => setTimeout(() => { s.classList.add('on'); sfx.ting(1046 * (1 + i * 0.25), 0.07, 0.8); }, 500 + i * 550));
-      });
-      return () => st.dispose();
-    },
-  };
-}
-
 // ---------------------------------------------------------------- market
 function market() {
   return {
     html: `<section class="view">
-      ${head('MARKET INTELLIGENCE', 'بازار طلا و <b>گزارش روزانه</b>', 'اخبار داخلی و جهانی، انس جهانی و گزارش کامل روز با قیمت‌ها — هر شب ساعت ۲۱ به شما ارسال می‌شود.', `<button class="btn" data-speak>${I.sound} گزارش را بخوان</button>`)}
+      ${head('MARKET INTELLIGENCE', 'بازار طلا و <b>گزارش روزانه</b>', 'اخبار داخلی و جهانی و انس طلا.', `<button class="btn" data-speak>${I.sound} گزارش را بخوان</button>`)}
       <div class="grid">
         <div class="card c8"><div class="ch"><h3>انس جهانی طلا <small>دلار · ۳۰ روز</small></h3>${chip('ok', '▲ ۲٫۱٪ ماهانه')}</div><div class="chart" id="oz"></div></div>
         <div class="card c4"><div class="ch"><h3>نرخ‌های لحظه‌ای</h3></div>
@@ -529,7 +489,7 @@ function report() {
   const date = d.toLocaleDateString('fa-IR-u-ca-persian', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   return {
     html: `<section class="view">
-      ${head('THE DAILY LEDGER', 'گزارش روزانه <b>مدیریتی</b>', `هر شب ساعت ۲۱ بازرس ویژه این برگه را خودکار می‌نویسد و با صدای خودش برای ${OWNER.call} می‌خواند؛ قیمت‌ها، فروش، تولید، خزانه، پرسنل و یافته‌های نظارتی.`, `<button class="btn ghost" data-sfx data-toast="نسخه PDF آماده دانلود است">${I.report} دریافت PDF</button><button class="btn" data-speak>${I.sound} بخوان برایم</button>`)}
+      ${head('THE DAILY LEDGER', 'گزارش روزانه <b>مدیریتی</b>', `هر شب ساعت ۲۱، بازرس ویژه برای ${OWNER.call} می‌خواند.`, `<button class="btn ghost" data-sfx data-toast="نسخه PDF آماده دانلود است">${I.report} دریافت PDF</button><button class="btn" data-speak>${I.sound} بخوان برایم</button>`)}
       <article class="ledger card">
         <header class="lg-mast">
           <span class="en">VOL. XXXI · AGHIGH GOLD · YAZD</span>
@@ -585,4 +545,4 @@ function report() {
   };
 }
 
-export const VIEWS = { report, overview, agents, line, invoice, treasury, accounting, warehouse, people, calendar, studio, market };
+export const VIEWS = { report, overview, agents, line, invoice, treasury, accounting, warehouse, people, calendar, market };

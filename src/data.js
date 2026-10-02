@@ -20,15 +20,14 @@ export const ROLES = [
 
 export const NAV = [
   { id: 'overview', label: 'اتاق فرمان', icon: 'home', roles: ['owner', 'acc', 'wh', 'hr'] },
-  { id: 'agents', label: 'ایجنت‌های هوشمند', icon: 'agents', roles: ['owner'], badge: '۱۴', g: true },
+  { id: 'agents', label: 'ایجنت‌های هوشمند', icon: 'agents', roles: ['owner'], badge: '۱۳', g: true },
   { id: 'line', label: 'خط تولید و مراکز هزینه', icon: 'line', roles: ['owner', 'acc', 'wh'] },
-  { id: 'invoice', label: 'فاکتور لحظه‌ای', icon: 'invoice', roles: ['owner', 'acc'] },
+  { id: 'invoice', label: 'فاکتور طلایی', icon: 'invoice', roles: ['owner', 'acc'] },
   { id: 'treasury', label: 'خزانه', icon: 'vault', roles: ['owner', 'acc'] },
   { id: 'accounting', label: 'حسابداری و هزینه‌ها', icon: 'ledger', roles: ['owner', 'acc'] },
   { id: 'warehouse', label: 'انبار و تولیدی‌ها', icon: 'box', roles: ['owner', 'wh'], badge: '۳' },
   { id: 'people', label: 'پرسنل و شیفت', icon: 'people', roles: ['owner', 'hr'] },
   { id: 'calendar', label: 'سررسیدها و کارها', icon: 'cal', roles: ['owner', 'acc', 'wh', 'hr'], badge: '۵' },
-  { id: 'studio', label: 'استودیو سه‌بعدی', icon: 'cube', roles: ['owner', 'wh'] },
   { id: 'report', label: 'گزارش روزانه مدیریتی', icon: 'report', roles: ['owner', 'acc'], badge: 'نو', g: true },
   { id: 'market', label: 'بازار و اخبار', icon: 'globe', roles: ['owner', 'acc'] },
 ];
@@ -36,7 +35,6 @@ export const NAV = [
 export const AGENTS = [
   { id: 'treasury', name: 'خزانه‌دار', icon: 'vault', desc: 'موجودی طلای آب‌شده، ساخته، سکه و نقد را لحظه‌به‌لحظه با ورود و خروج تطبیق می‌دهد.', metric: 'تطبیق امروز', val: '۱۰۰٪', st: 'ok' },
   { id: 'pricing', name: 'قیمت‌گذار آنلاین', icon: 'calc', desc: 'قیمت هر گرم، اجرت، سود و مالیات را هنگام فروش در فاکتور محاسبه و در داشبورد شخصی ثبت می‌کند.', metric: 'فاکتور امروز', val: '۲۱۸', st: 'ok' },
-  { id: 'render', name: 'رندر سه‌بعدی', icon: 'cube', desc: 'عکس یا اسکچ طرح را به مدل سه‌بعدی و رندر کاتالوگ تبدیل می‌کند.', metric: 'در صف', val: '۴ طرح', st: 'ok' },
   { id: 'face', name: 'شناسایی کارکنان', icon: 'face', desc: 'ورود و خروج ۱۵۰ نفر پرسنل را با تشخیص چهره ثبت و با شیفت تطبیق می‌دهد.', metric: 'حاضر', val: '۱۴۲ / ۱۵۰', st: 'ok' },
   { id: 'due', name: 'سررسید', icon: 'cal', desc: 'چک‌ها، پرداخت‌ها و تحویل بار را دنبال می‌کند و پیش از موعد هشدار می‌دهد.', metric: 'این هفته', val: '۹ مورد', st: 'warn' },
   { id: 'stock', name: 'موجودی انبار', icon: 'box', desc: 'موجودی مواد، قطعات و محصول نهایی را پایش و کمبود را پیش‌بینی می‌کند.', metric: 'کمبود', val: '۳ قلم', st: 'warn' },

@@ -61,7 +61,6 @@ const LOG = [
   ['face', 'face-id agent', '142/150 on site'],
   ['sync', 'rayvarz bridge', '412 vouchers synced'],
   ['alert', 'order sentinel', '1 anomaly held'],
-  ['cube', 'render agent', 'GPU warm'],
 ];
 let holding = false, prog = 0, unlocked = false, logShown = 0;
 const HOLD = 1.6;
@@ -72,12 +71,14 @@ function holdStart(e) {
   sfx.initAudio().resume();
   holding = true; vault.classList.add('charging');
   sfx.chargeStart(HOLD * (1 - prog));
-  $('#bootHint').innerHTML = 'در حال احراز هویت <b class="gold-text">مهر مدیر</b>…';
+  $('#bootHint').innerHTML = 'در حال باز کردن <b class="gold-text">خزانه</b>…';
 }
 function holdEnd() {
+  // a quick tap still opens the vault: once pressed, the charge completes on its own
+  if (holding && !unlocked) return;
   if (!holding || unlocked) return;
   holding = false; vault.classList.remove('charging'); sfx.chargeStop();
-  $('#bootHint').innerHTML = 'مهر طلایی را <b class="gold-text">نگه دارید</b> تا خزانه باز شود';
+  $('#bootHint').innerHTML = 'برای ورود روی <b class="gold-text">مهر طلایی</b> بزنید';
 }
 seal.addEventListener('pointerdown', holdStart);
 addEventListener('pointerup', holdEnd); addEventListener('pointercancel', holdEnd);
@@ -103,7 +104,7 @@ let lastT = performance.now();
 
 function openVault() {
   unlocked = true; holding = false;
-  sfx.unlock(); bg.pulse(2.5); bg.setIntensity(1.25);
+  sfx.unlock(); sfx.startMusic(); bg.pulse(2.5); bg.setIntensity(1.25);
   const fl = $('#flash'); fl.classList.add('go');
   const iris = $('#iris'); iris.classList.add('on');
   iris.innerHTML = Array.from({ length: 10 }, () => '<i></i>').join('');
@@ -114,7 +115,7 @@ function openVault() {
     b.animate([{ transform: `rotate(${a}deg) translateX(0)` }, { transform: `rotate(${a + 50}deg) translateX(110vmax)` }], { duration: 1500, delay: 250, easing: 'cubic-bezier(.7,0,.2,1)', fill: 'forwards' });
   });
   setTimeout(() => { $('#app').classList.add('in'); document.body.classList.add('unlocked'); }, 450);
-  setTimeout(() => { iris.remove(); sfx.startDrone(); }, 1900);
+  setTimeout(() => iris.remove(), 1900);
   setTimeout(() => toast(`خوش آمدید ${OWNER.call}`, 'خزانه باز شد. بازرس ویژه گزارش امروز را آماده کرده است.', 'vault'), 1600);
   setTimeout(() => { sfx.alarm(); toast('نگهبان سفارش — هشدار', `سفارش ${ORDERS_ANOMALY.who}: ${fa(ORDERS_ANOMALY.x)} برابر حد نرمال`, 'alert', 'crit'); }, 7000);
 }
@@ -186,7 +187,7 @@ function ticker() {
   const one = items.map(([k, key, u]) => { const up = live[key] >= live.prev[key]; const pct = ((live[key] - live.prev[key]) / live.prev[key]) * 100; return `<span class="tk"><span class="k">${k}</span><span class="v num">${fa(live[key], key === 'ounce' ? 1 : 0)}</span><span class="k">${u}</span><span class="num ${up ? 'up' : 'down'}">${up ? '▲' : '▼'}${fa(Math.abs(pct), 2)}٪</span></span>`; }).join('');
   $('#ticker').innerHTML = one + one;
 }
-onPrice(() => { ticker(); sfx.blip(live.g18 >= live.prev.g18); });
+onPrice(ticker);
 
 function clock() {
   const d = new Date();
@@ -229,10 +230,6 @@ addEventListener('pointermove', (e) => {
     const rx = ((y / r.height) - 0.5) * -6, ry = ((x / r.width) - 0.5) * 6;
     card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(0)`;
   }
-});
-document.addEventListener('pointerover', (e) => {
-  const t = e.target.closest?.('a, button, .agent, label[data-sfx]');
-  if (t && !t.contains(e.relatedTarget)) sfx.hover();
 });
 document.addEventListener('click', (e) => {
   const t = e.target.closest('[data-sfx], .nav a, .mobile-nav a, .tabs button');
