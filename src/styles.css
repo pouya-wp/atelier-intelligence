@@ -867,3 +867,28 @@ body { font-size: 16px; line-height: 1.75; }
 .boot-hint { font-size: 18px; }
 .btn { font-size: 15px; padding: 13px 26px; }
 .iconbtn { width: 44px; height: 44px; }
+
+/* ---------- gold invoice v2: grams in, wage out in gold ---------- */
+.gi-form { display: grid; grid-template-columns: 1.3fr 1fr .7fr; gap: 14px; margin-top: 6px; }
+.gi-form .gi-field input, .gi-form .gi-field select { font-size: 28px; padding: 14px 16px; }
+.gi-field select {
+  width: 100%; padding: 16px 20px; border-radius: 8px; font-size: 20px !important; font-weight: 700; color: #2a1c03;
+  background: rgba(255,248,225,.55); border: 1px solid rgba(90,60,8,.35); box-shadow: inset 0 2px 6px rgba(90,60,8,.18); outline: none; height: 100%;
+}
+.gi-field select option { background: #f6dc8e; color: #2a1c03; }
+.gi-quick button.on { background: #2a1c03; color: #f6dc8e; border-color: #2a1c03; }
+.gi-result small { font-size: 16px; }
+.gi-lines { display: grid; gap: 0; margin-top: 16px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(90,60,8,.25); }
+.gi-lines div { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 18px; background: rgba(255,248,225,.35); font-size: 17px; }
+.gi-lines div + div { border-top: 1px solid rgba(90,60,8,.18); }
+.gi-lines span { color: #5a3f0a; }
+.gi-lines b { font-size: 22px; font-weight: 800; }
+.gi-lines .sum { background: rgba(42,28,3,.12); }
+.gi-lines .sum b { font-size: 28px; }
+.gi-foot { align-items: center; font-size: 15px; }
+.gi-save { padding: 12px 26px; border-radius: 8px; font-size: 16px; font-weight: 800; color: #f6dc8e; background: linear-gradient(180deg, #3a2806, #1f1502); border: 1px solid #1f1502; box-shadow: inset 0 1px 0 rgba(255,235,180,.25), 0 8px 20px -8px rgba(42,28,3,.8); transition: transform .3s var(--ease); }
+.gi-save:hover { transform: translateY(-2px); } .gi-save:active { transform: scale(.97); }
+.gi-tbl tfoot td { padding: 14px 10px; font-weight: 800; border-top: 1px solid var(--line-2); }
+.gi-gold { color: var(--gold-hi); font-weight: 800; }
+.gi-tbl tr.new { animation: feedIn 1s var(--ease); }
+@media (max-width: 900px) { .gi-form { grid-template-columns: 1fr; } }

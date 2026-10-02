@@ -167,3 +167,12 @@ export const DEFECT_RATE = [
   { u: 'تراش CNC', d: 0.4, y: 0.6, m: 0.7 },
   { u: 'آبکاری', d: 1.6, y: 1.3, m: 1.5 },
 ];
+
+// today's gold invoices — sales are settled in grams; the wage (اجرت) is collected as gold
+export const GOLD_INVOICES = [
+  { no: 4821, who: 'گالری ارغوان — تهران', item: 'النگو ماشینی', g: 1000, pct: 10 },
+  { no: 4820, who: 'نمایندگی شیراز', item: 'زنجیر کارتیه', g: 2400, pct: 9 },
+  { no: 4819, who: 'طلای پارسیان — مشهد', item: 'سرویس عقیق دست‌ساز', g: 650, pct: 12 },
+  { no: 4818, who: 'گالری ماهان — کرمان', item: 'پلاک CNC', g: 820, pct: 10 },
+  { no: 4817, who: 'نمایندگی اصفهان', item: 'انگشتر عقیق یمنی', g: 310, pct: 14 },
+];
