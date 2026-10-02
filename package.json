@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/pouya-wp/khaki#readme",
   "dependencies": {
+    "@fontsource/cormorant-garamond": "^5.3.0",
+    "@fontsource/markazi-text": "^5.3.0",
     "three": "^0.186.1",
     "vazirmatn": "^33.0.3"
   },

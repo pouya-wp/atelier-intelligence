@@ -35,15 +35,15 @@ void main(){
   float spec2 = pow(max(dot(n,H),0.), 9.);
   float dist = length(m-p);
   float fall = 1./(1.+dist*dist*2.2);
-  vec3 goldDeep = vec3(.28,.16,.04), gold = vec3(.86,.62,.26), goldHi = vec3(1.,.86,.55);
-  vec3 col = goldDeep*diff*.35*ridge;
-  col += gold*spec2*.55*fall*ridge;
-  col += goldHi*spec*1.6*fall;
-  // ambient key from top-left so the room never goes fully black
+  vec3 goldDeep = vec3(.20,.11,.03), gold = vec3(.90,.62,.24), goldHi = vec3(1.,.88,.58);
+  // black satin: almost no diffuse, light lives only in the specular glints
+  vec3 col = goldDeep*diff*.10*ridge;
+  col += gold*spec2*.22*fall*ridge;
+  col += goldHi*spec*1.5*fall*ridge;
+  // faint top-left rim so folds read even far from the cursor
   vec3 K = normalize(vec3(-.6,.8,.7));
-  col += gold*pow(max(dot(n,normalize(K+V)),0.),40.)*.18*ridge;
-  // agate ember in the deepest troughs
-  col += vec3(.45,.09,.06)*smoothstep(.42,.2,h)*.06;
+  col += gold*pow(max(dot(n,normalize(K+V)),0.),90.)*.10*ridge;
+  col += vec3(.38,.06,.03)*smoothstep(.42,.2,h)*.03;
   col *= uIntensity;
   col += goldHi*uPulse*fall*.6;
   // vignette + tone
@@ -51,7 +51,7 @@ void main(){
   col *= mix(.35,1.,vg);
   col = col/(1.+col);
   col = pow(col, vec3(.92));
-  gl_FragColor = vec4(col + vec3(.012,.010,.012), 1.);
+  gl_FragColor = vec4(col + vec3(.006,.005,.005), 1.);
 }`;
 
 export function createBackground(canvas) {
@@ -78,7 +78,7 @@ export function createBackground(canvas) {
 
   const mouse = { x: .7, y: .65, tx: .7, ty: .65 };
   addEventListener('pointermove', (e) => { mouse.tx = e.clientX / innerWidth; mouse.ty = 1 - e.clientY / innerHeight; });
-  let intensity = 1.6, target = 1.6, pulse = 0;
+  let intensity = 1.4, target = 1.4, pulse = 0;
   const t0 = performance.now();
   (function loop() {
     mouse.x += (mouse.tx - mouse.x) * 0.06; mouse.y += (mouse.ty - mouse.y) * 0.06;

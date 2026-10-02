@@ -225,10 +225,10 @@ function invoice() {
         </div>
         <div class="c5"><div class="receipt" id="rcpt">
           <div class="live"><span class="dot"></span>LIVE</div>
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px"><div style="width:40px;height:40px;color:#6e5022" class="rlogo"></div><div><b style="font-size:16px">طلای عقیق</b><div style="font-size:11px;color:#6a5530;letter-spacing:.2em">AGHIGH GOLD · YAZD</div></div></div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px"><div style="width:44px;height:44px" class="rlogo"></div><div><b class="metal" style="font-family:var(--display);font-size:28px;line-height:1">طلای عقیق</b><div class="en" style="font-size:11px;color:var(--muted);letter-spacing:.3em">AGHIGH GOLD · YAZD</div></div></div>
           <div id="rl"></div>
           <div class="tot"><span>مبلغ قابل پرداخت</span><b class="num" id="tot"></b></div>
-          <div style="font-size:11px;color:#6a5530;margin-top:8px" id="totw"></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:10px" id="totw"></div>
         </div></div>
       </div>
     </section>`,

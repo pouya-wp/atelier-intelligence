@@ -9,7 +9,7 @@ import { live, onPrice } from './price.js';
 import { fa, $, $$ } from './util.js';
 
 const bg = createBackground($('#bg'));
-$$('.brand .mark').forEach((m) => (m.innerHTML = LOGO));
+$$('.brand .mark, .mbrand .mark').forEach((m) => (m.innerHTML = LOGO));
 $('#seal').innerHTML = LOGO;
 
 /* ------------------------------------------------ Midas dust: the cursor sheds gold */
@@ -89,7 +89,7 @@ let lastT = performance.now();
   if (!unlocked) {
     prog = Math.max(0, Math.min(1, prog + (holding ? dt / HOLD : -dt * 1.5)));
     progEl.setAttribute('stroke-dashoffset', 653.5 * (1 - prog));
-    bg.setIntensity(1.6 + prog * 2.4);
+    bg.setIntensity(1.4 + prog * 2.6);
     const want = Math.floor(prog * LOG.length);
     while (logShown < want) {
       const [, a, b] = LOG[logShown++];
@@ -103,7 +103,7 @@ let lastT = performance.now();
 
 function openVault() {
   unlocked = true; holding = false;
-  sfx.unlock(); bg.pulse(2.5); bg.setIntensity(0.9);
+  sfx.unlock(); bg.pulse(2.5); bg.setIntensity(1);
   const fl = $('#flash'); fl.classList.add('go');
   const iris = $('#iris'); iris.classList.add('on');
   iris.innerHTML = Array.from({ length: 10 }, () => '<i></i>').join('');
@@ -157,6 +157,25 @@ function go(id, force) {
   $$('#nav a, #mnav a').forEach((a) => a.classList.toggle('active', a.dataset.id === id));
   const v = VIEWS[id](role);
   const main = $('#main'); main.innerHTML = v.html; main.scrollTop = 0;
+  // editorial heading reveal: split words into masked spans
+  main.querySelectorAll('.head h2').forEach((h) => {
+    let k = 0;
+    const wrap = (node) => {
+      [...node.childNodes].forEach((c) => {
+        if (c.nodeType === 3) {
+          const frag = document.createDocumentFragment();
+          c.textContent.split(/(\s+)/).forEach((t) => {
+            if (!t.trim()) { frag.append(t); return; }
+            const w = document.createElement('span'); w.className = 'w';
+            w.innerHTML = `<span style="animation-delay:${0.08 + k++ * 0.07}s">${t}</span>`; frag.append(w);
+          });
+          c.replaceWith(frag);
+        } else wrap(c);
+      });
+    };
+    wrap(h);
+  });
+  const sw = $('#sweep'); sw.classList.remove('go'); void sw.offsetWidth; sw.classList.add('go');
   cleanup = v.mount ? v.mount(main) : null;
   if (location.hash !== `#${id}`) history.replaceState(null, '', `#${id}`);
 }
@@ -176,6 +195,26 @@ function clock() {
   $('#load').textContent = `${fa(30 + Math.round(Math.random() * 20))}٪`;
 }
 setInterval(clock, 1000);
+
+/* ------------------------------------------------ Cursor ring + magnetic buttons */
+(function cursor() {
+  const ring = $('#cursor'), dot = $('#cursorDot');
+  let x = innerWidth / 2, y = innerHeight / 2, rx = x, ry = y, mag = null;
+  addEventListener('pointermove', (e) => {
+    x = e.clientX; y = e.clientY;
+    const t = e.target.closest?.('a, button, .agent, label, select, input, .orbwrap, .seal');
+    ring.classList.toggle('big', !!t && !t.matches('input, select'));
+    const m = e.target.closest?.('.btn, .iconbtn');
+    if (mag && mag !== m) mag.style.transform = '';
+    mag = m;
+    if (m) { const r = m.getBoundingClientRect(); m.style.transform = `translate(${(x - r.left - r.width / 2) * 0.22}px, ${(y - r.top - r.height / 2) * 0.3}px)`; }
+  });
+  (function loop() {
+    rx += (x - rx) * 0.18; ry += (y - ry) * 0.18;
+    ring.style.transform = `translate(${rx}px, ${ry}px)`; dot.style.transform = `translate(${x}px, ${y}px)`;
+    requestAnimationFrame(loop);
+  })();
+})();
 
 /* ------------------------------------------------ Interactions: foil, tilt, sounds, toasts */
 let hoverCard = null;
@@ -255,7 +294,7 @@ function stopTalk() {
   talking = false; clearInterval(talkTimer); orb.setEnergy(0);
   if ('speechSynthesis' in window) speechSynthesis.cancel();
   $('#dock').classList.remove('talking');
-  $('#say').innerHTML = '«عقیق» گوش می‌دهد — روی گوی طلایی بزنید یا <kbd>Space</kbd>';
+  $('#say').innerHTML = 'دستیار سخنگو <kbd>Space</kbd>';
 }
 $('#orbBtn').addEventListener('click', () => { sfx.click(); speak(); });
 addEventListener('keydown', (e) => { if (unlocked && e.code === 'Space' && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); speak(); } });
@@ -263,7 +302,7 @@ addEventListener('keydown', (e) => { if (unlocked && e.code === 'Space' && !/INP
 /* ------------------------------------------------ Boot */
 renderRoles(); renderNav(); ticker(); clock();
 if (new URLSearchParams(location.search).has('open')) { // skip the vault (handy for presenting a specific page)
-  unlocked = true; $('#boot').remove(); $('#iris').remove(); bg.setIntensity(0.9);
+  unlocked = true; $('#boot').remove(); $('#iris').remove(); bg.setIntensity(1);
   $('#app').classList.add('in'); document.body.classList.add('unlocked');
 }
 go(location.hash.slice(1) || 'overview', true);

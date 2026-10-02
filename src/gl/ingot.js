@@ -37,6 +37,19 @@ function stampTexture() {
   const t = new THREE.CanvasTexture(c); t.anisotropy = 8; return t;
 }
 
+function coinTexture() {
+  const c = document.createElement('canvas'); c.width = c.height = 512;
+  const g = c.getContext('2d');
+  g.fillStyle = '#444'; g.fillRect(0, 0, 512, 512);
+  g.strokeStyle = '#fff'; g.lineWidth = 10; g.beginPath(); g.arc(256, 256, 238, 0, 7); g.stroke();
+  g.lineWidth = 3; g.beginPath(); g.arc(256, 256, 214, 0, 7); g.stroke();
+  for (let i = 0; i < 120; i++) { const a = (i / 120) * Math.PI * 2; g.beginPath(); g.moveTo(256 + Math.cos(a) * 222, 256 + Math.sin(a) * 222); g.lineTo(256 + Math.cos(a) * 232, 256 + Math.sin(a) * 232); g.stroke(); }
+  g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.font = '700 150px Vazirmatn, sans-serif'; g.fillText('ع', 256, 236);
+  g.font = '500 34px Georgia, serif'; g.fillText('AGHIGH · 750', 256, 360);
+  const t = new THREE.CanvasTexture(c); t.anisotropy = 8; return t;
+}
+
 export function createIngotScene(canvas) {
   const renderer = makeRenderer(canvas);
   const scene = new THREE.Scene();
@@ -65,10 +78,13 @@ export function createIngotScene(canvas) {
   bar2.position.set(0.9, -0.95, -1.6); bar2.rotation.set(0.25, 0.4, -0.05); root.add(bar2);
 
   // coins orbiting
-  const coinGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.06, 64);
+  const coinGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.06, 96);
+  const coinFace = coinTexture();
+  const coinSide = goldMaterial(0xe9b860, 0.35);
   const coins = [];
   for (let i = 0; i < 5; i++) {
-    const m = new THREE.Mesh(coinGeo, goldMaterial(0xf5cc78, 0.22 + i * 0.03));
+    const face = goldMaterial(0xf5cc78, 0.2, { bumpMap: coinFace, bumpScale: 3, roughnessMap: coinFace });
+    const m = new THREE.Mesh(coinGeo, [coinSide, face, face]);
     m.userData = { a: (i / 5) * Math.PI * 2, r: 2.4 + (i % 2) * 0.5, y: (i - 2) * 0.35, s: 0.18 + i * 0.03 };
     root.add(m); coins.push(m);
   }
