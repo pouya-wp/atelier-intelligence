@@ -198,36 +198,36 @@ function line() {
 
 // ---------------------------------------------------------------- invoice
 function invoice() {
-  const BUYERS = ['گالری ارغوان — تهران', 'نمایندگی شیراز', 'طلای پارسیان — مشهد', 'گالری ماهان — کرمان', 'نمایندگی اصفهان'];
   const wageOf = (g, pct) => (g * pct) / 100;
   const fmtG = (g) => `${fa(g, g % 1 ? 1 : 0)} گرم`;
   const todayWage = GOLD_INVOICES.reduce((t, x) => t + wageOf(x.g, x.pct), 0);
   const todaySold = GOLD_INVOICES.reduce((t, x) => t + x.g, 0);
   return {
     html: `<section class="view">
-      ${head('GOLD INVOICE', 'فاکتور <b>طلایی</b>', 'اجرت هر فروش به گرم طلا حساب و دریافت می‌شود.')}
-      <div class="gold-inv">
-        <div class="gi-top"><div class="gi-logo">${logo()}</div><div><b>فاکتور طلایی</b><span>کارخانه طلای عقیق · یزد</span></div><span class="gi-live"><i></i>شماره ${fa(4822)}</span></div>
-        <div class="gi-form">
-          <label class="gi-field gi-buyer" for="giBuyer"><span>خریدار</span><select id="giBuyer">${BUYERS.map((b) => `<option>${b}</option>`).join('')}</select></label>
-          <label class="gi-field" for="giWeight"><span>وزن طلای فروخته‌شده (گرم)</span><input id="giWeight" inputmode="decimal" autocomplete="off" value="${fa(1000)}"></label>
-          <label class="gi-field" for="giPct"><span>درصد اجرت</span><input id="giPct" inputmode="decimal" autocomplete="off" value="${fa(10)}"></label>
+      ${head('GOLD INVOICE', 'فاکتور <b>طلایی</b>', 'اجرت هر فاکتور به گرم طلا نوشته می‌شود.')}
+      <div class="grid">
+        <div class="card c7">
+          <div class="ch"><h3>اقلام فاکتور</h3>${chip('ok', 'قیمت زنده')}</div>
+          <div class="form">
+            <div class="field"><label for="buyer">خریدار</label><select id="buyer"><option>گالری ارغوان — تهران</option><option>نمایندگی شیراز</option><option>طلای پارسیان — مشهد</option><option>گالری ماهان — کرمان</option><option>نمایندگی اصفهان</option></select></div>
+            <div class="field"><label for="prod">محصول</label><select id="prod"><option>النگو ماشینی</option><option>زنجیر کارتیه</option><option>سرویس عقیق دست‌ساز</option><option>انگشتر CNC</option></select></div>
+            <div class="field"><label for="w">وزن (گرم)</label><input id="w" type="number" value="1000" step="0.01" min="0"></div>
+            <div class="field"><label for="wp">اجرت (٪)</label><input id="wp" type="number" value="10" step="0.5" min="0"></div>
+            <div class="field"><label for="k">عیار</label><select id="k"><option value="750">۱۸ عیار (۷۵۰)</option><option value="705">۱۷ عیار (۷۰۵)</option><option value="875">۲۱ عیار (۸۷۵)</option></select></div>
+            <div class="field"><label for="p">سود فروشنده (٪)</label><input id="p" type="number" value="7" step="0.5" min="0"></div>
+          </div>
+          <div class="mt" style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" id="issue" data-sfx>${I.invoice} صدور و ثبت در رایورز</button><button class="btn ghost" data-sfx data-toast="قیمت برای ۱۰ دقیقه قفل شد">${I.lock} قفل قیمت</button></div>
         </div>
-        <div class="gi-quick" role="group" aria-label="درصد اجرت">${[7, 9, 10, 12, 15].map((v) => `<button type="button" data-pct="${v}" class="${v === 10 ? 'on' : ''}">${fa(v)}٪</button>`).join('')}</div>
-        <div class="gi-result">
-          <span>اجرت کارخانه عقیق</span>
-          <b id="giWage">—</b>
-          <small id="giWageNote"></small>
-        </div>
-        <div class="gi-lines">
-          <div><span>وزن طلا</span><b id="giL1">—</b></div>
-          <div><span>اجرت (طلا)</span><b id="giL2">—</b></div>
-          <div class="sum"><span>جمع دریافتی از خریدار</span><b id="giL3">—</b></div>
-        </div>
-        <div class="gi-foot"><span id="giToman"></span><button type="button" class="gi-save" id="giSave">ثبت فاکتور</button></div>
+        <div class="c5"><div class="receipt gold-receipt" id="rcpt">
+          <div class="live"><span class="dot"></span>رسید</div>
+          <div class="gr-head"><div class="rlogo"></div><div><b>طلای عقیق</b><span>کارخانه طلای عقیق · یزد</span></div></div>
+          <div id="rl"></div>
+          <div class="gr-wage"><span id="wageLbl">اجرت</span><b id="wageG">—</b><small id="wageT"></small></div>
+          <div class="tot"><span>مبلغ قابل پرداخت</span><b class="num" id="tot"></b></div>
+          <div class="gr-note" id="totw"></div>
+        </div></div>
       </div>
-
-      <div class="card mt" style="max-width:960px;margin-inline:auto">
+      <div class="card mt" >
         <div class="ch"><h3>فاکتورهای امروز</h3><span id="giChip">${chip('gold', `اجرت امروز: ${fmtG(todayWage)} طلا`)}</span></div>
         <div class="scroll-x"><table class="tbl gi-tbl"><thead><tr><th>شماره</th><th>خریدار</th><th>کالا</th><th>وزن</th><th>اجرت</th><th class="end">اجرت به طلا</th></tr></thead>
         <tbody id="giRows">${GOLD_INVOICES.map((x) => `<tr><td class="num muted">${fa(x.no)}</td><td>${x.who}</td><td class="muted">${x.item}</td><td class="num">${fa(x.g)} گرم</td><td class="num">${fa(x.pct)}٪</td><td class="end num gi-gold">${fmtG(wageOf(x.g, x.pct))}</td></tr>`).join('')}</tbody>
@@ -235,33 +235,38 @@ function invoice() {
       </div>
     </section>`,
     mount(root) {
+      root.querySelector('.rlogo').innerHTML = logo();
       const $ = (id) => root.querySelector(id);
-      const toLatin = (t) => t.replace(/[۰-۹]/g, (c) => '۰۱۲۳۴۵۶۷۸۹'.indexOf(c)).replace(/[٠-٩]/g, (c) => '٠١٢٣٤٥٦٧٨٩'.indexOf(c)).replace(/[٫,]/g, '.');
-      const num = (el) => +toLatin(el.value).replace(/[^0-9.]/g, '') || 0;
-      const flash = (el, v) => { if (el.textContent !== v) { el.textContent = v; el.classList.remove('flashnum'); void el.offsetWidth; el.classList.add('flashnum'); } };
-      let saved = 0;
+      let last = 0, saved = 0;
+      const flash = (el) => { el.classList.remove('flashnum'); void el.offsetWidth; el.classList.add('flashnum'); };
       const calc = () => {
-        const g = num($('#giWeight')), pct = num($('#giPct')), w = wageOf(g, pct);
-        flash($('#giWage'), fmtG(w));
-        $('#giWageNote').textContent = `${fa(pct)}٪ از ${fmtG(g)} — به گرم دریافت می‌شود`;
-        $('#giL1').textContent = fmtG(g); $('#giL2').textContent = fmtG(w); flash($('#giL3'), fmtG(g + w));
-        $('#giToman').textContent = `ارزش اجرت به قیمت امروز ≈ ${fa(Math.round((w * live.g18) / 1e6))} میلیون تومان`;
-        root.querySelectorAll('[data-pct]').forEach((b) => b.classList.toggle('on', +b.dataset.pct === pct));
+        const w = +$('#w').value || 0, wp = +$('#wp').value || 0, k = +$('#k').value, p = +$('#p').value || 0;
+        const gram = (live.g18 / 750) * k;
+        const base = w * gram, wageG = wageOf(w, wp), wageA = wageG * gram;
+        const profit = (base + wageA) * (p / 100), vat = (wageA + profit) * 0.1;
+        const tot = base + wageA + profit + vat;
+        const rows = [['وزن طلا', fmtG(w)], ['قیمت هر گرم', `${fa(gram)} تومان`], ['ارزش طلا', `${fa(base)} تومان`], [`سود (${fa(p)}٪)`, `${fa(profit)} تومان`], ['مالیات اجرت و سود', `${fa(vat)} تومان`]];
+        $('#rl').innerHTML = rows.map(([a, b]) => `<div class="rl"><span>${a}</span><span class="num">${b}</span></div>`).join('');
+        $('#wageLbl').textContent = `اجرت ساخت (${fa(wp)}٪)`;
+        const wg = $('#wageG'), nv = `${fmtG(wageG)} طلا`;
+        if (wg.textContent !== nv) { wg.textContent = nv; flash(wg); }
+        $('#wageT').textContent = `معادل ${fa(Math.round(wageA / 1e6))} میلیون تومان`;
+        const t = $('#tot'); t.textContent = `${fa(tot)} تومان`;
+        if (last && Math.round(last) !== Math.round(tot)) flash(t);
+        last = tot;
+        $('#totw').textContent = `قیمت پایه از قیمت‌گذار آنلاین — ${new Date().toLocaleTimeString('fa-IR')}`;
       };
-      ['#giWeight', '#giPct'].forEach((id) => { $(id).addEventListener('input', calc); $(id).addEventListener('change', () => { $(id).value = fa(num($(id)), 2); }); });
-      root.querySelectorAll('[data-pct]').forEach((b) => b.addEventListener('click', () => { $('#giPct').value = fa(+b.dataset.pct); calc(); sfx.ting(1318, 0.07, 0.9); }));
-      $('#giSave').addEventListener('click', () => {
-        const g = num($('#giWeight')), pct = num($('#giPct')); if (!g) return;
-        const no = 4822 + saved++, w = wageOf(g, pct);
+      root.querySelectorAll('.form input, .form select').forEach((el) => el.addEventListener('input', calc));
+      $('#issue').addEventListener('click', () => {
+        const w = +$('#w').value || 0, wp = +$('#wp').value || 0; if (!w) return;
+        const no = 4822 + saved++, wageG = wageOf(w, wp);
         const tr = document.createElement('tr'); tr.className = 'new';
-        tr.innerHTML = `<td class="num muted">${fa(no)}</td><td>${$('#giBuyer').value}</td><td class="muted">—</td><td class="num">${fmtG(g)}</td><td class="num">${fa(pct)}٪</td><td class="end num gi-gold">${fmtG(w)}</td>`;
+        tr.innerHTML = `<td class="num muted">${fa(no)}</td><td>${$('#buyer').value}</td><td class="muted">${$('#prod').value}</td><td class="num">${fmtG(w)}</td><td class="num">${fa(wp)}٪</td><td class="end num gi-gold">${fmtG(wageG)}</td>`;
         $('#giRows').prepend(tr);
-        const total = [...root.querySelectorAll('#giRows .gi-gold')].reduce((t, el) => t + +toLatin(el.textContent).replace(/[^0-9.]/g, ''), 0);
+        const total = [...root.querySelectorAll('#giRows tr')].reduce((t, r) => t + +r.lastElementChild.textContent.replace(/[۰-۹]/g, (c) => '۰۱۲۳۴۵۶۷۸۹'.indexOf(c)).replace('٫', '.').replace(/[^0-9.]/g, ''), 0);
         $('#giTotal').textContent = fmtG(total);
         $('#giChip').innerHTML = chip('gold', `اجرت امروز: ${fmtG(total)} طلا`);
-        $('.gi-live').innerHTML = `<i></i>شماره ${fa(no + 1)}`;
-        sfx.ting(1568, 0.09, 1.4);
-        $('#giSave').dataset.toast = `فاکتور ${fa(no)} ثبت شد — ${$('#giBuyer').value}، اجرت ${fmtG(w)} طلا`;
+        $('#issue').dataset.toast = `فاکتور ${fa(no)} ثبت شد — ${$('#buyer').value}، اجرت ${fmtG(wageG)} طلا`;
       });
       calc();
       return onPrice(calc);
