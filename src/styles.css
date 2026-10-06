@@ -195,22 +195,25 @@ main { grid-area: main; overflow-y: auto; overflow-x: hidden; padding: 30px 32px
 .btn.ghost:hover { color: #fff; background: var(--navy); border-color: var(--navy); }
 
 /* hero: the bar on emerald velvet */
-.hero { position: relative; min-height: 460px; padding: 0; overflow: hidden; color: #fff; background: var(--velvet); border: 0; }
+.hero { position: relative; min-height: 500px; padding: 0; overflow: hidden; color: #fff; background: var(--velvet); border: 0; }
 .hero:hover { box-shadow: none; }
 .hero canvas.gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.hero .hero-copy { position: relative; z-index: 2; display: grid; gap: 10px; max-width: 54%; padding: 34px 36px; }
+.hero .hero-copy { position: relative; z-index: 2; display: grid; gap: 10px; max-width: 56%; padding: 34px 36px 88px; }
 .hero .greet { font-size: 16px; color: rgba(255,255,255,.8); }
 .hero .caps { color: var(--emerald-on-dark); letter-spacing: 0; text-transform: none; font-size: 13px; }
 .hero .big { font-size: clamp(64px, 7vw, 108px); font-weight: 300; line-height: 1; letter-spacing: -.02em; color: #fff; }
 .hero .big small { font-size: 15px; font-weight: 500; color: rgba(255,255,255,.7); letter-spacing: 0; }
-.hero .stats { display: flex; flex-wrap: wrap; gap: 40px; margin-top: 16px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.14); }
+.hero .stats { display: flex; flex-wrap: wrap; gap: 18px 34px; margin-top: 16px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.14); }
 .hero .stats > div { display: grid; gap: 4px; }
 .hero .stats > div > span { font-size: 13px; color: rgba(255,255,255,.65); }
 .hero .stats b { font-size: 28px; font-weight: 300; line-height: 1; }
 .hero .stamp { position: absolute; z-index: 2; bottom: 24px; inset-inline-start: 36px; display: flex; gap: 8px; flex-wrap: wrap; }
 .hero .stamp .chip { color: #fff; background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.14); }
 .hero .stamp .dot { background: var(--emerald-on-dark); }
-.hero .hint3d { position: absolute; z-index: 2; bottom: 24px; inset-inline-end: 28px; font-family: var(--mono); font-size: 10px; letter-spacing: .3em; color: rgba(255,255,255,.45); }
+.hero .hint3d { position: absolute; z-index: 4; bottom: 26px; inset-inline-end: 30px; font-family: var(--mono); font-size: 10px; letter-spacing: .32em; color: rgba(217,195,154,.7); word-spacing: normal; }
+
+/* signature: a jeweller's-box hairline inside the hero, and a line of fine print on its edge */
+.hero::after { content: ""; position: absolute; inset: 12px; z-index: 3; border: 1px solid rgba(181,148,87,.38); border-radius: 6px; pointer-events: none; }
 
 /* alert */
 .alert { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 16px 20px; border-radius: var(--r); background: #fdf5f4; border: 1px solid #f0d3cf; font-size: 15.5px; }

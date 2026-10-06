@@ -40,7 +40,7 @@ function overview(role) {
           </div>
         </div>
         <div class="stamp">${chip('gold', '۱۳ ایجنت فعال')}${chip('ok', 'همگام با رایورز')}${chip('ok', 'خزانه تطبیق شد')}</div>
-        <div class="hint3d">MOVE · TO · LIGHT</div>
+        <div class="hint3d">AGHIGH · ATELIER · 999.9 · YAZD</div>
       </div>
 
       <div class="alert mt" id="anomaly">
