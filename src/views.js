@@ -1,9 +1,10 @@
-import { I, logo } from './icons.js';
+import { I } from './icons.js';
 import { fa, toman, sparkline, areaChart, donut, bars, countUp, rand } from './util.js';
 import { OWNER, AGENTS, STATIONS, ADMIN_UNITS, STAFF, DUE, TODOS, NEWS, STOCK, MAKERS, RETURNS, DEFECTS, ORDERS_ANOMALY, CODES, ORDER_CHECK, FINDINGS, DEFECT_RATE, GOLD_INVOICES } from './data.js';
 import { live, onPrice } from './price.js';
 import { createIngotScene } from './gl/ingot.js';
 import { createConstellation } from './gl/constellation.js';
+import { mountLogo } from './gl/logo3d.js';
 import * as sfx from './sfx.js';
 
 const series = (n, base, vol, drift = 0) => { let v = base; return Array.from({ length: n }, () => (v += (Math.random() - 0.48 + drift) * vol)); };
@@ -235,7 +236,7 @@ function invoice() {
       </div>
     </section>`,
     mount(root) {
-      root.querySelector('.rlogo').innerHTML = logo();
+      mountLogo(root.querySelector('.rlogo'));
       const $ = (id) => root.querySelector(id);
       let last = 0, saved = 0;
       const flash = (el) => { el.classList.remove('flashnum'); void el.offsetWidth; el.classList.add('flashnum'); };

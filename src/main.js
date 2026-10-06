@@ -1,14 +1,14 @@
 import './styles.css';
 import { createOrb } from './gl/orb.js';
 import * as sfx from './sfx.js';
-import { I, logo } from './icons.js';
+import { I } from './icons.js';
+import { mountLogo } from './gl/logo3d.js';
 import { NAV, ROLES, OWNER, ORDERS_ANOMALY } from './data.js';
 import { VIEWS, reportText } from './views.js';
 import { live, onPrice } from './price.js';
 import { fa, $, $$ } from './util.js';
 
-$$('.brand .mark, .mbrand .mark').forEach((m) => (m.innerHTML = logo()));
-$('#seal').innerHTML = logo();
+$$('.brand .mark, .mbrand .mark, #seal').forEach(mountLogo);
 
 /* ------------------------------------------------ Vault intro */
 const vaultSvg = $('#vaultSvg');
