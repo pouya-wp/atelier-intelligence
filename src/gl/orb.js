@@ -37,11 +37,11 @@ export function createOrb(canvas) {
         vec3 n = normalize(vN); vec3 v = normalize(vV); vec3 r = reflect(-v, n);
         // procedural studio reflection: bright softbox top, warm floor, dark horizon band
         float sky = smoothstep(-.1,.9,r.y); float box = smoothstep(.75,.98, dot(r, normalize(vec3(uLight,1.))));
-        vec3 env = mix(vec3(.18,.09,.03), vec3(1.,.86,.55), sky) + vec3(1.,.95,.8)*box*1.6;
+        vec3 env = mix(vec3(.02,.12,.09), vec3(.75,.92,.85), sky) + vec3(1.)*box*1.2;
         env *= .55 + .45*smoothstep(-.4,.2,abs(r.y-.05));
         float fr = pow(1.-max(dot(n,v),0.), 3.);
-        vec3 gold = vec3(1.,.76,.36);
-        vec3 col = env*gold*(.85+.6*fr) + vec3(.7,.15,.08)*fr*.25;
+        vec3 gold = vec3(.35,.78,.62);
+        vec3 col = env*gold*(.85+.5*fr) + vec3(.71,.58,.34)*fr*.35;
         col = col/(1.+col*.6);
         gl_FragColor = vec4(pow(col, vec3(.9)), 1.); }`,
   });

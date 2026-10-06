@@ -53,7 +53,7 @@ function overview(role) {
         ${kpi('هر گرم طلای ۱۸ عیار', live.g18 / 1e6, 'میلیون تومان', '۱٫۲٪', sparkline(series(30, 50, 3, 0.05)), true, 2)}
         ${kpi('انس جهانی', live.ounce, 'دلار', '۰٫۸٪', sparkline(series(30, 50, 3, 0.04)), true, 1)}
         ${kpi('فروش امروز', 92.8, 'میلیارد تومان', '۹٪', sparkline(series(30, 50, 4, 0.06)), true, 1)}
-        ${kpi('هزینه جاری ماه', 1.84, 'میلیارد تومان', '۳٪', sparkline(series(30, 50, 2, -0.03), { color: '#b23a2e' }), false, 2)}
+        ${kpi('هزینه جاری ماه', 1.84, 'میلیارد تومان', '۳٪', sparkline(series(30, 50, 2, -0.03), { color: '#b42318' }), false, 2)}
       </div>
 
       <div class="grid mt">
@@ -114,7 +114,7 @@ function agents() {
         <div class="card c4"><div class="ch"><h3>تپش‌های زنده</h3>${chip('ok', 'جریان داده')}</div><div class="feed" id="pulseLog"></div></div>
       </div>
       <div class="grid mt">
-        ${AGENTS.map((a, i) => `<div class="card agent c3" data-tilt title="${a.desc}" style="animation-delay:${i * 0.04}s">
+        ${AGENTS.map((a, i) => `<div class="card agent ${a.id === 'voice' ? 'c12 agent-feature' : 'c3'}" title="${a.desc}">
           <div class="top-row"><div class="ic">${I[a.icon]}</div>${chip(a.st, a.st === 'ok' ? 'فعال' : a.st === 'warn' ? 'نیاز به توجه' : 'هشدار')}</div>
           <h4>${a.name}</h4>
           <div class="metric"><span>${a.metric}</span><b class="num">${a.val}</b></div>
@@ -160,10 +160,10 @@ function line() {
           </div>
         </div>
       </div>
-      <div class="card mt"><div class="ch"><h3>آمار خرابی هر واحد <small>در هر ۱۰۰ قطعه — امروز در برابر دیروز و میانگین ماه قبل</small></h3><div class="legend"><span><i style="background:var(--gold-hi)"></i>امروز</span><span><i style="background:var(--blue-hi)"></i>دیروز</span><span><i style="background:rgba(198,200,207,.35)"></i>ماه قبل</span></div></div>
+      <div class="card mt"><div class="ch"><h3>آمار خرابی هر واحد <small>در هر ۱۰۰ قطعه — امروز در برابر دیروز و میانگین ماه قبل</small></h3><div class="legend"><span><i style="background:#0e5a44"></i>امروز</span><span><i style="background:#3c5a80"></i>دیروز</span><span><i style="background:#d5dfda"></i>ماه قبل</span></div></div>
         <div class="dfx">${DEFECT_RATE.map((r) => { const better = r.d <= r.y; const vsM = ((r.d - r.m) / r.m) * 100; const mx = 4; return `<div class="dfx-r">
           <b>${r.u}</b>
-          <div class="dfx-bars"><i style="width:${(r.d / mx) * 100}%;background:linear-gradient(270deg,#b98532,#fbe7b6)"></i><i style="width:${(r.y / mx) * 100}%;background:var(--blue-hi);opacity:.7"></i><i style="width:${(r.m / mx) * 100}%;background:rgba(198,200,207,.3)"></i></div>
+          <div class="dfx-bars"><i style="width:${(r.d / mx) * 100}%;background:#0e5a44"></i><i style="width:${(r.y / mx) * 100}%;background:#3c5a80;opacity:.75"></i><i style="width:${(r.m / mx) * 100}%;background:#d5dfda"></i></div>
           <span class="num">${fa(r.d, 1)}</span>
           ${chip(better ? 'ok' : 'crit', `${better ? '▼ بهبود' : '▲ بدتر'} ${fa(Math.abs(vsM), 0)}٪ نسبت به ماه قبل`)}
         </div>`; }).join('')}</div></div>
@@ -176,15 +176,15 @@ function line() {
       const svg = root.querySelector('#flow'), n = STATIONS.length, W = 1200, step = W / n;
       const xs = STATIONS.map((_, i) => W - (i + 0.5) * step); // RTL flow: right → left
       const path = `M${xs[0]},60 ` + xs.slice(1).map((x, i) => `C${xs[i] - step / 2},${i % 2 ? 20 : 100} ${x + step / 2},${i % 2 ? 100 : 20} ${x},60`).join(' ');
-      svg.innerHTML = `<defs><linearGradient id="fl" x1="1" x2="0"><stop offset="0" stop-color="#e2664f"/><stop offset=".2" stop-color="#f7e4b5"/><stop offset="1" stop-color="#d4af6a"/></linearGradient>
+      svg.innerHTML = `<defs><linearGradient id="fl" x1="1" x2="0"><stop offset="0" stop-color="#1f7a5e"/><stop offset="1" stop-color="#0e5a44"/></linearGradient>
         <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-        <path id="fp" d="${path}" fill="none" stroke="rgba(212,175,106,.12)" stroke-width="14" stroke-linecap="round"/>
+        <path id="fp" d="${path}" fill="none" stroke="rgba(14,90,68,.08)" stroke-width="14" stroke-linecap="round"/>
         <path d="${path}" fill="none" stroke="url(#fl)" stroke-width="2" stroke-dasharray="2 10" stroke-linecap="round"><animate attributeName="stroke-dashoffset" from="0" to="-120" dur="2s" repeatCount="indefinite"/></path>
-        ${Array.from({ length: 16 }, (_, i) => `<circle r="${2 + (i % 3)}" fill="#f7e4b5" filter="url(#glow)"><animateMotion dur="${9 + (i % 4)}s" begin="${-i * 0.7}s" repeatCount="indefinite"><mpath href="#fp"/></animateMotion></circle>`).join('')}
-        ${xs.map((x, i) => `<g transform="translate(${x},60)"><circle r="20" fill="#0c0a0c" stroke="${i === 1 ? '#e8b04f' : '#d4af6a'}" stroke-width="1.5"/><circle r="26" fill="none" stroke="rgba(212,175,106,.25)"><animate attributeName="r" values="22;32;22" dur="${2.4 + i * 0.2}s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0;1" dur="${2.4 + i * 0.2}s" repeatCount="indefinite"/></circle><g transform="translate(-9,-9) scale(.75)" color="#f7e4b5">${I[STATIONS[i].icon]}</g></g>`).join('')}`;
+        ${Array.from({ length: 16 }, (_, i) => `<circle r="${2 + (i % 3)}" fill="#b59457"><animateMotion dur="${9 + (i % 4)}s" begin="${-i * 0.7}s" repeatCount="indefinite"><mpath href="#fp"/></animateMotion></circle>`).join('')}
+        ${xs.map((x, i) => `<g transform="translate(${x},60)"><circle r="21" fill="#fff" stroke="${i === 1 ? '#b7791f' : '#0e5a44'}" stroke-width="1.5"/><circle r="26" fill="none" stroke="rgba(14,90,68,.2)"><animate attributeName="r" values="22;32;22" dur="${2.4 + i * 0.2}s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0;1" dur="${2.4 + i * 0.2}s" repeatCount="indefinite"/></circle><g transform="translate(-9,-9) scale(.75)" color="#0e5a44">${I[STATIONS[i].icon]}</g></g>`).join('')}`;
       svg.querySelectorAll('g > g > svg').forEach((s) => { s.setAttribute('width', 24); s.setAttribute('height', 24); });
       root.querySelector('#stations').innerHTML = STATIONS.map((s) => `<div style="text-align:center;display:grid;gap:4px">
-        <b style="font-size:13px">${s.name}</b><span class="num" style="font-size:12px;color:var(--gold-hi)" data-wip="${s.wip}">${fa(s.wip, 1)} کیلو</span>
+        <b style="font-size:13px">${s.name}</b><span class="num" style="font-size:13px;color:var(--emerald)" data-wip="${s.wip}">${fa(s.wip, 1)} کیلو</span>
         <span class="muted" style="font-size:11px">افت ${fa(s.loss, 2)}٪ · ${fa(s.staff)} نفر</span></div>`).join('');
       const prod = STATIONS.filter((s) => s.loss > 0);
       root.querySelector('#lossBars').innerHTML = bars(prod.map((s) => s.loss), prod.map((s) => s.name), { hi: 1, fmt: (v) => `${fa(v, 2)}٪`, h: 190 });
@@ -287,10 +287,10 @@ function treasury() {
       <div class="grid mt">
         <div class="card c5"><div class="ch"><h3>ترکیب خزانه</h3></div><div id="d2"></div>
           <div class="kv" style="margin-top:16px">
-            <div><i style="background:#f7e4b5"></i><span>محصول ساخته</span><b class="num">۸۲٫۱ کیلو</b></div>
-            <div><i style="background:#d4af6a"></i><span>آب‌شده ۷۵۰</span><b class="num">۶۱٫۲ کیلو</b></div>
-            <div><i style="background:#8a6a2f"></i><span>در جریان تولید</span><b class="num">۳۲٫۷ کیلو</b></div>
-            <div><i style="background:#3c6491"></i><span>سکه و شمش</span><b class="num">۱۰٫۴ کیلو</b></div>
+            <div><i style="background:#0a3f30"></i><span>محصول ساخته</span><b class="num">۸۲٫۱ کیلو</b></div>
+            <div><i style="background:#1f7a5e"></i><span>آب‌شده ۷۵۰</span><b class="num">۶۱٫۲ کیلو</b></div>
+            <div><i style="background:#b59457"></i><span>در جریان تولید</span><b class="num">۳۲٫۷ کیلو</b></div>
+            <div><i style="background:#0a1e35"></i><span>سکه و شمش</span><b class="num">۱۰٫۴ کیلو</b></div>
           </div></div>
         <div class="card c7"><div class="ch"><h3>ورود و خروج امروز</h3>${chip('ok', 'تراز')}</div>
           <div class="scroll-x"><table class="tbl"><thead><tr><th>ساعت</th><th>شرح</th><th>نوع</th><th class="end">وزن</th></tr></thead><tbody>
@@ -304,7 +304,7 @@ function treasury() {
     </section>`,
     mount(root) {
       countUp(root);
-      donut(root.querySelector('#d2'), [{ l: 'محصول ساخته', v: 82.1, c: '#f7e4b5' }, { l: 'آب‌شده', v: 61.2, c: '#d4af6a' }, { l: 'در جریان تولید', v: 32.7, c: '#8a6a2f' }, { l: 'سکه و شمش', v: 10.4, c: '#3c6491' }], { size: 200, center: '۱۸۶٫۴' });
+      donut(root.querySelector('#d2'), [{ l: 'محصول ساخته', v: 82.1, c: '#0a3f30' }, { l: 'آب‌شده', v: 61.2, c: '#1f7a5e' }, { l: 'در جریان تولید', v: 32.7, c: '#b59457' }, { l: 'سکه و شمش', v: 10.4, c: '#0a1e35' }], { size: 200, center: '۱۸۶٫۴' });
       const set = () => {
         root.querySelector('#tv').textContent = `${fa((186420 * live.g18) / 1e9, 1)} میلیارد تومان`;
         root.querySelectorAll('[data-kg]').forEach((el) => { el.textContent = `${fa((+el.dataset.kg * 1000 * live.g18) / 1e9, 2)} میلیارد`; });
@@ -324,7 +324,7 @@ function accounting() {
       <div class="grid">
         ${kpi('درآمد ماه', 1.92, 'هزار میلیارد', '۱۱٪', sparkline(series(30, 50, 3, 0.06)), true, 2)}
         ${kpi('حاشیه سود ناخالص', 14.6, 'درصد', '۰٫۴٪', sparkline(series(30, 50, 2, 0.02)), true, 1)}
-        ${kpi('هزینه‌های جاری', 5.31, 'میلیارد', '۳٪', sparkline(series(30, 50, 2, 0.02), { color: '#b23a2e' }), false, 2)}
+        ${kpi('هزینه‌های جاری', 5.31, 'میلیارد', '۳٪', sparkline(series(30, 50, 2, 0.02), { color: '#b42318' }), false, 2)}
         ${kpi('اسناد ثبت‌شده امروز', 412, 'سند', '۶۲', sparkline(series(30, 50, 4, 0.03)), true)}
       </div>
       <div class="grid mt">
@@ -350,7 +350,7 @@ function warehouse() {
           ${x.o > x.st ? chip('crit', `کسری ${fa(x.o - x.st)} عدد`) : chip('ok', 'پوشش کامل')}</div>`).join('')}</div></div>
       <div class="grid">
         <div class="card c7"><div class="ch"><h3>موجودی انبار</h3>${chip('warn', '۳ قلم زیر حد')}</div>
-          <div style="display:grid;gap:16px">${STOCK.map((s) => `<div style="display:grid;grid-template-columns:1fr auto;gap:8px 14px;align-items:center"><span style="font-size:13px">${s.n}</span><span class="num" style="font-size:12.5px">${s.q} ${chip(s.st, s.st === 'ok' ? 'کافی' : s.st === 'warn' ? 'رو به اتمام' : 'بحرانی')}</span><div class="meter" style="grid-column:span 2"><i style="width:${s.lvl}%;${s.st === 'crit' ? 'background:linear-gradient(90deg,#7a1f16,#e2664f)' : ''}"></i></div></div>`).join('')}</div></div>
+          <div style="display:grid;gap:16px">${STOCK.map((s) => `<div style="display:grid;grid-template-columns:1fr auto;gap:8px 14px;align-items:center"><span style="font-size:13px">${s.n}</span><span class="num" style="font-size:12.5px">${s.q} ${chip(s.st, s.st === 'ok' ? 'کافی' : s.st === 'warn' ? 'رو به اتمام' : 'بحرانی')}</span><div class="meter" style="grid-column:span 2"><i style="width:${s.lvl}%;${s.st === 'crit' ? 'background:#b42318' : ''}"></i></div></div>`).join('')}</div></div>
         <div class="card c5"><div class="ch"><h3>تولیدی‌های طرف قرارداد</h3></div>
           <table class="tbl"><thead><tr><th>تولیدی</th><th>محصول</th><th class="end">تحویل به‌موقع</th></tr></thead><tbody>
           ${MAKERS.map((m) => `<tr><td>${m.n}</td><td class="muted">${m.k}</td><td class="end num">${fa(m.on)}٪</td></tr>`).join('')}</tbody></table></div>
@@ -378,7 +378,7 @@ function people() {
         ${kpi('غذای امشب', 23, 'پرس', '۴ پرس', '', true)}
       </div>
       <div class="card mt shift">
-        <div class="ch"><h3>${I.clock.replace('<svg', '<svg width="16"')} شیفت امروز <small>ساعت کاری ۸ تا ۱۶ · دو ساعت اضافه‌کاری (تا ۱۸) = غذای پرسنلی</small></h3><div class="legend"><span><i style="background:var(--gold-mid)"></i>ساعت کاری</span><span><i class="stripe"></i>اضافه‌کاری</span><span><i style="background:var(--agate-hi)"></i>مشمول غذا</span></div></div>
+        <div class="ch"><h3>${I.clock.replace('<svg', '<svg width="16"')} شیفت امروز <small>ساعت کاری ۸ تا ۱۶ · دو ساعت اضافه‌کاری (تا ۱۸) = غذای پرسنلی</small></h3><div class="legend"><span><i style="background:#e6efeb;border:1px solid #1f7a5e"></i>ساعت کاری</span><span><i class="stripe"></i>اضافه‌کاری</span><span><i style="background:#b42318"></i>مشمول غذا</span></div></div>
         <div class="tl">
           <div class="tl-axis">${Array.from({ length: 9 }, (_, i) => `<span style="inset-inline-start:${(i * 2 / 16) * 100}%">${fa(6 + i * 2)}:۰۰</span>`).join('')}</div>
           <div class="tl-zone reg" style="inset-inline-start:${(2 / 16) * 100}%;width:${(8 / 16) * 100}%"><em>ساعت کاری</em></div>
@@ -417,7 +417,7 @@ function people() {
 
 // ---------------------------------------------------------------- calendar
 function calendar() {
-  const kc = { in: '#8cc29a', out: '#e2664f', ship: '#d4af6a', gold: '#f7e4b5' };
+  const kc = { in: '#2f8f62', out: '#b42318', ship: '#b59457', gold: '#0a1e35' };
   const today = 10;
   return {
     html: `<section class="view">

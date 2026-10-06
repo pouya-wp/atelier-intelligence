@@ -21,7 +21,7 @@ const vaultSvg = $('#vaultSvg');
   }
   vaultSvg.innerHTML = `<g class="ring r1">${t}</g>
     <circle cx="${C}" cy="${C}" r="150" fill="none" stroke="currentColor" stroke-opacity=".18"/>
-    <circle id="prog" cx="${C}" cy="${C}" r="150" fill="none" stroke="#CB9B2D" stroke-width="1.5" transform="rotate(-90 ${C} ${C})" stroke-dasharray="942.5" stroke-dashoffset="942.5"/>`;
+    <circle id="prog" cx="${C}" cy="${C}" r="150" fill="none" stroke="#fff" stroke-width="1.5" transform="rotate(-90 ${C} ${C})" stroke-dasharray="942.5" stroke-dashoffset="942.5"/>`;
 })();
 
 let holding = false, prog = 0, unlocked = false;

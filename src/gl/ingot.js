@@ -13,13 +13,13 @@ function drawMark(g, cx, cy, size) {
 
 // Real polished gold: pure metal, no clearcoat (clearcoat is what reads as "plastic").
 export function goldMaterial(color = 0xf2b84b, rough = 0.1, extra = {}) {
-  return new THREE.MeshPhysicalMaterial({ color, metalness: 1, roughness: rough, envMapIntensity: 1.9, ...extra });
+  return new THREE.MeshPhysicalMaterial({ color, metalness: 1, roughness: rough, envMapIntensity: 1.15, ...extra });
 }
 
 export function makeRenderer(canvas) {
   const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
   r.setPixelRatio(Math.min(Math.max(devicePixelRatio, 1.5), 2));
-  r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1.15;
+  r.toneMapping = THREE.NeutralToneMapping; r.toneMappingExposure = 0.95;
   r.outputColorSpace = THREE.SRGBColorSpace;
   return r;
 }
@@ -44,18 +44,18 @@ export function studioEnv(renderer, scene) {
     const pm = new THREE.PMREMGenerator(renderer);
     const envScene = new THREE.Scene();
     const sky = new THREE.Mesh(new THREE.SphereGeometry(30, 48, 24), new THREE.MeshBasicMaterial({ map: hdr, side: THREE.BackSide }));
-    sky.material.color.setScalar(1.1); envScene.add(sky);
+    sky.material.color.setScalar(1.0); envScene.add(sky);
     // softboxes: big key above/behind (lights top faces), strip lights for razor edges, warm bounce below
     const box = (w, h, x, y, z, i, c = [1, 0.95, 0.85]) => {
       const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(...c).multiplyScalar(i), side: THREE.DoubleSide }));
       m.position.set(x, y, z); m.lookAt(0, 0, 0); envScene.add(m);
     };
-    box(14, 5, 0, 9, -6, 3.2);
-    box(10, 4, 0, 8, 6, 2.2);
-    box(1.4, 14, -9, 2, 1, 5);
-    box(1.4, 14, 9, 2, -1, 4);
-    box(16, 0.6, 0, 1.5, -11, 6);
-    box(18, 6, 0, -8, 0, 0.6, [1, 0.7, 0.35]);
+    box(14, 7, 0, 9, -6, 1.8);
+    box(12, 6, 0, 8, 6, 1.4);
+    box(3, 14, -9, 2, 1, 1.6);
+    box(3, 14, 9, 2, -1, 1.4);
+    box(16, 1.2, 0, 1.5, -11, 1.8);
+    box(18, 8, 0, -8, 0, 0.9, [0.55, 0.85, 0.72]);
     scene.environment = pm.fromScene(envScene, 0.015).texture;
     pm.dispose();
   });
@@ -102,7 +102,7 @@ function coinTexture() {
 }
 
 // stamped face: frosted lettering (rough) recessed into a mirror surface
-export function stampedGold(map, base = 0.08, frost = 0.5, color = 0xf2b84b) {
+export function stampedGold(map, base = 0.16, frost = 0.5, color = 0xe8c06a) {
   const m = goldMaterial(color, 1, { bumpMap: map, bumpScale: -3, roughnessMap: map });
   m.onBeforeCompile = (sh) => {
     sh.fragmentShader = sh.fragmentShader.replace('#include <roughnessmap_fragment>', `
@@ -137,20 +137,20 @@ export function createIngotScene(canvas) {
   const root = new THREE.Group(); scene.add(root);
   const bar = new THREE.Group(); root.add(bar);
   const W = 3.4, H = 0.62, D = 1.6, T = 0.84;
-  bar.add(new THREE.Mesh(ingotGeometry(W, H, D, T), goldMaterial(0xf2b84b, 0.1)));
+  bar.add(new THREE.Mesh(ingotGeometry(W, H, D, T), goldMaterial(0xe8c06a, 0.2)));
   const face = new THREE.Mesh(new THREE.PlaneGeometry(W * T - 0.14, D * T - 0.12), stampedGold(stampTexture()));
   face.rotation.x = -Math.PI / 2; face.position.y = H / 2 + 0.002; bar.add(face);
   bar.rotation.set(0.42, -0.6, 0.04);
 
-  const bar2 = new THREE.Mesh(ingotGeometry(2.2, 0.42, 1.05, 0.84), goldMaterial(0xeab04a, 0.14));
+  const bar2 = new THREE.Mesh(ingotGeometry(2.2, 0.42, 1.05, 0.84), goldMaterial(0xe0b862, 0.24));
   bar2.position.set(0.9, -0.75, -1.6); bar2.rotation.set(0.25, 0.4, -0.05); root.add(bar2);
 
   const coinGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.06, 128);
   const coinFace = coinTexture();
-  const edge = goldMaterial(0xf2b84b, 0.22);
+  const edge = goldMaterial(0xe8c06a, 0.28);
   const coins = [];
   for (let i = 0; i < 5; i++) {
-    const f = stampedGold(coinFace, 0.07, 0.42);
+    const f = stampedGold(coinFace, 0.16, 0.45);
     const m = new THREE.Mesh(coinGeo, [edge, f, f]);
     m.userData = { a: (i / 5) * Math.PI * 2, r: 2.4 + (i % 2) * 0.5, y: (i - 2) * 0.35, s: 0.18 + i * 0.03 };
     root.add(m); coins.push(m);
@@ -167,12 +167,12 @@ export function createIngotScene(canvas) {
       void main(){ vec3 p = position; p.y += mod(uTime*.12*(.3+seed) + seed*6., 6.) - 3.; p.x += sin(uTime*.3+seed*20.)*.2;
       vec4 mv = modelViewMatrix*vec4(p,1.); gl_Position = projectionMatrix*mv;
       gl_PointSize = (1.+seed*2.5)*uPx*(6./-mv.z); vA = .2+.8*pow(abs(sin(uTime*1.5+seed*40.)),4.); }`,
-    fragmentShader: `varying float vA; void main(){ float d = length(gl_PointCoord-.5); if(d>.5) discard; gl_FragColor = vec4(1.,.86,.55, vA*smoothstep(.5,0.,d)); }`,
+    fragmentShader: `varying float vA; void main(){ float d = length(gl_PointCoord-.5); if(d>.5) discard; gl_FragColor = vec4(1.,.95,.85, vA*.6*smoothstep(.5,0.,d)); }`,
   });
   scene.add(new THREE.Points(dg, dm));
 
   // one hard key that follows the cursor — the highlight you "move to light"
-  const key = new THREE.SpotLight(0xfff4e0, 260, 30, 0.35, 0.35, 1.4); key.position.set(3, 5, 6); scene.add(key); scene.add(key.target);
+  const key = new THREE.SpotLight(0xfff8ee, 70, 30, 0.6, 0.8, 1.4); key.position.set(3, 5, 6); scene.add(key); scene.add(key.target);
 
   const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   const onMove = (e) => {

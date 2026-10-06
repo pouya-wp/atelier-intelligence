@@ -47,7 +47,7 @@ export function createConstellation(wrap, agents, { onPulse } = {}) {
     nodes.forEach((n) => {
       const a = 0.05 + n.hot * 0.5 + (n === hover ? 0.5 : 0);
       const grd = g.createLinearGradient(n.x, n.y, cx, cy);
-      grd.addColorStop(0, `rgba(251,231,182,${a})`); grd.addColorStop(1, 'rgba(251,231,182,0)');
+      grd.addColorStop(0, `rgba(255,255,255,${a})`); grd.addColorStop(1, 'rgba(255,255,255,0)');
       g.strokeStyle = grd; g.lineWidth = n === hover ? 1.5 : 1;
       g.beginPath(); g.moveTo(n.x, n.y); g.lineTo(cx, cy); g.stroke();
       n.hot = Math.max(0, n.hot - dt * 0.8);
@@ -58,7 +58,7 @@ export function createConstellation(wrap, agents, { onPulse } = {}) {
       if (p.t >= 1) { pulses.splice(i, 1); core.setEnergy(0.8); setTimeout(() => core.setEnergy(0.15), 160); continue; }
       const e = p.t * p.t, x = p.n.x + (cx - p.n.x) * e, y = p.n.y + (cy - p.n.y) * e;
       const rg = g.createRadialGradient(x, y, 0, x, y, 10);
-      rg.addColorStop(0, 'rgba(255,246,220,1)'); rg.addColorStop(0.3, 'rgba(246,220,152,.7)'); rg.addColorStop(1, 'rgba(214,178,110,0)');
+      rg.addColorStop(0, 'rgba(255,255,255,1)'); rg.addColorStop(0.3, 'rgba(243,236,221,.7)'); rg.addColorStop(1, 'rgba(181,148,87,0)');
       g.fillStyle = rg; g.beginPath(); g.arc(x, y, 10, 0, 7); g.fill();
     }
     // nodes
@@ -66,11 +66,11 @@ export function createConstellation(wrap, agents, { onPulse } = {}) {
       const crit = n.a.st === 'crit', warn = n.a.st === 'warn';
       const r = 5 + n.hot * 2.5 + (n === hover ? 3 : 0);
       const rg = g.createRadialGradient(n.x - r * 0.3, n.y - r * 0.4, 0, n.x, n.y, r);
-      rg.addColorStop(0, '#fff6dc'); rg.addColorStop(0.45, crit ? '#e0553f' : '#e2bb6c'); rg.addColorStop(1, crit ? '#6a140c' : '#6b4614');
+      rg.addColorStop(0, '#ffffff'); rg.addColorStop(0.5, crit ? '#e0553f' : '#d9c39a'); rg.addColorStop(1, crit ? '#7a1610' : '#8d7140');
       g.fillStyle = rg; g.beginPath(); g.arc(n.x, n.y, r, 0, 7); g.fill();
-      if (crit || warn) { g.strokeStyle = crit ? 'rgba(224,85,63,.6)' : 'rgba(230,182,92,.45)'; g.lineWidth = 1; g.beginPath(); g.arc(n.x, n.y, r + 5 + Math.sin(t / 300) * 2, 0, 7); g.stroke(); }
+      if (crit || warn) { g.strokeStyle = crit ? 'rgba(224,85,63,.6)' : 'rgba(217,195,154,.5)'; g.lineWidth = 1; g.beginPath(); g.arc(n.x, n.y, r + 5 + Math.sin(t / 300) * 2, 0, 7); g.stroke(); }
       g.font = `${n === hover ? 600 : 400} 12px Meem`; g.textAlign = 'center';
-      g.fillStyle = n === hover ? '#fbe7b6' : 'rgba(247,242,232,.62)';
+      g.fillStyle = n === hover ? '#ffffff' : 'rgba(255,255,255,.7)';
       g.fillText(n.a.name, n.x, n.y + r + 16);
     });
     if (hover) {

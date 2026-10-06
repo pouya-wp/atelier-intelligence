@@ -38,7 +38,7 @@ export function smoothPath(pts) {
 }
 
 let gid = 0;
-export function sparkline(values, { w = 200, h = 38, color = '#d4af6a' } = {}) {
+export function sparkline(values, { w = 200, h = 38, color = '#0e5a44' } = {}) {
   const min = Math.min(...values), max = Math.max(...values), id = `sp${gid++}`;
   const pts = values.map((v, i) => [(i / (values.length - 1)) * w, h - 3 - ((v - min) / (max - min || 1)) * (h - 6)]);
   const line = smoothPath(pts);
@@ -57,18 +57,18 @@ export function areaChart(el, values, labels, { h = 220, fmt = (v) => fa(v) } = 
   const Y = (v) => pad.t + (1 - (v - min) / (max - min)) * (h - pad.t - pad.b);
   const pts = values.map((v, i) => [X(i), Y(v)]);
   const line = smoothPath(pts), id = `ac${gid++}`;
-  const grid = [0.25, 0.5, 0.75].map((k) => `<line x1="0" x2="${w}" y1="${pad.t + k * (h - pad.t - pad.b)}" y2="${pad.t + k * (h - pad.t - pad.b)}" stroke="rgba(212,175,106,.08)" stroke-dasharray="2 6"/>`).join('');
-  const xl = labels.map((l, i) => (i % Math.ceil(labels.length / 7) === 0 ? `<text x="${X(i)}" y="${h - 6}" fill="#857a68" font-size="11" text-anchor="middle">${l}</text>` : '')).join('');
+  const grid = [0.25, 0.5, 0.75].map((k) => `<line x1="0" x2="${w}" y1="${pad.t + k * (h - pad.t - pad.b)}" y2="${pad.t + k * (h - pad.t - pad.b)}" stroke="rgba(16,32,27,.08)" stroke-dasharray="2 6"/>`).join('');
+  const xl = labels.map((l, i) => (i % Math.ceil(labels.length / 7) === 0 ? `<text x="${X(i)}" y="${h - 6}" fill="#7f8b86" font-size="11" text-anchor="middle">${l}</text>` : '')).join('');
   el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="height:${h}px">
-    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d4af6a" stop-opacity=".38"/><stop offset=".7" stop-color="#d4af6a" stop-opacity=".04"/><stop offset="1" stop-color="#d4af6a" stop-opacity="0"/></linearGradient>
-    <linearGradient id="${id}s" x1="0" x2="1"><stop offset="0" stop-color="#8a6a2f"/><stop offset=".6" stop-color="#d4af6a"/><stop offset="1" stop-color="#f7e4b5"/></linearGradient></defs>
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0e5a44" stop-opacity=".22"/><stop offset=".7" stop-color="#0e5a44" stop-opacity=".03"/><stop offset="1" stop-color="#0e5a44" stop-opacity="0"/></linearGradient>
+    <linearGradient id="${id}s" x1="0" x2="1"><stop offset="0" stop-color="#1f7a5e"/><stop offset="1" stop-color="#0e5a44"/></linearGradient></defs>
     ${grid}
     <path d="${line} L${X(values.length - 1)},${h - pad.b} L${X(0)},${h - pad.b}Z" fill="url(#${id})"/>
     <path class="ln" d="${line}" fill="none" stroke="url(#${id}s)" stroke-width="2" vector-effect="non-scaling-stroke" style="stroke-dasharray:3000;stroke-dashoffset:3000;animation:draw 2.2s cubic-bezier(.2,.8,.2,1) forwards"/>
-    <circle cx="${pts.at(-1)[0]}" cy="${pts.at(-1)[1]}" r="4" fill="#f7e4b5"><animate attributeName="r" values="4;9;4" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;.3;1" dur="2s" repeatCount="indefinite"/></circle>
+    <circle cx="${pts.at(-1)[0]}" cy="${pts.at(-1)[1]}" r="4" fill="#0e5a44"><animate attributeName="r" values="4;9;4" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;.3;1" dur="2s" repeatCount="indefinite"/></circle>
     ${xl}
-    <line class="cx" x1="0" x2="0" y1="${pad.t}" y2="${h - pad.b}" stroke="rgba(247,228,181,.5)" opacity="0"/>
-    <circle class="cd" r="5" fill="#0c0a0c" stroke="#f7e4b5" stroke-width="2" opacity="0"/>
+    <line class="cx" x1="0" x2="0" y1="${pad.t}" y2="${h - pad.b}" stroke="rgba(14,90,68,.4)" opacity="0"/>
+    <circle class="cd" r="5" fill="#fff" stroke="#0e5a44" stroke-width="2" opacity="0"/>
     <rect x="0" y="0" width="${w}" height="${h}" fill="transparent"/>
   </svg><div class="tip"></div>`;
   if (!document.getElementById('drawkf')) { const st = document.createElement('style'); st.id = 'drawkf'; st.textContent = '@keyframes draw{to{stroke-dashoffset:0}}'; document.head.appendChild(st); }
@@ -98,8 +98,8 @@ export function donut(el, parts, { size = 180, center = '' } = {}) {
     return `<path d="${d}" fill="${p.c}" data-l="${p.l}" data-v="${fa((p.v / tot) * 100, 1)}٪ · ${p.t || fa(p.v)}" style="transition:transform .3s;transform-origin:${C}px ${C}px"/>`;
   }).join('');
   el.innerHTML = `<div class="chart" style="width:${size}px;margin-inline:auto"><svg viewBox="0 0 180 180">${arcs}
-    <text x="90" y="86" text-anchor="middle" fill="#f1e8d6" font-size="20" font-weight="300">${center}</text>
-    <text x="90" y="106" text-anchor="middle" fill="#857a68" font-size="10">کیلوگرم</text></svg><div class="tip"></div></div>`;
+    <text x="90" y="86" text-anchor="middle" fill="#10201b" font-size="20" font-weight="300">${center}</text>
+    <text x="90" y="106" text-anchor="middle" fill="#7f8b86" font-size="10">کیلوگرم</text></svg><div class="tip"></div></div>`;
   const tip = el.querySelector('.tip');
   el.querySelectorAll('path').forEach((p) => {
     p.addEventListener('pointerenter', () => { p.style.transform = 'scale(1.05)'; tip.style.opacity = 1; tip.innerHTML = `${p.dataset.l} <b>${p.dataset.v}</b>`; tip.style.left = '50%'; tip.style.top = '0%'; });
@@ -111,8 +111,8 @@ export function bars(values, labels, { h = 150, hi = -1, fmt = (v) => fa(v) } = 
   const max = Math.max(...values);
   return `<div style="display:flex;align-items:flex-end;gap:10px;height:${h}px">${values.map((v, i) => `
     <div style="flex:1;display:grid;gap:8px;justify-items:center;height:100%;align-content:end" title="${labels[i]}: ${fmt(v)}">
-      <span style="font-size:10.5px;color:${i === hi ? '#f7e4b5' : '#857a68'}">${fmt(v)}</span>
-      <div style="width:100%;max-width:34px;height:${(v / max) * (h - 44)}px;border-radius:1px;background:${i === hi ? '#CB9B2D' : 'rgba(255,255,255,.13)'};transform-origin:bottom;animation:grow2 1.2s ${i * 0.06}s cubic-bezier(.2,.8,.2,1) both"></div>
-      <span style="font-size:11px;color:#857a68">${labels[i]}</span></div>`).join('')}</div>
+      <span style="font-size:10.5px;color:${i === hi ? '#0e5a44' : '#7f8b86'}">${fmt(v)}</span>
+      <div style="width:100%;max-width:34px;height:${(v / max) * (h - 44)}px;border-radius:1px;background:${i === hi ? '#0e5a44' : '#d5dfda'};transform-origin:bottom;animation:grow2 1.2s ${i * 0.06}s cubic-bezier(.2,.8,.2,1) both"></div>
+      <span style="font-size:11px;color:#7f8b86">${labels[i]}</span></div>`).join('')}</div>
     <style>@keyframes grow2{from{transform:scaleY(0)}}</style>`;
 }
