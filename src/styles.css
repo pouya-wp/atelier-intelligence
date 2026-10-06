@@ -581,3 +581,9 @@ body::after { content: ""; position: fixed; inset: 0; z-index: 90; pointer-event
 /* the colophon carries a champagne rule */
 .colophon { border-top: 0; background: linear-gradient(90deg, transparent, var(--frame), transparent) top / 100% 1px no-repeat; }
 @media (prefers-reduced-motion: reduce) { .card:hover { transform: none; } }
+
+/* logo: struck gold that answers the cursor */
+.logo { display: block; overflow: visible; transition: transform .5s var(--ease); filter: drop-shadow(0 3px 5px rgba(7,46,35,.35)); }
+.logo-spec { transform: translate(calc(var(--lx, 0) * 1px), calc(var(--ly, 0) * 1px)); transition: transform .35s var(--ease), opacity .35s; opacity: .55; }
+.logo:hover .logo-spec, .logo.hot .logo-spec { opacity: 1; }
+.logo.hot { transform: perspective(260px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) scale(1.05); }

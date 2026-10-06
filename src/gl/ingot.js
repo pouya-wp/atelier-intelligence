@@ -183,10 +183,18 @@ export function createIngotScene(canvas) {
   const coinFace = coinTexture();
   const edge = goldMaterial(0xe8c06a, 0.28);
   const coins = [];
-  for (let i = 0; i < 5; i++) {
+  // orbits found by a clearance search (scratch sim, 25 min of motion): each coin has its own
+  // height layer and ellipse, so coins never pass through each other or through either bar
+  const ORBITS = [
+    { a: 4.68, r: 2.735, y: 1.532, s: 0.172, zf: 0.833 },
+    { a: 5.733, r: 3.453, y: 0.455, s: -0.157, zf: 0.674 },
+    { a: 1.651, r: 3.078, y: -1.895, s: 0.157, zf: 0.825 },
+    { a: 3.062, r: 3.485, y: 2.547, s: -0.158, zf: 0.865 },
+  ];
+  for (const u of ORBITS) {
     const f = stampedGold(coinFace, 0.2, 0.34);
     const m = new THREE.Mesh(coinGeo, [edge, f, f]);
-    m.userData = { a: (i / 5) * Math.PI * 2, r: 2.4 + (i % 2) * 0.5, y: (i - 2) * 0.35, s: 0.18 + i * 0.03 };
+    m.userData = u;
     root.add(m); coins.push(m);
   }
 
@@ -268,7 +276,7 @@ export function createIngotScene(canvas) {
     bar2.position.y = -0.75 + Math.sin(t * 0.7 + 1) * 0.05;
     coins.forEach((c) => {
       const u = c.userData, a = u.a + t * u.s;
-      c.position.set(Math.cos(a) * u.r, u.y + Math.sin(t + u.a) * 0.15, Math.sin(a) * u.r * 0.6);
+      c.position.set(Math.cos(a) * u.r, u.y + Math.sin(t + u.a) * 0.1, Math.sin(a) * u.r * u.zf);
       c.rotation.set(t * 0.6 + u.a, t * 0.9, 0.4);
     });
     key.position.set(mouse.x * 8, 4 + mouse.y * 3, 6);

@@ -146,6 +146,19 @@ function clock() {
 }
 setInterval(clock, 1000);
 
+/* ------------------------------------------------ Logo: highlight and tilt follow the cursor */
+let hotLogo = null;
+addEventListener('pointermove', (e) => {
+  const l = e.target.closest?.('svg.logo');
+  if (hotLogo && hotLogo !== l) { hotLogo.classList.remove('hot'); hotLogo.style.cssText = ''; }
+  hotLogo = l;
+  if (!l) return;
+  const r = l.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+  l.classList.add('hot');
+  l.style.setProperty('--lx', (x * 90).toFixed(1)); l.style.setProperty('--ly', (y * 90).toFixed(1));
+  l.style.setProperty('--rx', `${(-y * 14).toFixed(1)}deg`); l.style.setProperty('--ry', `${(x * 14).toFixed(1)}deg`);
+}, { passive: true });
+
 /* ------------------------------------------------ Interactions: sounds, toasts */
 document.addEventListener('click', (e) => {
   const t = e.target.closest('[data-sfx], .nav a, .mobile-nav a, .tabs button');

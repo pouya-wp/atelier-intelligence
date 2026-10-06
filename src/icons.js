@@ -47,5 +47,22 @@ export const I = {
 // Official Aghigh Gold mark (brand gold #CB9B2D) — circle rendered as polished metal, glyph in ivory.
 export const LOGO_GLYPH = 'M49.2,33.9c4.2-0.9,7,0.2,8.2,6.3c1.7,8.6,10.5,14.1,19.6,13.9c9.1-0.1,16.9-5.9,18.9-14.8 c1-4.5,2.7-5.6,7.2-5.5c11.3,0.4,11.5,0.4,7.9,11.4C105.8,60.6,92.1,70.1,75,70c-13-0.1-22.1,8.5-22,20.6 c0.1,10.2,7.8,18.5,18.7,20c8.9,1.2,19.2-5.4,21-14.7c1-5.2,3.3-6,7.9-5.8c10.3,0.4,10.3,0.1,7.4,10.2 c-4.1,14.4-16.7,24.8-31.4,25.9c-16.2,1.2-30-6.9-36.6-21.5c-6.1-13.6-3-30,8.2-40.3c3.2-2.9,3.4-4.3,0.4-7.5 c-4.6-4.9-6.9-11.1-8-17.9c-0.7-4,0-5.6,4.2-5.1C46,34.1,47.2,33.9,49.2,33.9z';
 export const LOGO_CIRCLE = 'M75.1,3c39.8,0,71.9,32.3,71.8,72.2c-0.1,39.8-32.4,71.8-72.4,71.7C34.8,146.9,2.8,114.5,3,74.5C3.1,35,35.4,3,75.1,3z';
-// official mark: flat brand gold circle, white glyph
-export const logo = () => `<svg viewBox="1 1 148 148" aria-label="طلای عقیق"><path d="${LOGO_CIRCLE}" fill="#CB9B2D"/><path d="${LOGO_GLYPH}" fill="#fff"/></svg>`;
+// official mark rendered as struck gold: soft metal gradient, raised rim, embossed glyph,
+// and a specular highlight that follows the cursor (moved by --lx/--ly from main.js)
+let lid = 0;
+export const logo = () => {
+  const id = `lg${lid++}`;
+  return `<svg class="logo" viewBox="1 1 148 148" aria-label="طلای عقیق">
+  <defs>
+    <linearGradient id="${id}g" x1=".15" y1="0" x2=".85" y2="1"><stop offset="0" stop-color="#ecd08a"/><stop offset=".45" stop-color="#CB9B2D"/><stop offset=".82" stop-color="#a47a1c"/><stop offset="1" stop-color="#d2a945"/></linearGradient>
+    <radialGradient id="${id}s"><stop offset="0" stop-color="#fff8e2" stop-opacity=".75"/><stop offset="1" stop-color="#fff8e2" stop-opacity="0"/></radialGradient>
+    <clipPath id="${id}c"><path d="${LOGO_CIRCLE}"/></clipPath>
+    <filter id="${id}e" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="1.6" stdDeviation=".8" flood-color="#5c400e" flood-opacity=".5"/></filter>
+  </defs>
+  <path d="${LOGO_CIRCLE}" fill="url(#${id}g)"/>
+  <g clip-path="url(#${id}c)"><circle class="logo-spec" cx="52" cy="40" r="46" fill="url(#${id}s)"/></g>
+  <circle cx="75" cy="75" r="66.5" fill="none" stroke="#f7e6b4" stroke-opacity=".55" stroke-width="1.1"/>
+  <circle cx="75" cy="75" r="71" fill="none" stroke="#7a5713" stroke-opacity=".35" stroke-width="1"/>
+  <path d="${LOGO_GLYPH}" fill="#fffdf6" filter="url(#${id}e)"/>
+</svg>`;
+};
