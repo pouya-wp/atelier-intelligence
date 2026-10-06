@@ -1,5 +1,4 @@
 import './styles.css';
-import { createBackground } from './gl/background.js';
 import { createOrb } from './gl/orb.js';
 import * as sfx from './sfx.js';
 import { I, logo } from './icons.js';
@@ -8,63 +7,26 @@ import { VIEWS, reportText } from './views.js';
 import { live, onPrice } from './price.js';
 import { fa, $, $$ } from './util.js';
 
-const bg = createBackground($('#bg'));
 $$('.brand .mark, .mbrand .mark').forEach((m) => (m.innerHTML = logo()));
 $('#seal').innerHTML = logo();
-
-/* ------------------------------------------------ Midas dust: the cursor sheds gold */
-(function dust() {
-  const c = $('#dust'), g = c.getContext('2d'), P = [];
-  const fit = () => { c.width = innerWidth * devicePixelRatio; c.height = innerHeight * devicePixelRatio; g.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0); };
-  fit(); addEventListener('resize', fit);
-  let lx = 0, ly = 0;
-  addEventListener('pointermove', (e) => {
-    const sp = Math.hypot(e.clientX - lx, e.clientY - ly); lx = e.clientX; ly = e.clientY;
-    for (let i = 0; i < Math.min(4, sp / 6); i++) P.push({ x: e.clientX, y: e.clientY, vx: (Math.random() - 0.5) * 0.8, vy: Math.random() * 0.6 + 0.2, l: 1, s: Math.random() * 1.8 + 0.4 });
-  });
-  (function loop() {
-    g.clearRect(0, 0, innerWidth, innerHeight);
-    g.globalCompositeOperation = 'lighter';
-    for (let i = P.length - 1; i >= 0; i--) {
-      const p = P[i]; p.x += p.vx; p.y += p.vy; p.vy += 0.015; p.l -= 0.018;
-      if (p.l <= 0) { P.splice(i, 1); continue; }
-      g.fillStyle = `rgba(247,${200 + p.l * 28 | 0},${130 + p.l * 50 | 0},${p.l * 0.85})`;
-      g.beginPath(); g.arc(p.x, p.y, p.s * p.l + 0.3, 0, 7); g.fill();
-    }
-    requestAnimationFrame(loop);
-  })();
-})();
 
 /* ------------------------------------------------ Vault intro */
 const vaultSvg = $('#vaultSvg');
 (function buildVault() {
-  const C = 200; let s = '';
-  s += `<defs><linearGradient id="vg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f7e4b5"/><stop offset=".5" stop-color="#d4af6a"/><stop offset="1" stop-color="#6e5022"/></linearGradient>
-    <filter id="vglow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`;
-  // r1: fine ticks
-  s += `<g class="ring r1">`; for (let i = 0; i < 120; i++) { const a = (i / 120) * Math.PI * 2, r0 = i % 10 ? 186 : 178; s += `<line x1="${C + Math.cos(a) * r0}" y1="${C + Math.sin(a) * r0}" x2="${C + Math.cos(a) * 194}" y2="${C + Math.sin(a) * 194}" stroke="url(#vg)" stroke-width="${i % 10 ? 0.6 : 1.4}" opacity="${i % 10 ? 0.5 : 1}"/>`; } s += `</g>`;
-  // r2: numerals (karats & station names)
-  const words = ['۷۵۰', 'ریخته‌گری', '۹۹۹٫۹', 'ساخت', '۷۰۵', 'تراش', '۸۷۵', 'آبکاری', '۹۱۶', 'خزانه'];
-  s += `<g class="ring r2"><circle cx="${C}" cy="${C}" r="158" fill="none" stroke="rgba(212,175,106,.25)"/>`;
-  words.forEach((w, i) => { const a = (i / words.length) * 360; s += `<text x="${C}" y="${C - 164}" transform="rotate(${a} ${C} ${C})" fill="#d4af6a" font-size="10" text-anchor="middle" opacity=".75" font-family="Meem">${w}</text>`; });
-  s += `<circle cx="${C}" cy="${C}" r="140" fill="none" stroke="rgba(212,175,106,.18)" stroke-dasharray="1 5"/></g>`;
-  // r3: bolts
-  s += `<g class="ring r3">`; for (let i = 0; i < 12; i++) { const a = (i / 12) * Math.PI * 2; s += `<circle cx="${C + Math.cos(a) * 124}" cy="${C + Math.sin(a) * 124}" r="4" fill="url(#vg)" opacity=".8"/>`; } s += `</g>`;
-  // progress arc
-  s += `<circle id="prog" cx="${C}" cy="${C}" r="104" fill="none" stroke="url(#vg)" stroke-width="3" stroke-linecap="round" filter="url(#vglow)" transform="rotate(-90 ${C} ${C})" stroke-dasharray="653.5" stroke-dashoffset="653.5"/>`;
-  vaultSvg.innerHTML = s;
+  // one hairline dial: 60 ticks, every fifth longer, and a thin progress arc
+  const C = 200; let t = '';
+  for (let i = 0; i < 60; i++) {
+    const a = (i / 60) * Math.PI * 2, r0 = i % 5 ? 172 : 164;
+    t += `<line x1="${C + Math.cos(a) * r0}" y1="${C + Math.sin(a) * r0}" x2="${C + Math.cos(a) * 178}" y2="${C + Math.sin(a) * 178}" stroke="currentColor" stroke-width="${i % 5 ? 0.6 : 1.1}" opacity="${i % 5 ? 0.35 : 0.8}"/>`;
+  }
+  vaultSvg.innerHTML = `<g class="ring r1">${t}</g>
+    <circle cx="${C}" cy="${C}" r="150" fill="none" stroke="currentColor" stroke-opacity=".18"/>
+    <circle id="prog" cx="${C}" cy="${C}" r="150" fill="none" stroke="#CB9B2D" stroke-width="1.5" transform="rotate(-90 ${C} ${C})" stroke-dasharray="942.5" stroke-dashoffset="942.5"/>`;
 })();
 
-const LOG = [
-  ['vault', 'treasury agent', 'reconciled 186.42 kg'],
-  ['calc', 'pricing agent', 'live feed · XAU ' + live.ounce],
-  ['face', 'face-id agent', '142/150 on site'],
-  ['sync', 'rayvarz bridge', '412 vouchers synced'],
-  ['alert', 'order sentinel', '1 anomaly held'],
-];
-let holding = false, prog = 0, unlocked = false, logShown = 0;
+let holding = false, prog = 0, unlocked = false;
 const HOLD = 1.6;
-const seal = $('#seal'), vault = $('#vault'), progEl = $('#prog'), log = $('#bootLog');
+const seal = $('#seal'), vault = $('#vault'), progEl = $('#prog');
 function holdStart(e) {
   e.preventDefault();
   if (unlocked) return;
@@ -89,14 +51,7 @@ let lastT = performance.now();
   const dt = (t - lastT) / 1000; lastT = t;
   if (!unlocked) {
     prog = Math.max(0, Math.min(1, prog + (holding ? dt / HOLD : -dt * 1.5)));
-    progEl.setAttribute('stroke-dashoffset', 653.5 * (1 - prog));
-    bg.setIntensity(1.4 + prog * 2.6);
-    const want = Math.floor(prog * LOG.length);
-    while (logShown < want) {
-      const [, a, b] = LOG[logShown++];
-      log.innerHTML += `<div><b>▸ ${a}</b> … ${b} <span class="ok">✓</span></div>`;
-      sfx.ting(880 + logShown * 220, 0.04, 0.5);
-    }
+    progEl.setAttribute('stroke-dashoffset', 942.5 * (1 - prog));
     if (prog >= 1) openVault();
     requestAnimationFrame(vaultLoop);
   }
@@ -104,19 +59,11 @@ let lastT = performance.now();
 
 function openVault() {
   unlocked = true; holding = false;
-  sfx.unlock(); sfx.startMusic(); bg.pulse(2.5); bg.setIntensity(1.25);
-  const fl = $('#flash'); fl.classList.add('go');
-  const iris = $('#iris'); iris.classList.add('on');
-  iris.innerHTML = Array.from({ length: 10 }, () => '<i></i>').join('');
+  sfx.unlock(); sfx.startMusic();
   $('#boot').classList.add('gone');
-  setTimeout(() => { $('#boot').remove(); }, 1200);
-  $$('#iris i').forEach((b, i) => {
-    const a = i * 36;
-    b.animate([{ transform: `rotate(${a}deg) translateX(0)` }, { transform: `rotate(${a + 50}deg) translateX(110vmax)` }], { duration: 1500, delay: 250, easing: 'cubic-bezier(.7,0,.2,1)', fill: 'forwards' });
-  });
-  setTimeout(() => { $('#app').classList.add('in'); document.body.classList.add('unlocked'); }, 450);
-  setTimeout(() => iris.remove(), 1900);
-  setTimeout(() => toast(`خوش آمدید ${OWNER.call}`, 'خزانه باز شد. بازرس ویژه گزارش امروز را آماده کرده است.', 'vault'), 1600);
+  setTimeout(() => $('#boot').remove(), 1200);
+  setTimeout(() => { $('#app').classList.add('in'); document.body.classList.add('unlocked'); }, 350);
+  setTimeout(() => toast(`خوش آمدید ${OWNER.call}`, 'بازرس ویژه گزارش امروز را آماده کرده است.', 'vault'), 1400);
   setTimeout(() => { sfx.alarm(); toast('نگهبان سفارش — هشدار', `سفارش ${ORDERS_ANOMALY.who}: ${fa(ORDERS_ANOMALY.x)} برابر حد نرمال`, 'alert', 'crit'); }, 7000);
 }
 
@@ -158,6 +105,7 @@ function go(id, force) {
   $$('#nav a, #mnav a').forEach((a) => a.classList.toggle('active', a.dataset.id === id));
   const v = VIEWS[id](role);
   const main = $('#main'); main.innerHTML = v.html; main.scrollTop = 0;
+  main.querySelector('.view')?.insertAdjacentHTML('beforeend', `<footer class="colophon"><span><b>AGHIGH GOLD</b> · YAZD 31.89°N 54.36°E</span><span>${NAV.findIndex((n) => n.id === id) + 1 < 10 ? '0' : ''}${NAV.findIndex((n) => n.id === id) + 1} / ${NAV.length} · ${id.toUpperCase()}</span><span>ATELIER AI · DEMO 1.0 · 1405</span></footer>`);
   // editorial heading reveal: split words into masked spans
   main.querySelectorAll('.head h2').forEach((h) => {
     let k = 0;
@@ -176,7 +124,6 @@ function go(id, force) {
     };
     wrap(h);
   });
-  const sw = $('#sweep'); sw.classList.remove('go'); void sw.offsetWidth; sw.classList.add('go');
   cleanup = v.mount ? v.mount(main) : null;
   if (location.hash !== `#${id}`) { try { history.replaceState(null, '', `#${id}`); } catch { /* sandboxed frame */ } }
 }
@@ -197,40 +144,7 @@ function clock() {
 }
 setInterval(clock, 1000);
 
-/* ------------------------------------------------ Cursor ring + magnetic buttons */
-(function cursor() {
-  const ring = $('#cursor'), dot = $('#cursorDot');
-  let x = innerWidth / 2, y = innerHeight / 2, rx = x, ry = y, mag = null;
-  addEventListener('pointermove', (e) => {
-    x = e.clientX; y = e.clientY;
-    const t = e.target.closest?.('a, button, .agent, label, select, input, .orbwrap, .seal');
-    ring.classList.toggle('big', !!t && !t.matches('input, select'));
-    const m = e.target.closest?.('.btn, .iconbtn');
-    if (mag && mag !== m) mag.style.transform = '';
-    mag = m;
-    if (m) { const r = m.getBoundingClientRect(); m.style.transform = `translate(${(x - r.left - r.width / 2) * 0.22}px, ${(y - r.top - r.height / 2) * 0.3}px)`; }
-  });
-  (function loop() {
-    rx += (x - rx) * 0.18; ry += (y - ry) * 0.18;
-    ring.style.transform = `translate(${rx}px, ${ry}px)`; dot.style.transform = `translate(${x}px, ${y}px)`;
-    requestAnimationFrame(loop);
-  })();
-})();
-
-/* ------------------------------------------------ Interactions: foil, tilt, sounds, toasts */
-let hoverCard = null;
-addEventListener('pointermove', (e) => {
-  const card = e.target.closest?.('.card');
-  if (hoverCard && hoverCard !== card && hoverCard.hasAttribute('data-tilt')) hoverCard.style.transform = '';
-  hoverCard = card;
-  if (!card) return;
-  const r = card.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
-  card.style.setProperty('--mx', `${x}px`); card.style.setProperty('--my', `${y}px`);
-  if (card.dataset.tilt === '') {
-    const rx = ((y / r.height) - 0.5) * -6, ry = ((x / r.width) - 0.5) * 6;
-    card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(0)`;
-  }
-});
+/* ------------------------------------------------ Interactions: sounds, toasts */
 document.addEventListener('click', (e) => {
   const t = e.target.closest('[data-sfx], .nav a, .mobile-nav a, .tabs button');
   if (t) sfx.click();
@@ -240,7 +154,7 @@ document.addEventListener('click', (e) => {
   if (ts) toast('انجام شد', ts.dataset.toast, 'check');
   if (e.target.closest('[data-speak]')) speak();
   const ag = e.target.closest('.agent');
-  if (ag) { bg.pulse(0.8); toast(ag.querySelector('h4').textContent, 'ایجنت گزارش لحظه‌ای را آماده کرد.', 'agents'); }
+  if (ag) { toast(ag.querySelector('h4').textContent, 'ایجنت گزارش لحظه‌ای را آماده کرد.', 'agents'); }
 });
 
 export function toast(title, body, icon = 'bell', kind = '') {
@@ -299,7 +213,7 @@ addEventListener('keydown', (e) => { if (unlocked && e.code === 'Space' && !/INP
 /* ------------------------------------------------ Boot */
 renderRoles(); renderNav(); ticker(); clock();
 if (new URLSearchParams(location.search).has('open')) { // skip the vault (handy for presenting a specific page)
-  unlocked = true; $('#boot').remove(); $('#iris').remove(); bg.setIntensity(1.25);
+  unlocked = true; $('#boot').remove();
   $('#app').classList.add('in'); document.body.classList.add('unlocked');
 }
 go(location.hash.slice(1) || 'overview', true);

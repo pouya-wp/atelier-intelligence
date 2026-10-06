@@ -112,7 +112,7 @@ export function bars(values, labels, { h = 150, hi = -1, fmt = (v) => fa(v) } = 
   return `<div style="display:flex;align-items:flex-end;gap:10px;height:${h}px">${values.map((v, i) => `
     <div style="flex:1;display:grid;gap:8px;justify-items:center;height:100%;align-content:end" title="${labels[i]}: ${fmt(v)}">
       <span style="font-size:10.5px;color:${i === hi ? '#f7e4b5' : '#857a68'}">${fmt(v)}</span>
-      <div style="width:100%;max-width:34px;height:${(v / max) * (h - 44)}px;border-radius:4px 4px 2px 2px;background:${i === hi ? 'linear-gradient(#f7e4b5,#b8893f)' : 'linear-gradient(rgba(212,175,106,.55),rgba(212,175,106,.12))'};${i === hi ? 'box-shadow:0 0 24px rgba(212,175,106,.45)' : ''};transform-origin:bottom;animation:grow2 1.2s ${i * 0.06}s cubic-bezier(.2,.8,.2,1) both"></div>
+      <div style="width:100%;max-width:34px;height:${(v / max) * (h - 44)}px;border-radius:1px;background:${i === hi ? '#CB9B2D' : 'rgba(255,255,255,.13)'};transform-origin:bottom;animation:grow2 1.2s ${i * 0.06}s cubic-bezier(.2,.8,.2,1) both"></div>
       <span style="font-size:11px;color:#857a68">${labels[i]}</span></div>`).join('')}</div>
     <style>@keyframes grow2{from{transform:scaleY(0)}}</style>`;
 }
