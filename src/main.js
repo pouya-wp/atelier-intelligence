@@ -3,6 +3,7 @@ import { createOrb } from './gl/orb.js';
 import * as sfx from './sfx.js';
 import { I } from './icons.js';
 import { mountLogo } from './gl/logo3d.js';
+import { playIntro } from './gl/intro.js';
 import { NAV, ROLES, OWNER, ORDERS_ANOMALY } from './data.js';
 import { VIEWS, reportText } from './views.js';
 import { live, onPrice } from './price.js';
@@ -27,9 +28,10 @@ const vaultSvg = $('#vaultSvg');
 let holding = false, prog = 0, unlocked = false;
 const HOLD = 1.6;
 const seal = $('#seal'), vault = $('#vault'), progEl = $('#prog');
+let introOn = false;
 function holdStart(e) {
   e.preventDefault();
-  if (unlocked) return;
+  if (unlocked || introOn) return;
   sfx.initAudio().resume();
   holding = true; vault.classList.add('charging');
   sfx.chargeStart(HOLD * (1 - prog));
@@ -227,8 +229,12 @@ addEventListener('keydown', (e) => { if (unlocked && e.code === 'Space' && !/INP
 
 /* ------------------------------------------------ Boot */
 renderRoles(); renderNav(); ticker(); clock();
+if (!new URLSearchParams(location.search).has('open')) {
+  introOn = true;
+  playIntro($('#seal')).then(() => { introOn = false; });
+}
 if (new URLSearchParams(location.search).has('open')) { // skip the vault (handy for presenting a specific page)
-  unlocked = true; $('#boot').remove();
+  unlocked = true; $('#boot').remove(); document.body.classList.remove('preintro');
   $('#app').classList.add('in'); document.body.classList.add('unlocked');
 }
 go(location.hash.slice(1) || 'overview', true);

@@ -8,6 +8,7 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import studioHDR from '@pmndrs/assets/hdri/studio.exr.js';
 import { LOGO_GLYPH, LOGO_CIRCLE } from '../icons.js';
+import { watchVisible } from './visibility.js';
 
 // draws the brand mark (ring + glyph) as an engraving mask
 function drawMark(g, cx, cy, size) {
@@ -157,6 +158,8 @@ function ingotGeometry(w, h, d, taper = 0.84, r = 0.035) {
 
 export function createIngotScene(canvas) {
   const renderer = makeRenderer(canvas);
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5)); // post chain already AA's; cap the fill cost
+  const vis = watchVisible(canvas);
   const scene = new THREE.Scene();
   studioEnv(renderer, scene);
   scene.background = velvetTexture();
@@ -262,6 +265,8 @@ export function createIngotScene(canvas) {
   const timer = new THREE.Timer(); let raf, alive = true;
   function loop(ts) {
     if (!alive) return;
+    raf = requestAnimationFrame(loop);
+    if (!vis.active()) return; // off screen or tab hidden: no GPU work
     resize(); timer.update(ts);
     const t = timer.getElapsed();
     mouse.x += (mouse.tx - mouse.x) * 0.05; mouse.y += (mouse.ty - mouse.y) * 0.05;
@@ -282,8 +287,7 @@ export function createIngotScene(canvas) {
     key.position.set(mouse.x * 8, 4 + mouse.y * 3, 6);
     dm.uniforms.uTime.value = t; grade.uniforms.uTime.value = t % 10;
     composer.render();
-    raf = requestAnimationFrame(loop);
   }
   raf = requestAnimationFrame(loop);
-  return { dispose() { alive = false; cancelAnimationFrame(raf); removeEventListener('pointermove', onMove); composer.dispose(); rt.dispose(); renderer.dispose(); } };
+  return { dispose() { alive = false; cancelAnimationFrame(raf); vis.stop(); removeEventListener('pointermove', onMove); composer.dispose(); rt.dispose(); renderer.dispose(); } };
 }

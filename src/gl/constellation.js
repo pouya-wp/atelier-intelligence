@@ -1,4 +1,5 @@
 import { createOrb } from './orb.js';
+import { watchVisible } from './visibility.js';
 
 // Agents orbit a molten-gold core; each one periodically sends a data pulse inward.
 export function createConstellation(wrap, agents, { onPulse } = {}) {
@@ -18,6 +19,7 @@ export function createConstellation(wrap, agents, { onPulse } = {}) {
     cx = W / 2; cy = H / 2; rx = W * 0.46; ry = H * 0.42;
   };
   fit(); const ro = new ResizeObserver(fit); ro.observe(wrap);
+  const vis = watchVisible(wrap);
   const move = (e) => { const r = cv.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; };
   const leave = () => { mx = my = -1; };
   cv.addEventListener('pointermove', move); cv.addEventListener('pointerleave', leave);
@@ -28,6 +30,7 @@ export function createConstellation(wrap, agents, { onPulse } = {}) {
   let last = performance.now();
   (function loop(t) {
     if (!alive) return;
+    if (!vis.active()) { last = t; requestAnimationFrame(loop); return; }
     const dt = Math.min(0.05, (t - last) / 1000); last = t;
     g.clearRect(0, 0, W, H);
     // orbits
@@ -82,5 +85,5 @@ export function createConstellation(wrap, agents, { onPulse } = {}) {
   })(last);
 
   cv.addEventListener('click', () => { if (hover) { fire(hover); onPulse?.(hover.a, true); } });
-  return { dispose() { alive = false; clearInterval(iv); ro.disconnect(); core.dispose(); } };
+  return { dispose() { alive = false; clearInterval(iv); ro.disconnect(); vis.stop(); core.dispose(); } };
 }

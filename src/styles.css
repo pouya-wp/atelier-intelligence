@@ -508,7 +508,7 @@ body.unlocked .dock { opacity: 1; pointer-events: auto; }
   radial-gradient(55% 45% at 100% 0%, rgba(14,90,68,.075), transparent 65%),
   radial-gradient(45% 40% at 0% 100%, rgba(181,148,87,.10), transparent 65%),
   var(--paper); }
-body::after { content: ""; position: fixed; inset: 0; z-index: 90; pointer-events: none; background: var(--grain); opacity: .045; mix-blend-mode: multiply; }
+body::after { content: ""; position: fixed; inset: 0; z-index: 90; pointer-events: none; background: var(--grain); opacity: .03; } /* no blend mode: cheap to composite */
 
 /* velvet surfaces share the hero's jeweller's-box frame */
 .side, .gr-wage, .agent-feature, #boot .boot-inner { position: relative; }
@@ -589,4 +589,13 @@ body::after { content: ""; position: fixed; inset: 0; z-index: 90; pointer-event
 .logo.hot { transform: perspective(260px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) scale(1.05); }
 
 /* 3D logo canvas (shared WebGL renderer draws into it) */
-canvas.logo3d { display: block; width: 100%; height: 100%; filter: drop-shadow(0 4px 6px rgba(7,46,35,.35)); }
+canvas.logo3d { display: block; width: 100%; height: 100%; } /* shadow is drawn in WebGL, no per-frame CSS filter */
+
+/* opening title canvas + the page settling in behind the ripple */
+canvas.intro { position: fixed; inset: 0; z-index: 80; width: 100vw; height: 100vh; display: block; cursor: pointer; }
+body.intro-reveal #boot .boot-inner { animation: introSettle 1.3s var(--ease) both; }
+@keyframes introSettle { from { transform: scale(1.05); filter: blur(3px); } to { transform: none; filter: none; } }
+
+/* before the opening title takes over: a blank paper ground, no flash of the entry screen */
+body.preintro { background: #f3f4f1; }
+body.preintro #boot, body.preintro #app, body.preintro .dock { visibility: hidden; }

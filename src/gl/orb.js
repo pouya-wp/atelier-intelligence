@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { watchVisible } from './visibility.js';
 
 // Molten-gold orb for the talking assistant. Displacement grows with "voice" energy.
 const noise = `
@@ -45,13 +46,17 @@ export function createOrb(canvas) {
         col = col/(1.+col*.6);
         gl_FragColor = vec4(pow(col, vec3(.9)), 1.); }`,
   });
-  const mesh = new THREE.Mesh(new THREE.IcosahedronGeometry(1, 64), mat); scene.add(mesh);
-  let amp = 0.06, target = 0.06, alive = true, w = 0;
+  const mesh = new THREE.Mesh(new THREE.IcosahedronGeometry(1, 18), mat); scene.add(mesh);
+  let amp = 0.06, target = 0.06, alive = true, w = 0, frameNo = 0;
+  const vis = watchVisible(canvas);
   const clock = new THREE.Clock();
   const lm = { x: .3, y: .6 };
   addEventListener('pointermove', (e) => { lm.x = (e.clientX / innerWidth) * 2 - 1; lm.y = -(e.clientY / innerHeight) * 2 + 1; });
   (function loop() {
     if (!alive) return;
+    requestAnimationFrame(loop);
+    // idle orb: 30 fps; talking: full rate; hidden: nothing
+    if (!vis.active() || (amp < 0.08 && (frameNo++ & 1))) return;
     const r = canvas.getBoundingClientRect();
     if (r.width !== w) { w = r.width; renderer.setSize(r.width, r.height, false); }
     amp += (target - amp) * 0.1;
@@ -60,7 +65,6 @@ export function createOrb(canvas) {
     mat.uniforms.uLight.value.set(lm.x, lm.y);
     mesh.rotation.y = t * 0.3;
     renderer.render(scene, cam);
-    requestAnimationFrame(loop);
   })();
   return { setEnergy(v) { target = 0.06 + v * 0.32; }, dispose() { alive = false; renderer.dispose(); } };
 }

@@ -17,7 +17,7 @@ const SSAA = 1.5; // render 1.5× then scale down, FXAA on top
 
 // product-shot studio: dark room, big overhead softbox, two tall strips, a back rim and a warm kicker.
 // Small PMREM blur keeps reflections crisp → contrasty, believable gold.
-function studio(renderer) {
+export function studio(renderer) {
   const env = new THREE.Scene();
   env.background = new THREE.Color(0x060606);
   const panel = (w, h, x, y, z, i, c = [1, 0.97, 0.92]) => {
@@ -46,22 +46,9 @@ function flipWinding(geo) {
   }
 }
 
-function build() {
-  const canvas = document.createElement('canvas');
-  let renderer;
-  try {
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
-  } catch { return null; }
-  renderer.setClearColor(0x000000, 0);
-  renderer.toneMapping = THREE.NeutralToneMapping; renderer.toneMappingExposure = 1.0;
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-
-  const scene = new THREE.Scene();
-  scene.environment = studio(renderer);
-  const cam = new THREE.PerspectiveCamera(26, 1, 10, 1000);
-  cam.position.set(0, 0, 360);
-
-  const medal = new THREE.Group(); scene.add(medal);
+// The medallion itself, shared by the logo renderer and the intro animation.
+export function createMedal() {
+  const medal = new THREE.Group();
 
   // disc: extruded circle with a generous bevel → the rolled edge of a struck coin
   const disc = new THREE.Shape(); disc.absarc(0, 0, 70, 0, Math.PI * 2, false);
@@ -85,6 +72,33 @@ function build() {
   const glyph = new THREE.Mesh(glyphGeo, enamel);
   glyph.position.z = 6.2; medal.add(glyph);
 
+  return medal;
+}
+
+function build() {
+  const canvas = document.createElement('canvas');
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
+  } catch { return null; }
+  renderer.setClearColor(0x000000, 0);
+  renderer.toneMapping = THREE.NeutralToneMapping; renderer.toneMappingExposure = 1.0;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+  const scene = new THREE.Scene();
+  scene.environment = studio(renderer);
+  const cam = new THREE.PerspectiveCamera(26, 1, 10, 1000);
+  cam.position.set(0, 0, 385);
+
+  const medal = createMedal(); scene.add(medal);
+
+  // soft contact shadow rendered in GL (replaces a per-frame CSS drop-shadow)
+  const sc = document.createElement('canvas'); sc.width = sc.height = 128;
+  const sg = sc.getContext('2d'), sr = sg.createRadialGradient(64, 64, 20, 64, 64, 64);
+  sr.addColorStop(0, 'rgba(4,28,20,.45)'); sr.addColorStop(1, 'rgba(4,28,20,0)'); sg.fillStyle = sr; sg.fillRect(0, 0, 128, 128);
+  const shade = new THREE.Mesh(new THREE.PlaneGeometry(176, 176), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(sc), transparent: true, depthWrite: false }));
+  shade.position.set(0, -7, -16); scene.add(shade);
+
   // light that follows the cursor across the whole page
   const key = new THREE.DirectionalLight(0xfff3dd, 1.4); scene.add(key);
   scene.add(new THREE.AmbientLight(0xfff4e0, 0.12));
@@ -107,6 +121,9 @@ function frame(t) {
   for (const inst of instances) {
     if (!inst.canvas.isConnected) { instances.delete(inst); continue; }
     if (!inst.visible) continue;
+    // idle logos redraw at ~24 fps; hovered ones every frame
+    if (!inst.hover && Math.abs(inst.s - 1) < 0.002 && t - inst.last < 41) continue;
+    inst.last = t;
     inst.tx += ((inst.hover ? inst.hx : Math.sin(t / 2600 + inst.seed) * 0.12) - inst.tx) * 0.09;
     inst.ty += ((inst.hover ? inst.hy : Math.cos(t / 3100 + inst.seed) * 0.08) - inst.ty) * 0.09;
     inst.s += ((inst.hover ? 1.05 : 1) - inst.s) * 0.12;
@@ -131,7 +148,7 @@ export function mountLogo(host) {
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = px; canvas.className = 'logo3d'; canvas.setAttribute('role', 'img'); canvas.setAttribute('aria-label', 'طلای عقیق');
   host.innerHTML = ''; host.appendChild(canvas);
-  const inst = { canvas, ctx: canvas.getContext('2d'), size, visible: true, hover: false, hx: 0, hy: 0, tx: 0, ty: 0, s: 1, seed: Math.random() * 10 };
+  const inst = { canvas, ctx: canvas.getContext('2d'), size, visible: true, hover: false, hx: 0, hy: 0, tx: 0, ty: 0, s: 1, last: 0, seed: Math.random() * 10 };
   instances.add(inst);
   host.addEventListener('pointermove', (e) => {
     const r = canvas.getBoundingClientRect();
