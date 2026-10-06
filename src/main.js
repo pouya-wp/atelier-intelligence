@@ -105,6 +105,7 @@ function go(id, force) {
   $$('#nav a, #mnav a').forEach((a) => a.classList.toggle('active', a.dataset.id === id));
   const v = VIEWS[id](role);
   const main = $('#main'); main.innerHTML = v.html; main.scrollTop = 0;
+  $('#app').classList.remove('scrolled');
   main.querySelector('.view')?.insertAdjacentHTML('beforeend', `<footer class="colophon"><span><b>AGHIGH GOLD</b> · YAZD 31.89°N 54.36°E</span><span>${NAV.findIndex((n) => n.id === id) + 1 < 10 ? '0' : ''}${NAV.findIndex((n) => n.id === id) + 1} / ${NAV.length} · ${id.toUpperCase()}</span><span>ATELIER AI · DEMO 1.0 · 1405</span></footer>`);
   // editorial heading reveal: split words into masked spans
   main.querySelectorAll('.head h2').forEach((h) => {
@@ -127,6 +128,7 @@ function go(id, force) {
   cleanup = v.mount ? v.mount(main) : null;
   if (location.hash !== `#${id}`) { try { history.replaceState(null, '', `#${id}`); } catch { /* sandboxed frame */ } }
 }
+$('#main').addEventListener('scroll', (e) => $('#app').classList.toggle('scrolled', e.target.scrollTop > 8), { passive: true });
 addEventListener('hashchange', () => { go(location.hash.slice(1)); sfx.whoosh(0.6, true); });
 
 function ticker() {
