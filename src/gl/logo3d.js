@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js';
-import { studioEnv } from './ingot.js';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
+import { FXAAPass } from 'three/examples/jsm/postprocessing/FXAAPass.js';
 import { LOGO_GLYPH, logo } from '../icons.js';
 
 // The official mark as a real object: a gold medallion (satin field, polished bevel and rim)
@@ -10,6 +13,27 @@ import { LOGO_GLYPH, logo } from '../icons.js';
 let shared = null;
 const instances = new Set();
 const mouse = { x: 0.3, y: -0.4 };
+const SSAA = 1.5; // render 1.5× then scale down, FXAA on top
+
+// product-shot studio: dark room, big overhead softbox, two tall strips, a back rim and a warm kicker.
+// Small PMREM blur keeps reflections crisp → contrasty, believable gold.
+function studio(renderer) {
+  const env = new THREE.Scene();
+  env.background = new THREE.Color(0x060606);
+  const panel = (w, h, x, y, z, i, c = [1, 0.97, 0.92]) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(...c).multiplyScalar(i), side: THREE.DoubleSide }));
+    m.position.set(x, y, z); m.lookAt(0, 0, 0); env.add(m);
+  };
+  panel(9, 5, 0, 7, 3, 7);          // overhead softbox
+  panel(1.2, 12, -7, 0, 2, 10);     // left strip
+  panel(1.2, 12, 7, 0, 1, 8);       // right strip
+  panel(14, 0.7, 0, 2.5, -8, 6);    // back rim line
+  panel(3, 1.2, 1.5, -4, 6, 2.2, [1, 0.85, 0.65]); // warm kicker from below-front
+  panel(30, 30, 0, -10, 0, 0.15);   // faint floor bounce
+  const pm = new THREE.PMREMGenerator(renderer);
+  const tex = pm.fromScene(env, 0.008).texture; pm.dispose();
+  return tex;
+}
 
 function flipWinding(geo) {
   for (const name of ['position', 'normal', 'uv']) {
@@ -33,7 +57,7 @@ function build() {
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   const scene = new THREE.Scene();
-  studioEnv(renderer, scene);
+  scene.environment = studio(renderer);
   const cam = new THREE.PerspectiveCamera(26, 1, 10, 1000);
   cam.position.set(0, 0, 360);
 
@@ -43,8 +67,8 @@ function build() {
   const disc = new THREE.Shape(); disc.absarc(0, 0, 70, 0, Math.PI * 2, false);
   const discGeo = new THREE.ExtrudeGeometry(disc, { depth: 6, bevelEnabled: true, bevelThickness: 4, bevelSize: 3.5, bevelSegments: 10, curveSegments: 128 });
   discGeo.translate(0, 0, -3);
-  const field = new THREE.MeshPhysicalMaterial({ color: 0xe9b955, metalness: 1, roughness: 0.3, envMapIntensity: 1.7 });
-  const polished = new THREE.MeshPhysicalMaterial({ color: 0xf0c260, metalness: 1, roughness: 0.14, envMapIntensity: 1.6 });
+  const field = new THREE.MeshPhysicalMaterial({ color: 0xe6b450, metalness: 1, roughness: 0.2, envMapIntensity: 1.25 });
+  const polished = new THREE.MeshPhysicalMaterial({ color: 0xf0c260, metalness: 1, roughness: 0.06, envMapIntensity: 1.35 });
   medal.add(new THREE.Mesh(discGeo, [field, polished]));
 
   // raised inner rim
@@ -57,21 +81,28 @@ function build() {
   const glyphGeo = new THREE.ExtrudeGeometry(shapes, { depth: 3, bevelEnabled: true, bevelThickness: 1.4, bevelSize: 0.9, bevelSegments: 6, curveSegments: 48 });
   glyphGeo.translate(-75, -75, 0); glyphGeo.scale(1, -1, 1);
   flipWinding(glyphGeo); // the y-flip mirrors triangles; restore outward-facing winding
-  const enamel = new THREE.MeshPhysicalMaterial({ color: 0xfbf7ec, metalness: 0, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.06, envMapIntensity: 0.9 });
+  const enamel = new THREE.MeshPhysicalMaterial({ color: 0xfbf7ec, metalness: 0, roughness: 0.28, clearcoat: 1, clearcoatRoughness: 0.04, envMapIntensity: 1.0 });
   const glyph = new THREE.Mesh(glyphGeo, enamel);
   glyph.position.z = 6.2; medal.add(glyph);
 
   // light that follows the cursor across the whole page
-  const key = new THREE.DirectionalLight(0xfff3dd, 2.2); scene.add(key);
-  scene.add(new THREE.AmbientLight(0xfff4e0, 0.45));
+  const key = new THREE.DirectionalLight(0xfff3dd, 1.4); scene.add(key);
+  scene.add(new THREE.AmbientLight(0xfff4e0, 0.12));
 
-  return { renderer, scene, cam, medal, key };
+  // tone map + sRGB, then FXAA in display space; alpha is carried through for the transparent canvas
+  const rt = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 });
+  const composer = new EffectComposer(renderer, rt);
+  composer.addPass(new RenderPass(scene, cam));
+  composer.addPass(new OutputPass());
+  const fxaa = new FXAAPass(); composer.addPass(fxaa);
+
+  return { renderer, scene, cam, medal, key, composer, fxaa };
 }
 
 function frame(t) {
   requestAnimationFrame(frame);
   if (!shared || document.hidden) return;
-  const { renderer, scene, cam, medal, key } = shared;
+  const { renderer, cam, medal, key, composer, fxaa } = shared;
   key.position.set(mouse.x * 300, mouse.y * 300 + 120, 260);
   for (const inst of instances) {
     if (!inst.canvas.isConnected) { instances.delete(inst); continue; }
@@ -80,11 +111,12 @@ function frame(t) {
     inst.ty += ((inst.hover ? inst.hy : Math.cos(t / 3100 + inst.seed) * 0.08) - inst.ty) * 0.09;
     inst.s += ((inst.hover ? 1.05 : 1) - inst.s) * 0.12;
     const px = Math.round(inst.size * Math.min(devicePixelRatio, 2));
-    if (renderer.domElement.width !== px) renderer.setSize(px, px, false);
+    const rpx = Math.round(px * SSAA);
+    if (renderer.domElement.width !== rpx) { renderer.setSize(rpx, rpx, false); composer.setSize(rpx, rpx); fxaa.setSize(rpx, rpx); }
     medal.rotation.set(inst.ty, inst.tx, 0);
     medal.scale.setScalar(inst.s);
-    renderer.render(scene, cam);
-    const g = inst.ctx; g.clearRect(0, 0, px, px); g.drawImage(renderer.domElement, 0, 0, px, px);
+    composer.render();
+    const g = inst.ctx; g.clearRect(0, 0, px, px); g.imageSmoothingQuality = 'high'; g.drawImage(renderer.domElement, 0, 0, px, px);
   }
 }
 
