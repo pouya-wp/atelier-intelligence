@@ -53,7 +53,7 @@ function overview(role) {
       <div class="grid mt">
         ${kpi('هر گرم طلای ۱۸ عیار', live.g18 / 1e6, 'میلیون تومان', '۱٫۲٪', sparkline(series(30, 50, 3, 0.05)), true, 2)}
         ${kpi('انس جهانی', live.ounce, 'دلار', '۰٫۸٪', sparkline(series(30, 50, 3, 0.04)), true, 1)}
-        ${kpi('فروش امروز', 92.8, 'میلیارد تومان', '۹٪', sparkline(series(30, 50, 4, 0.06)), true, 1)}
+        ${kpi('فروش امروز', 205.7, 'میلیارد تومان', '۹٪', sparkline(series(30, 50, 4, 0.06)), true, 1)}
         ${kpi('هزینه جاری ماه', 1.84, 'میلیارد تومان', '۳٪', sparkline(series(30, 50, 2, -0.03), { color: 'var(--crit)' }), false, 2)}
       </div>
 
@@ -89,7 +89,7 @@ function overview(role) {
     mount(root) {
       countUp(root);
       const gl = createIngotScene(root.querySelector('#ingot'));
-      areaChart(root.querySelector('#priceChart'), series(48, live.g18 * 0.985, 22000, 0.08).map((v) => Math.round(v)), hoursLbl, { fmt: (v) => `${fa(v)} تومان` });
+      areaChart(root.querySelector('#priceChart'), series(48, live.g18 * 0.985, 50000, 0.08).map((v) => Math.round(v)), hoursLbl, { fmt: (v) => `${fa(v)} تومان` });
       const heroVal = root.querySelector('#heroVal');
       const setHero = () => { heroVal.innerHTML = `${fa((186420 * live.g18) / 1e12, 3)} <small>هزار میلیارد تومان</small>`; };
       setHero();
@@ -283,8 +283,8 @@ function treasury() {
       <nav class="jump">${[['tw-gold', 'گردش طلا'], ['tw-codes', 'کد کالا'], ['tw-orders', 'سفارش و موجودی'], ['tw-stock', 'انبار و تولیدی‌ها'], ['tw-ret', 'مرجوعی و خرابی']].map(([id, l]) => `<a href="#" data-jump="${id}">${l}</a>`).join('')}</nav>
       <div class="grid">
         <div class="card gold c4 kpi"><div class="label">کل طلای خزانه</div><div class="val num gold-text"><span data-count="186.42" data-dec="2">۰</span><small>کیلوگرم</small></div><div class="delta">معادل <span class="num" id="tv"></span></div></div>
-        <div class="card c4 kpi"><div class="label">نقدینگی حساب‌ها</div><div class="val num"><span data-count="48.6" data-dec="1">۰</span><small>میلیارد تومان</small></div><div class="delta"><span class="up">▲ ۴٫۲ میلیارد</span> واریز امروز</div></div>
-        <div class="card c4 kpi"><div class="label">چک‌های در جریان</div><div class="val num"><span data-count="23">۰</span><small>فقره</small></div><div class="delta">مجموع <span class="num">۱۸٫۴ میلیارد</span> · سه فقره این هفته</div></div>
+        <div class="card c4 kpi"><div class="label">نقدینگی حساب‌ها</div><div class="val num"><span data-count="107.4" data-dec="1">۰</span><small>میلیارد تومان</small></div><div class="delta"><span class="up">▲ ۹٫۳ میلیارد</span> واریز امروز</div></div>
+        <div class="card c4 kpi"><div class="label">چک‌های در جریان</div><div class="val num"><span data-count="23">۰</span><small>فقره</small></div><div class="delta">مجموع <span class="num">۴۰٫۸ میلیارد</span> · سه فقره این هفته</div></div>
       </div>
       <div class="grid mt" id="tw-gold">
         <div class="card c5"><div class="ch"><h3>ترکیب خزانه</h3></div><div id="d2"></div>
@@ -343,7 +343,7 @@ function accounting() {
     html: `<section class="view">
       ${head('LEDGER · RAYVARZ', 'حسابداری <b>بدون ورود دستی</b>', 'اسناد خودکار به رایورز می‌رود.', chip('ok', 'آخرین همگام‌سازی: ۲ دقیقه پیش'))}
       <div class="grid">
-        ${kpi('درآمد ماه', 1.92, 'هزار میلیارد', '۱۱٪', sparkline(series(30, 50, 3, 0.06)), true, 2)}
+        ${kpi('درآمد ماه', 4.26, 'هزار میلیارد', '۱۱٪', sparkline(series(30, 50, 3, 0.06)), true, 2)}
         ${kpi('حاشیه سود ناخالص', 14.6, 'درصد', '۰٫۴٪', sparkline(series(30, 50, 2, 0.02)), true, 1)}
         ${kpi('هزینه‌های جاری', 5.31, 'میلیارد', '۳٪', sparkline(series(30, 50, 2, 0.02), { color: 'var(--crit)' }), false, 2)}
         ${kpi('اسناد ثبت‌شده امروز', 412, 'سند', '۶۲', sparkline(series(30, 50, 4, 0.03)), true)}
@@ -352,7 +352,7 @@ function accounting() {
         <div class="card c7"><div class="ch"><h3>هزینه‌های نگهداری و مصرفی <small>میلیون تومان · ماه جاری</small></h3></div>
           <div style="display:grid;gap:14px">${cost.map(([n, v]) => `<div style="display:grid;gap:6px"><div style="display:flex;justify-content:space-between;font-size:12.5px"><span>${n}</span><span class="num">${fa(v)}</span></div><div class="meter"><i style="width:${(v / max) * 100}%"></i></div></div>`).join('')}</div></div>
         <div class="card c5"><div class="ch"><h3>اسناد اخیر رایورز</h3></div>
-          <div class="feed">${[['invoice', 'سند فروش ۴۸۲۱', 'گالری ارغوان · ۷٫۴ میلیارد'], ['cart', 'سند خرید ۲۲۰۴', 'آلیاژ نوین · ۶۴۰ میلیون'], ['meal', 'سند هزینه ۹۱۱', 'غذای پرسنل · ۱۲ میلیون'], ['people', 'سند دستمزد', 'اضافه‌کاری مهر · ۴۸۰ میلیون'], ['wrench', 'سند هزینه ۹۱۰', 'سرویس کوره · ۸۵ میلیون']].map(([i, a, b]) => `<div class="it"><div class="ico ok">${I[i]}</div><div><b>${a}</b><div class="s">${b}</div></div><time>${I.check.replace('<svg', '<svg width="14" style="color:var(--ok)"')}</time></div>`).join('')}</div></div>
+          <div class="feed">${[['invoice', 'سند فروش ۴۸۲۱', 'گالری ارغوان · ۱۶٫۴ میلیارد'], ['cart', 'سند خرید ۲۲۰۴', 'آلیاژ نوین · ۱٫۴۲ میلیارد'], ['meal', 'سند هزینه ۹۱۱', 'غذای پرسنل · ۱۲ میلیون'], ['people', 'سند دستمزد', 'اضافه‌کاری مهر · ۴۸۰ میلیون'], ['wrench', 'سند هزینه ۹۱۰', 'سرویس کوره · ۸۵ میلیون']].map(([i, a, b]) => `<div class="it"><div class="ico ok">${I[i]}</div><div><b>${a}</b><div class="s">${b}</div></div><time>${I.check.replace('<svg', '<svg width="14" style="color:var(--ok)"')}</time></div>`).join('')}</div></div>
       </div>
     </section>`,
     mount(root) { countUp(root); },
@@ -467,7 +467,7 @@ export function reportText() {
   return `<b>${OWNER.call}، گزارش بازرس امروز:</b> قیمت هر گرم طلای ۱۸ عیار به <span class="hl num">${fa(live.g18)} تومان</span> رسید و انس جهانی روی <span class="hl num">${fa(live.ounce, 1)} دلار</span> است.
   فروش امروز <b>۷٫۸۴ کیلوگرم</b> بود؛ <span class="hl">۹٪ بیشتر</span> از دیروز. ارزش کل طلای در گردش <span class="hl num">${fa((186420 * live.g18) / 1e12, 3)} هزار میلیارد تومان</span> است.
   افت کل خط <b>۰٫۶۶٪</b> بود و واحد <b>ساخت</b> با ۰٫۲۱٪ بالاتر از استاندارد است. ۱۴۲ نفر از ۱۵۰ نفر حاضر بودند و ۲۳ نفر غذای اضافه‌کاری دریافت می‌کنند.
-  فردا یک چک دریافتی <b>۱٫۸۵ میلیارد تومانی</b> از گالری ارغوان دارید؛ معادل حدود <span class="hl num">${fa(goldEq(1_850_000_000))} گرم طلا</span>. سفارش چهار برابری نمایندگی کرمان منتظر تأیید شماست. از نظر نظارتی: در تحویل خزانه به تراش CNC اختلاف ۱۲ گرمی دیدم که باید بررسی شود.`;
+  فردا یک چک دریافتی <b>۴٫۱ میلیارد تومانی</b> از گالری ارغوان دارید؛ معادل حدود <span class="hl num">${fa(goldEq(4_100_000_000))} گرم طلا</span>. سفارش چهار برابری نمایندگی کرمان منتظر تأیید شماست. از نظر نظارتی: در تحویل خزانه به تراش CNC اختلاف ۱۲ گرمی دیدم که باید بررسی شود.`;
 }
 
 // ---------------------------------------------------------------- daily report (editorial)
@@ -499,7 +499,7 @@ function report() {
           <div class="lg-col">
             <span class="lg-kicker">اعداد روز</span>
             <dl>
-              <div><dt>فروش</dt><dd class="num">۷٫۸۴ کیلو · ۹۲٫۸ میلیارد</dd></div>
+              <div><dt>فروش</dt><dd class="num">۷٫۸۴ کیلو · ۲۰۵٫۷ میلیارد</dd></div>
               <div><dt>تولید وارد خزانه</dt><dd class="num">۶٫۱ کیلو</dd></div>
               <div><dt>افت کل خط</dt><dd class="num">۰٫۶۶٪</dd></div>
               <div><dt>هزینه امروز</dt><dd class="num">۱۴۲ میلیون</dd></div>
@@ -511,7 +511,7 @@ function report() {
           <div class="lg-col">
             <span class="lg-kicker">فردا روی میز شما</span>
             <ol class="lg-list">
-              <li><b>چک دریافتی ۱٫۸۵ میلیارد</b> — گالری ارغوان<br><small class="metal" data-goldeq="1850000000">≈ ${fa(1_850_000_000 / live.g18)} گرم طلا</small></li>
+              <li><b>چک دریافتی ۴٫۱ میلیارد</b> — گالری ارغوان<br><small class="metal" data-goldeq="4100000000">≈ ${fa(4_100_000_000 / live.g18)} گرم طلا</small></li>
               <li><b>تحویل ۲٫۴ کیلو</b> — نمایندگی شیراز</li>
               <li><b>تأیید سفارش غیرعادی</b> — نمایندگی کرمان</li>
               <li><b>کمبود قفل و اتصالات</b> — پیشنهاد خرید آماده است</li>

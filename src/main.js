@@ -198,7 +198,7 @@ export function toast(title, body, icon = 'bell', kind = '') {
 const setMuteIcon = () => { $('#muteBtn').innerHTML = sfx.isMuted() ? I.mute : I.sound; };
 $('#muteBtn').addEventListener('click', () => { sfx.setMuted(!sfx.isMuted()); setMuteIcon(); });
 $('#bellBtn').innerHTML = I.bell;
-$('#bellBtn').addEventListener('click', () => { sfx.alarm(); toast('سررسید فردا', 'چک ۱٫۸۵ میلیارد تومانی گالری ارغوان — معادل حدود ' + fa(1_850_000_000 / live.g18) + ' گرم طلا', 'cal', 'crit'); });
+$('#bellBtn').addEventListener('click', () => { sfx.alarm(); toast('سررسید فردا', 'چک ۴٫۱ میلیارد تومانی گالری ارغوان — معادل حدود ' + fa(4_100_000_000 / live.g18) + ' گرم طلا', 'cal', 'crit'); });
 setMuteIcon();
 
 /* ------------------------------------------------ بازرس ویژه (calm chat) */

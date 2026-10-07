@@ -2,13 +2,14 @@
 export const OWNER = { name: 'محمدرضا قدیرزاده', short: 'قدیرزاده', call: 'آقا رضا', initials: 'م‌ق' };
 
 export const PRICE = {
-  g18: 11_840_000, // per gram 18k, toman
-  ounce: 4_182.6, // USD
-  usd: 108_400, // toman
-  mesghal: 0, // derived
-  coin: 112_600_000, // Emami
-  half: 61_900_000,
-  quarter: 35_400_000,
+  // market close, Wed 15 Mehr 1405 (7 Oct 2026); the demo then drifts them live
+  g18: 26_243_200, // per gram 18k, toman
+  ounce: 4_105.1, // USD
+  usd: 268_000, // toman, open market
+  mesghal: 0, // derived (≈ 113.7 million)
+  coin: 269_100_000, // Emami
+  half: 142_100_000,
+  quarter: 76_900_000,
 };
 
 export const ROLES = [
@@ -77,11 +78,11 @@ export const STAFF = names.map((n, i) => ({
 export const ORDERS_ANOMALY = { who: 'نمایندگی کرمان (گالری ماهان)', kg: 4.8, normal: 1.2, x: 4 };
 
 export const DUE = [
-  { d: 2, t: 'چک دریافتی — گالری ارغوان', a: 1_850_000_000, k: 'in' },
+  { d: 2, t: 'چک دریافتی — گالری ارغوان', a: 4_100_000_000, k: 'in' },
   { d: 3, t: 'تحویل بار — نمایندگی شیراز (۲٫۴ کیلو)', a: 0, k: 'ship' },
-  { d: 5, t: 'چک پرداختی — تأمین آلیاژ نوین', a: 640_000_000, k: 'out' },
+  { d: 5, t: 'چک پرداختی — تأمین آلیاژ نوین', a: 1_420_000_000, k: 'out' },
   { d: 9, t: 'تسویه طلای امانی — بانک', a: 0, k: 'gold' },
-  { d: 12, t: 'چک دریافتی — نمایندگی مشهد', a: 2_300_000_000, k: 'in' },
+  { d: 12, t: 'چک دریافتی — نمایندگی مشهد', a: 5_100_000_000, k: 'in' },
   { d: 15, t: 'سرویس دوره‌ای کوره ریخته‌گری', a: 85_000_000, k: 'out' },
   { d: 18, t: 'تحویل بار — گالری ماهان', a: 0, k: 'ship' },
   { d: 22, t: 'حقوق و دستمزد ۱۵۰ نفر', a: 3_900_000_000, k: 'out' },
