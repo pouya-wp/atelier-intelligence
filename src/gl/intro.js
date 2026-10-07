@@ -20,11 +20,7 @@ vec3 neutral(vec3 c) {            // Khronos PBR Neutral, matches the rest of th
   float g = 1. - 1. / (.15 * (peak - np) + 1.); return mix(c, vec3(np), g);
 }
 vec3 srgb(vec3 c) { return mix(c * 12.92, 1.055 * pow(max(c, 0.), vec3(1. / 2.4)) - .055, step(.0031308, c)); }
-vec4 coin(vec2 uv) {
-  vec4 c = texture2D(tScene, uv);
-  if (c.a < .002) return vec4(0.);
-  return vec4(srgb(neutral(c.rgb / c.a)) * c.a, c.a);   // premultiplied, display space
-}
+vec4 coin(vec2 uv) { return texture2D(tScene, uv); }   // already tone-mapped, premultiplied
 
 void main() {
   vec2 p = gl_FragCoord.xy;                 // device px, origin bottom-left
@@ -79,17 +75,20 @@ void main() {
 export function playIntro(target) {
   return new Promise((resolve) => {
     const done = () => document.body.classList.remove('preintro');
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { done(); resolve(); return; }
+    // note: no prefers-reduced-motion skip — Windows "animation effects: off" sets it, and the intro is the point of the demo
+    let settled = false;
+    const bail = (e) => { if (settled) return; settled = true; console.warn('intro skipped', e); try { renderer?.dispose(); } catch {} canvas.remove(); done(); resolve(); };
     const canvas = document.createElement('canvas'); canvas.className = 'intro';
     document.body.appendChild(canvas);
     let renderer;
-    try { renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, powerPreference: 'high-performance' }); }
+    try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' }); }
     catch { canvas.remove(); done(); resolve(); return; }
 
     const dpr = Math.min(devicePixelRatio, 1.5);
     const W = innerWidth, H = innerHeight;
     renderer.setPixelRatio(dpr); renderer.setSize(W, H, false);
     renderer.setClearColor(0x000000, 0);
+    renderer.toneMapping = THREE.NeutralToneMapping; renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     // ---- coin scene (linear HDR into an MSAA target; tone-mapped in the composite)
     const scene = new THREE.Scene(); scene.environment = studio(renderer);
@@ -114,12 +113,14 @@ export function playIntro(target) {
     });
     scene.add(new THREE.Points(dgeo, dmat));
 
-    const rt = new THREE.WebGLRenderTarget(Math.round(W * dpr), Math.round(H * dpr), { type: THREE.HalfFloatType, samples: 4 });
+    // the coin pass is drawn to the canvas, then copied here — no float render targets required
+    const dbs = renderer.getDrawingBufferSize(new THREE.Vector2());
+    const grab = new THREE.FramebufferTexture(dbs.x, dbs.y);
 
     // ---- composite (full-screen quad straight to the canvas)
     const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({
       uniforms: {
-        tScene: { value: rt.texture }, uRes: { value: new THREE.Vector2(W * dpr, H * dpr) }, uDpr: { value: dpr },
+        tScene: { value: grab }, uRes: { value: dbs.clone() }, uDpr: { value: dpr },
         uTime: { value: 0 }, uLine: { value: 0 }, uFill: { value: 0 }, uSurf: { value: 0.5 },
         uSplashX: { value: 0 }, uSplashT: { value: -1 }, uReveal: { value: 0 }, uCenter: { value: new THREE.Vector2() },
       },
@@ -148,10 +149,16 @@ export function playIntro(target) {
     let skip = false;
     canvas.addEventListener('pointerdown', () => { skip = true; });
 
-    const t0 = performance.now(); let last = t0, raf;
+    // the timeline runs on capped frame time, not the wall clock: a slow first second (shader
+    // compiles, page still loading) slows the film down instead of skipping it
+    let T = 0, last = -1, raf;
     function frame(now) {
       raf = requestAnimationFrame(frame);
-      const t = (now - t0) / 1000, dt = Math.min(0.033, (now - last) / 1000); last = now;
+      try { step(now); } catch (e) { cancelAnimationFrame(raf); bail(e); }
+    }
+    function step(now) {
+      const dt = last < 0 ? 0 : Math.min(1 / 30, (now - last) / 1000); last = now;
+      const t = (T += dt);
 
       U.uLine.value = ease(Math.min(1, t / 0.5));
       U.uFill.value = ease(THREE.MathUtils.clamp((t - 0.25) / 0.6, 0, 1));
@@ -204,17 +211,20 @@ export function playIntro(target) {
       }
       U.uTime.value = t;
 
-      renderer.setRenderTarget(rt); renderer.clear(); renderer.render(scene, cam);
-      renderer.setRenderTarget(null); renderer.clear(); renderer.render(post, ocam);
+      renderer.clear(); renderer.render(scene, cam);
+      renderer.copyFramebufferToTexture(grab);
+      renderer.clear(); renderer.render(post, ocam);
     }
     function finish() {
       cancelAnimationFrame(raf);
+      if (settled) return; settled = true;
       document.body.classList.remove('intro-reveal');
-      rt.dispose(); dgeo.dispose(); dmat.dispose(); quad.geometry.dispose(); quad.material.dispose();
+      grab.dispose(); dgeo.dispose(); dmat.dispose(); quad.geometry.dispose(); quad.material.dispose();
       scene.environment?.dispose();
       renderer.dispose(); renderer.forceContextLoss(); canvas.remove();
       resolve();
     }
+    try { renderer.compile(scene, cam); renderer.compile(post, ocam); } catch {}
     raf = requestAnimationFrame((n) => { done(); frame(n); }); // canvas now covers the page
   });
 }

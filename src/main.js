@@ -4,8 +4,9 @@ import * as sfx from './sfx.js';
 import { I } from './icons.js';
 import { mountLogo } from './gl/logo3d.js';
 import { playIntro } from './gl/intro.js';
+import { createInspector } from './inspector.js';
 import { NAV, ROLES, OWNER, ORDERS_ANOMALY } from './data.js';
-import { VIEWS, reportText } from './views.js';
+import { VIEWS } from './views.js';
 import { live, onPrice } from './price.js';
 import { fa, $, $$ } from './util.js';
 
@@ -189,53 +190,31 @@ $('#bellBtn').innerHTML = I.bell;
 $('#bellBtn').addEventListener('click', () => { sfx.alarm(); toast('سررسید فردا', 'چک ۱٫۸۵ میلیارد تومانی گالری ارغوان — معادل حدود ' + fa(1_850_000_000 / live.g18) + ' گرم طلا', 'cal', 'crit'); });
 setMuteIcon();
 
-/* ------------------------------------------------ Talking assistant */
+/* ------------------------------------------------ بازرس ویژه (calm chat) */
 const orb = createOrb($('#orb'));
-let talking = false, talkTimer = null;
-function speak() {
-  const dock = $('#dock'), say = $('#say');
-  if (talking) { stopTalk(); return; }
-  sfx.initAudio().resume();
-  talking = true; dock.classList.add('talking');
-  const text = reportText().replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
-  let usedTTS = false;
-  if ('speechSynthesis' in window) {
-    const v = speechSynthesis.getVoices().find((x) => x.lang?.startsWith('fa'));
-    if (v) {
-      usedTTS = true;
-      const u = new SpeechSynthesisUtterance(text); u.voice = v; u.lang = 'fa-IR'; u.rate = 1;
-      u.onboundary = () => orb.setEnergy(0.6 + Math.random() * 0.4);
-      u.onend = stopTalk; speechSynthesis.speak(u);
-    }
-  }
-  // typewriter + synthesized voice texture (also drives the orb)
-  let i = 0;
-  say.textContent = '';
-  talkTimer = setInterval(() => {
-    i += 2; say.textContent = text.slice(Math.max(0, i - 140), i);
-    orb.setEnergy(0.3 + Math.random() * 0.7);
-    if (!usedTTS && i % 6 === 0) sfx.voiceChirp();
-    if (i >= text.length) { clearInterval(talkTimer); if (!usedTTS) setTimeout(stopTalk, 1500); }
-  }, 45);
-}
-function stopTalk() {
-  talking = false; clearInterval(talkTimer); orb.setEnergy(0);
-  if ('speechSynthesis' in window) speechSynthesis.cancel();
-  $('#dock').classList.remove('talking');
-  $('#say').innerHTML = 'بازرس ویژه <kbd>Space</kbd>';
-}
-$('#orbBtn').addEventListener('click', () => { sfx.click(); speak(); });
-addEventListener('keydown', (e) => { if (unlocked && e.code === 'Space' && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); speak(); } });
+const insp = createInspector({ orb });
+function speak() { insp.ask('today'); }
+$('#orbBtn').addEventListener('click', () => { sfx.click(); insp.toggle(); });
+$('#say').addEventListener('click', () => { sfx.click(); insp.toggle(); });
+addEventListener('keydown', (e) => {
+  if (!unlocked || /INPUT|SELECT|TEXTAREA|BUTTON/.test(document.activeElement.tagName)) return;
+  if (e.code === 'Space') { e.preventDefault(); insp.toggle(); }
+  if (e.code === 'Escape' && insp.isOpen()) insp.toggle(false);
+});
 
 /* ------------------------------------------------ Boot */
 renderRoles(); renderNav(); ticker(); clock();
-if (!new URLSearchParams(location.search).has('open')) {
+const INTRO = new URLSearchParams(location.search).has('intro'); // intro film parked for now; ?intro plays it
+if (INTRO && !new URLSearchParams(location.search).has('open')) {
   introOn = true;
-  playIntro($('#seal')).then(() => { introOn = false; });
+  const reveal = () => { introOn = false; document.body.classList.remove('preintro'); };
+  Promise.resolve().then(() => playIntro($('#seal'))).then(reveal, reveal).then(() => go(location.hash.slice(1) || 'overview', true));
+  setTimeout(() => document.body.classList.remove('preintro'), 2500); // never leave the page blank
 }
 if (new URLSearchParams(location.search).has('open')) { // skip the vault (handy for presenting a specific page)
   unlocked = true; $('#boot').remove(); document.body.classList.remove('preintro');
   $('#app').classList.add('in'); document.body.classList.add('unlocked');
 }
-go(location.hash.slice(1) || 'overview', true);
+if (!introOn) document.body.classList.remove('preintro');
+if (!introOn) go(location.hash.slice(1) || 'overview', true); // with the intro, the (heavy) first view mounts after it
 addEventListener('resize', movePill);

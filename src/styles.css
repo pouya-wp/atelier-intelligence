@@ -599,3 +599,64 @@ body.intro-reveal #boot .boot-inner { animation: introSettle 1.3s var(--ease) bo
 /* before the opening title takes over: a blank paper ground, no flash of the entry screen */
 body.preintro { background: #f3f4f1; }
 body.preintro #boot, body.preintro #app, body.preintro .dock { visibility: hidden; }
+
+/* ---------------------------------------------------------------- بازرس ویژه — calm chat
+   Large type, one short sentence at a time, generous spacing, big tap targets. */
+.dock .say { cursor: pointer; font-size: 16px; }
+.insp { position: fixed; z-index: 45; left: 26px; bottom: 92px; width: min(460px, calc(100vw - 32px)); height: min(660px, calc(100vh - 130px));
+  display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: 22px; overflow: hidden;
+  box-shadow: 0 40px 90px -30px rgba(7,46,35,.55), 0 0 0 1px rgba(181,148,87,.18);
+  opacity: 0; transform: translateY(16px) scale(.985); transform-origin: bottom left; pointer-events: none; transition: opacity .45s ease, transform .55s cubic-bezier(.2,.8,.2,1); }
+.insp.open { opacity: 1; transform: none; pointer-events: auto; }
+.insp-h { display: flex; align-items: center; gap: 14px; padding: 18px 20px; background: var(--velvet); color: #fff; border-bottom: 1px solid var(--frame); }
+.insp-av { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.08); border: 1px solid rgba(243,236,221,.35); color: var(--champagne-soft); flex: none; }
+.insp-av svg { width: 22px; height: 22px; }
+.insp.busy .insp-av { animation: inspBreath 2.4s ease-in-out infinite; }
+@keyframes inspBreath { 50% { box-shadow: 0 0 0 8px rgba(243,236,221,.08); } }
+.insp-ttl { flex: 1; display: grid; gap: 2px; }
+.insp-ttl b { font-size: 20px; font-weight: 700; }
+.insp-ttl span { font-size: 15px; color: rgba(255,255,255,.72); }
+.insp-x { width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(255,255,255,.25); background: transparent; color: #fff; font-size: 18px; cursor: pointer; }
+.insp-x:hover { background: rgba(255,255,255,.1); }
+
+.insp-log { flex: 1; overflow-y: auto; padding: 22px 20px 10px; display: flex; flex-direction: column; gap: 12px; scrollbar-width: thin; }
+.insp-b { max-width: 88%; font-size: 19px; line-height: 2; padding: 12px 18px; border-radius: 18px; opacity: 0; transform: translateY(6px); transition: opacity .6s ease, transform .6s ease, color .6s, background .6s; }
+.insp-b.in { opacity: 1; transform: none; }
+.insp-b.me { align-self: flex-start; background: var(--emerald-soft, #e7f0ec); color: var(--ink-2, #3a4a44); border-start-start-radius: 6px; }
+.insp-b.me.now { color: var(--ink); background: #e3eee9; box-shadow: inset 0 0 0 1px rgba(14,90,68,.18); }
+.insp-b.you { align-self: flex-end; background: var(--navy); color: #fff; font-size: 17px; border-start-end-radius: 6px; }
+.insp-b.typing { display: flex; gap: 6px; padding: 18px; }
+.insp-b.typing i { width: 8px; height: 8px; border-radius: 50%; background: var(--emerald); opacity: .35; animation: inspDot 1.2s infinite; }
+.insp-b.typing i:nth-child(2) { animation-delay: .2s; } .insp-b.typing i:nth-child(3) { animation-delay: .4s; }
+@keyframes inspDot { 40% { opacity: 1; transform: translateY(-3px); } }
+.insp-b.acts, .insp-b.again { background: none; padding: 4px 0; display: flex; gap: 10px; align-self: flex-start; }
+.insp-b.acts button, .insp-b.again button { font: inherit; font-size: 17px; min-height: 52px; padding: 0 22px; border-radius: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.insp-b.acts button { border: 0; background: var(--emerald); color: #fff; }
+.insp-b.acts button + button { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.insp-b.again button { border: 1px solid var(--line); background: var(--surface); color: var(--emerald); font-size: 16px; min-height: 46px; }
+.insp-b.again svg { width: 18px; height: 18px; }
+
+.insp-f { border-top: 1px solid var(--line); padding: 14px 16px 16px; background: var(--paper); display: grid; gap: 12px; }
+.insp-ask { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.insp-ask button { font: inherit; font-size: 16px; min-height: 54px; display: flex; align-items: center; gap: 10px; padding: 0 14px; text-align: start;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 14px; cursor: pointer; transition: border-color .2s, background .2s; }
+.insp-ask button:hover { border-color: var(--emerald); background: #f6faf8; }
+.insp-ask svg { width: 20px; height: 20px; color: var(--emerald); flex: none; }
+.insp-ctl { display: flex; gap: 8px; }
+.insp-ctl button { font: inherit; min-height: 58px; border-radius: 16px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 10px; }
+.insp-ctl svg { width: 22px; height: 22px; }
+.insp-mic { flex: 1; font-size: 18px; font-weight: 700; border: 0; color: #fff; background: var(--velvet); }
+.insp-stop { padding: 0 18px; font-size: 16px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); }
+.insp-big { width: 58px; font-size: 18px; font-weight: 700; background: var(--surface); color: var(--ink); border: 1px solid var(--line); }
+.insp.big .insp-big { background: var(--navy); color: #fff; }
+.insp.listening .insp-mic { animation: inspListen 1.3s ease-in-out infinite; }
+.insp.listening .insp-mic span::after { content: ' … در حال شنیدن'; font-weight: 400; }
+@keyframes inspListen { 50% { box-shadow: 0 0 0 7px rgba(14,90,68,.18); } }
+.insp.big .insp-b { font-size: 23px; } .insp.big .insp-b.you { font-size: 20px; }
+.insp.big .insp-ask button { font-size: 18px; min-height: 60px; }
+body.insp-open .dock .say { opacity: .55; }
+@media (max-width: 760px) {
+  .insp { left: 8px; right: 8px; width: auto; bottom: 140px; height: calc(100vh - 160px); }
+  .insp-b { font-size: 18px; }
+}
+@media (prefers-reduced-motion: reduce) { .insp, .insp-b { transition: opacity .3s; transform: none; } }
