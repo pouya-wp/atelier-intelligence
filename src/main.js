@@ -5,12 +5,23 @@ import { I } from './icons.js';
 import { mountLogo } from './gl/logo3d.js';
 import { playIntro } from './gl/intro.js';
 import { createInspector } from './inspector.js';
+import { THEMES, initTheme, setTheme, getTheme, onTheme } from './theme.js';
 import { NAV, ROLES, OWNER, ORDERS_ANOMALY } from './data.js';
 import { VIEWS } from './views.js';
 import { live, onPrice } from './price.js';
 import { fa, $, $$ } from './util.js';
 
+initTheme();
 $$('.brand .mark, .mbrand .mark, #seal').forEach(mountLogo);
+
+/* ------------------------------------------------ Style switcher: emerald · graphite · noir */
+(function themes() {
+  const box = $('#themes');
+  box.innerHTML = THEMES.map((t) => `<button data-theme-id="${t.id}" title="${t.label}" aria-label="${t.label}"><i style="background:${t.swatch}"></i></button>`).join('');
+  const mark = () => box.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.themeId === getTheme()));
+  box.addEventListener('click', (e) => { const b = e.target.closest('[data-theme-id]'); if (!b) return; sfx.click(); setTheme(b.dataset.themeId); });
+  mark(); onTheme(mark);
+})();
 
 /* ------------------------------------------------ Vault intro */
 const vaultSvg = $('#vaultSvg');
@@ -204,7 +215,7 @@ addEventListener('keydown', (e) => {
 
 /* ------------------------------------------------ Boot */
 renderRoles(); renderNav(); ticker(); clock();
-const INTRO = new URLSearchParams(location.search).has('intro'); // intro film parked for now; ?intro plays it
+const INTRO = new URLSearchParams(location.search).has('intro'); // opening film off; ?intro plays it
 if (INTRO && !new URLSearchParams(location.search).has('open')) {
   introOn = true;
   const reveal = () => { introOn = false; document.body.classList.remove('preintro'); };

@@ -9,6 +9,7 @@ import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import studioHDR from '@pmndrs/assets/hdri/studio.exr.js';
 import { LOGO_GLYPH, LOGO_CIRCLE } from '../icons.js';
 import { watchVisible } from './visibility.js';
+import { palette, onTheme } from '../theme.js';
 
 // draws the brand mark (ring + glyph) as an engraving mask
 function drawMark(g, cx, cy, size) {
@@ -67,17 +68,15 @@ export function studioEnv(renderer, scene) {
   });
 }
 
-// velvet backdrop drawn into the scene itself, matching the card's CSS velvet
-function velvetTexture() {
-  const c = document.createElement('canvas'); c.width = 1024; c.height = 512;
+// velvet backdrop drawn into the scene itself, matching the card's CSS velvet (theme-aware)
+function paintVelvet(c, pal) {
   const g = c.getContext('2d');
   const r = g.createRadialGradient(870, 0, 0, 870, 0, 1100);
-  r.addColorStop(0, '#14694f'); r.addColorStop(0.5, '#0a3f30'); r.addColorStop(1, '#072e23');
-  g.fillStyle = r; g.fillRect(0, 0, 1024, 512);
-  const img = g.getImageData(0, 0, 1024, 512), d = img.data;
+  r.addColorStop(0, pal.hi); r.addColorStop(0.5, pal.deep); r.addColorStop(1, pal.night);
+  g.fillStyle = r; g.fillRect(0, 0, c.width, c.height);
+  const img = g.getImageData(0, 0, c.width, c.height), d = img.data;
   for (let i = 0; i < d.length; i += 4) { const n = (Math.random() - 0.5) * 6; d[i] += n; d[i + 1] += n; d[i + 2] += n; }
   g.putImageData(img, 0, 0);
-  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
 }
 function radialTexture(color) {
   const c = document.createElement('canvas'); c.width = c.height = 256;
@@ -156,22 +155,50 @@ function ingotGeometry(w, h, d, taper = 0.84, r = 0.035) {
   return geo;
 }
 
+// the warm product studio of a bullion shot: black room, big warm softboxes, a low amber fill so the
+// shaded faces stay deep orange instead of going grey, and strip lights for bright edge highlights
+function bullionEnv(renderer) {
+  const env = new THREE.Scene();
+  env.background = new THREE.Color(0.11, 0.05, 0.012);
+  const box = (w, h, x, y, z, i, c = [1, 0.93, 0.8]) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(...c).multiplyScalar(i), side: THREE.DoubleSide }));
+    m.position.set(x, y, z); m.lookAt(0, 0, 0); env.add(m);
+  };
+  box(16, 9, 0, 11, -4, 2.4);                 // overhead key: the big bright sheet on every top face
+  box(10, 4, 0, 6, 9, 1.3);                   // front-top fill, lights the stamps
+  box(2.4, 14, -10, 3, 1, 2.6);               // left strip → hot edge lines
+  box(2.4, 14, 10, 3, -2, 2.0);               // right strip
+  box(18, 1.4, 0, 2, -12, 3.0, [1, 0.85, 0.6]); // back rim
+  box(20, 10, 0, -9, 3, 0.9, [1, 0.55, 0.18]);  // amber floor bounce
+  const pm = new THREE.PMREMGenerator(renderer);
+  const tex = pm.fromScene(env, 0.02).texture; pm.dispose();
+  return tex;
+}
+
+// 24k-looking gold: saturated, warm, with a mirror-bright top
+const GOLD = 0xf7b23a;
+
 export function createIngotScene(canvas) {
   const renderer = makeRenderer(canvas);
   renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5)); // post chain already AA's; cap the fill cost
   const vis = watchVisible(canvas);
   const scene = new THREE.Scene();
-  studioEnv(renderer, scene);
-  scene.background = velvetTexture();
-  scene.fog = new THREE.Fog(0x0b4535, 8.5, 16); // far coins sink into the velvet
+  renderer.toneMappingExposure = 0.92;
+  scene.environment = bullionEnv(renderer); // warm bullion-shot studio (reference photo lighting)
+  const vc = document.createElement('canvas'); vc.width = 1024; vc.height = 512;
+  const vtex = new THREE.CanvasTexture(vc); vtex.colorSpace = THREE.SRGBColorSpace;
+  scene.background = vtex;
+  scene.fog = new THREE.Fog(0x000000, 8.5, 16); // far coins sink into the velvet
+  const applyTheme = () => { const pal = palette(); paintVelvet(vc, pal); vtex.needsUpdate = true; scene.fog.color.set(pal.deep); };
+  applyTheme(); const offTheme = onTheme(applyTheme);
   const cam = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
   cam.position.set(0, 2.2, 9.5); cam.lookAt(0, 0, 0);
 
   const root = new THREE.Group(); scene.add(root);
   const bar = new THREE.Group(); root.add(bar);
   const W = 3.4, H = 0.62, D = 1.6, T = 0.84;
-  bar.add(new THREE.Mesh(ingotGeometry(W, H, D, T), goldMaterial(0xe8c06a, 0.2)));
-  const face = new THREE.Mesh(new THREE.PlaneGeometry(W * T - 0.14, D * T - 0.12), stampedGold(stampTexture()));
+  bar.add(new THREE.Mesh(ingotGeometry(W, H, D, T), goldMaterial(GOLD, 0.16, { envMapIntensity: 1.25 })));
+  const face = new THREE.Mesh(new THREE.PlaneGeometry(W * T - 0.14, D * T - 0.12), stampedGold(stampTexture(), 0.08, 0.42, GOLD));
   face.rotation.x = -Math.PI / 2; face.position.y = H / 2 + 0.002; bar.add(face);
   bar.rotation.set(0.42, -0.6, 0.04);
 
@@ -179,12 +206,12 @@ export function createIngotScene(canvas) {
   const shadow = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 3.2), new THREE.MeshBasicMaterial({ map: radialTexture('rgba(2,20,14,.75)'), transparent: true, depthWrite: false, fog: false }));
   shadow.rotation.x = -Math.PI / 2; shadow.position.set(0, -1.15, 0.2); root.add(shadow);
 
-  const bar2 = new THREE.Mesh(ingotGeometry(2.2, 0.42, 1.05, 0.84), goldMaterial(0xe0b862, 0.24));
+  const bar2 = new THREE.Mesh(ingotGeometry(2.2, 0.42, 1.05, 0.84), goldMaterial(GOLD, 0.2, { envMapIntensity: 1.2 }));
   bar2.position.set(0.9, -0.75, -1.6); bar2.rotation.set(0.25, 0.4, -0.05); root.add(bar2);
 
   const coinGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.06, 128);
   const coinFace = coinTexture();
-  const edge = goldMaterial(0xe8c06a, 0.28);
+  const edge = goldMaterial(GOLD, 0.22, { envMapIntensity: 1.2 });
   const coins = [];
   // orbits found by a clearance search (scratch sim, 25 min of motion): each coin has its own
   // height layer and ellipse, so coins never pass through each other or through either bar
@@ -195,7 +222,7 @@ export function createIngotScene(canvas) {
     { a: 3.062, r: 3.485, y: 2.547, s: -0.158, zf: 0.865 },
   ];
   for (const u of ORBITS) {
-    const f = stampedGold(coinFace, 0.2, 0.34);
+    const f = stampedGold(coinFace, 0.1, 0.34, GOLD);
     const m = new THREE.Mesh(coinGeo, [edge, f, f]);
     m.userData = u;
     root.add(m); coins.push(m);
@@ -217,14 +244,14 @@ export function createIngotScene(canvas) {
   scene.add(new THREE.Points(dg, dm));
 
   // one hard key that follows the cursor — the highlight you "move to light"
-  const key = new THREE.SpotLight(0xfff8ee, 70, 30, 0.6, 0.8, 1.4); key.position.set(3, 5, 6); scene.add(key); scene.add(key.target);
+  const key = new THREE.SpotLight(0xffe6b8, 45, 30, 0.6, 0.7, 1.4); key.position.set(3, 5, 6); scene.add(key); scene.add(key.target);
   const sweep = new THREE.PointLight(0xfff1d6, 0, 9, 1.6); scene.add(sweep);
 
   // compositing: MSAA render → soft bloom → tone map → grade (vignette, grain, green bounce)
   const rt = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 });
   const composer = new EffectComposer(renderer, rt);
   composer.addPass(new RenderPass(scene, cam));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.22, 0.55, 0.9);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.2, 0.45, 0.93);
   composer.addPass(bloom);
   composer.addPass(new OutputPass());
   const grade = new ShaderPass({
@@ -236,8 +263,6 @@ export function createIngotScene(canvas) {
         vec3 c = texture2D(tDiffuse, vUv).rgb;
         float v = smoothstep(1.15, .35, length((vUv - vec2(.62,.55)) * vec2(1.25,1.)));
         c *= mix(.72, 1., v);                                  // vignette toward the copy side
-        float l = dot(c, vec3(.299,.587,.114));
-        c = mix(c, c * vec3(.94,1.04,1.0), (1. - l) * .35);    // emerald bounce in the shadows
         c += (h(vUv * 900.) - .5) * .022;                      // fine grain
         gl_FragColor = vec4(c, 1.); }`,
   });
@@ -277,7 +302,7 @@ export function createIngotScene(canvas) {
     shadow.position.x = bar.position.x;
     // every 7s a warm glint sweeps across the bar
     const sw = (t % 7) / 1.8;
-    if (sw < 1) { sweep.position.set(-5 + sw * 10 - 3.3 * root.scale.x, 2.2, 3.2); sweep.intensity = Math.sin(sw * Math.PI) * 26; } else sweep.intensity = 0;
+    if (sw < 1) { sweep.position.set(-5 + sw * 10 - 3.3 * root.scale.x, 2.2, 3.2); sweep.intensity = Math.sin(sw * Math.PI) * 18; } else sweep.intensity = 0;
     bar2.position.y = -0.75 + Math.sin(t * 0.7 + 1) * 0.05;
     coins.forEach((c) => {
       const u = c.userData, a = u.a + t * u.s;
@@ -289,5 +314,5 @@ export function createIngotScene(canvas) {
     composer.render();
   }
   raf = requestAnimationFrame(loop);
-  return { dispose() { alive = false; cancelAnimationFrame(raf); vis.stop(); removeEventListener('pointermove', onMove); composer.dispose(); rt.dispose(); renderer.dispose(); } };
+  return { dispose() { alive = false; cancelAnimationFrame(raf); vis.stop(); offTheme(); vtex.dispose(); scene.environment?.dispose(); removeEventListener('pointermove', onMove); composer.dispose(); rt.dispose(); renderer.dispose(); } };
 }

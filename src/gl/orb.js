@@ -1,5 +1,14 @@
 import * as THREE from 'three';
 import { watchVisible } from './visibility.js';
+import { getTheme, onTheme } from '../theme.js';
+
+// per-theme liquid: tint, dark env, bright env
+const TONES = {
+  emerald: [[.35, .78, .62], [.02, .12, .09], [.75, .92, .85]],
+  blue: [[.45, .62, .9], [.02, .05, .1], [.8, .88, .98]],
+  graphite: [[.72, .76, .8], [.04, .045, .05], [.9, .92, .95]],
+  noir: [[1, .74, .3], [.03, .022, .012], [1, .93, .8]],
+};
 
 // Molten-gold orb for the talking assistant. Displacement grows with "voice" energy.
 const noise = `
@@ -23,7 +32,7 @@ export function createOrb(canvas) {
   const scene = new THREE.Scene();
   const cam = new THREE.PerspectiveCamera(35, 1, 0.1, 10); cam.position.z = 3.6;
   const mat = new THREE.ShaderMaterial({
-    uniforms: { uTime: { value: 0 }, uAmp: { value: 0.06 }, uLight: { value: new THREE.Vector2() } },
+    uniforms: { uTime: { value: 0 }, uAmp: { value: 0.06 }, uLight: { value: new THREE.Vector2() }, uTint: { value: new THREE.Vector3() }, uLow: { value: new THREE.Vector3() }, uHigh: { value: new THREE.Vector3() } },
     vertexShader: `${noise}
       uniform float uTime; uniform float uAmp; varying vec3 vN; varying vec3 vV;
       float disp(vec3 p){ return snoise(p*1.6+vec3(0.,0.,uTime*.6))*uAmp + snoise(p*2.6+uTime*.9)*uAmp*.15; }
@@ -33,19 +42,21 @@ export function createOrb(canvas) {
         vec3 p0 = p + n*disp(p); vec3 p1 = (p+t*e); p1 += normalize(p1)*disp(p1); vec3 p2 = (p+b*e); p2 += normalize(p2)*disp(p2);
         vN = normalize(normalMatrix*normalize(cross(p1-p0, p2-p0)));
         vec4 mv = modelViewMatrix*vec4(p0,1.); vV = -mv.xyz; gl_Position = projectionMatrix*mv; }`,
-    fragmentShader: `uniform vec2 uLight; varying vec3 vN; varying vec3 vV;
+    fragmentShader: `uniform vec2 uLight; uniform vec3 uTint, uLow, uHigh; varying vec3 vN; varying vec3 vV;
       void main(){
         vec3 n = normalize(vN); vec3 v = normalize(vV); vec3 r = reflect(-v, n);
         // procedural studio reflection: bright softbox top, warm floor, dark horizon band
         float sky = smoothstep(-.1,.9,r.y); float box = smoothstep(.75,.98, dot(r, normalize(vec3(uLight,1.))));
-        vec3 env = mix(vec3(.02,.12,.09), vec3(.75,.92,.85), sky) + vec3(1.)*box*1.2;
+        vec3 env = mix(uLow, uHigh, sky) + vec3(1.)*box*1.2;
         env *= .55 + .45*smoothstep(-.4,.2,abs(r.y-.05));
         float fr = pow(1.-max(dot(n,v),0.), 3.);
-        vec3 gold = vec3(.35,.78,.62);
+        vec3 gold = uTint;
         vec3 col = env*gold*(.85+.5*fr) + vec3(.71,.58,.34)*fr*.35;
         col = col/(1.+col*.6);
         gl_FragColor = vec4(pow(col, vec3(.9)), 1.); }`,
   });
+  const tone = () => { const [a, b, c] = TONES[getTheme()] || TONES.emerald; mat.uniforms.uTint.value.set(...a); mat.uniforms.uLow.value.set(...b); mat.uniforms.uHigh.value.set(...c); };
+  tone(); const offTheme = onTheme(tone);
   const mesh = new THREE.Mesh(new THREE.IcosahedronGeometry(1, 18), mat); scene.add(mesh);
   let amp = 0.06, target = 0.06, alive = true, w = 0, frameNo = 0;
   const vis = watchVisible(canvas);
@@ -66,5 +77,5 @@ export function createOrb(canvas) {
     mesh.rotation.y = t * 0.3;
     renderer.render(scene, cam);
   })();
-  return { setEnergy(v) { target = 0.06 + v * 0.32; }, dispose() { alive = false; renderer.dispose(); } };
+  return { setEnergy(v) { target = 0.06 + v * 0.32; }, dispose() { alive = false; offTheme(); vis.stop?.(); renderer.dispose(); } };
 }

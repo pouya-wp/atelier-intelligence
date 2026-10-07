@@ -54,7 +54,7 @@ function overview(role) {
         ${kpi('هر گرم طلای ۱۸ عیار', live.g18 / 1e6, 'میلیون تومان', '۱٫۲٪', sparkline(series(30, 50, 3, 0.05)), true, 2)}
         ${kpi('انس جهانی', live.ounce, 'دلار', '۰٫۸٪', sparkline(series(30, 50, 3, 0.04)), true, 1)}
         ${kpi('فروش امروز', 92.8, 'میلیارد تومان', '۹٪', sparkline(series(30, 50, 4, 0.06)), true, 1)}
-        ${kpi('هزینه جاری ماه', 1.84, 'میلیارد تومان', '۳٪', sparkline(series(30, 50, 2, -0.03), { color: '#b42318' }), false, 2)}
+        ${kpi('هزینه جاری ماه', 1.84, 'میلیارد تومان', '۳٪', sparkline(series(30, 50, 2, -0.03), { color: 'var(--crit)' }), false, 2)}
       </div>
 
       <div class="grid mt">
@@ -161,10 +161,10 @@ function line() {
           </div>
         </div>
       </div>
-      <div class="card mt"><div class="ch"><h3>آمار خرابی هر واحد <small>در هر ۱۰۰ قطعه — امروز در برابر دیروز و میانگین ماه قبل</small></h3><div class="legend"><span><i style="background:#0e5a44"></i>امروز</span><span><i style="background:#3c5a80"></i>دیروز</span><span><i style="background:#d5dfda"></i>ماه قبل</span></div></div>
+      <div class="card mt"><div class="ch"><h3>آمار خرابی هر واحد <small>در هر ۱۰۰ قطعه — امروز در برابر دیروز و میانگین ماه قبل</small></h3><div class="legend"><span><i style="background:var(--emerald)"></i>امروز</span><span><i style="background:var(--navy-mid)"></i>دیروز</span><span><i style="background:var(--bar-dim)"></i>ماه قبل</span></div></div>
         <div class="dfx">${DEFECT_RATE.map((r) => { const better = r.d <= r.y; const vsM = ((r.d - r.m) / r.m) * 100; const mx = 4; return `<div class="dfx-r">
           <b>${r.u}</b>
-          <div class="dfx-bars"><i style="width:${(r.d / mx) * 100}%;background:#0e5a44"></i><i style="width:${(r.y / mx) * 100}%;background:#3c5a80;opacity:.75"></i><i style="width:${(r.m / mx) * 100}%;background:#d5dfda"></i></div>
+          <div class="dfx-bars"><i style="width:${(r.d / mx) * 100}%;background:var(--emerald)"></i><i style="width:${(r.y / mx) * 100}%;background:var(--navy-mid);opacity:.75"></i><i style="width:${(r.m / mx) * 100}%;background:var(--bar-dim)"></i></div>
           <span class="num">${fa(r.d, 1)}</span>
           ${chip(better ? 'ok' : 'crit', `${better ? '▼ بهبود' : '▲ بدتر'} ${fa(Math.abs(vsM), 0)}٪ نسبت به ماه قبل`)}
         </div>`; }).join('')}</div></div>
@@ -177,12 +177,12 @@ function line() {
       const svg = root.querySelector('#flow'), n = STATIONS.length, W = 1200, step = W / n;
       const xs = STATIONS.map((_, i) => W - (i + 0.5) * step); // RTL flow: right → left
       const path = `M${xs[0]},60 ` + xs.slice(1).map((x, i) => `C${xs[i] - step / 2},${i % 2 ? 20 : 100} ${x + step / 2},${i % 2 ? 100 : 20} ${x},60`).join(' ');
-      svg.innerHTML = `<defs><linearGradient id="fl" x1="1" x2="0"><stop offset="0" stop-color="#1f7a5e"/><stop offset="1" stop-color="#0e5a44"/></linearGradient>
+      svg.innerHTML = `<defs><linearGradient id="fl" x1="1" x2="0"><stop offset="0" style="stop-color:var(--emerald-mid)"/><stop offset="1" style="stop-color:var(--emerald)"/></linearGradient>
         <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-        <path id="fp" d="${path}" fill="none" stroke="rgba(14,90,68,.08)" stroke-width="14" stroke-linecap="round"/>
+        <path id="fp" d="${path}" fill="none" style="stroke:rgb(var(--brand-rgb) / .08)" stroke-width="14" stroke-linecap="round"/>
         <path d="${path}" fill="none" stroke="url(#fl)" stroke-width="2" stroke-dasharray="2 10" stroke-linecap="round"><animate attributeName="stroke-dashoffset" from="0" to="-120" dur="2s" repeatCount="indefinite"/></path>
-        ${Array.from({ length: 16 }, (_, i) => `<circle r="${2 + (i % 3)}" fill="#b59457"><animateMotion dur="${9 + (i % 4)}s" begin="${-i * 0.7}s" repeatCount="indefinite"><mpath href="#fp"/></animateMotion></circle>`).join('')}
-        ${xs.map((x, i) => `<g transform="translate(${x},60)"><circle r="21" fill="#fff" stroke="${i === 1 ? '#b7791f' : '#0e5a44'}" stroke-width="1.5"/><circle r="26" fill="none" stroke="rgba(14,90,68,.2)"><animate attributeName="r" values="22;32;22" dur="${2.4 + i * 0.2}s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0;1" dur="${2.4 + i * 0.2}s" repeatCount="indefinite"/></circle><g transform="translate(-9,-9) scale(.75)" color="#0e5a44">${I[STATIONS[i].icon]}</g></g>`).join('')}`;
+        ${Array.from({ length: 16 }, (_, i) => `<circle r="${2 + (i % 3)}" style="fill:var(--champagne)"><animateMotion dur="${9 + (i % 4)}s" begin="${-i * 0.7}s" repeatCount="indefinite"><mpath href="#fp"/></animateMotion></circle>`).join('')}
+        ${xs.map((x, i) => `<g transform="translate(${x},60)"><circle r="21" stroke-width="1.5" style="fill:var(--surface);stroke:${i === 1 ? 'var(--warn)' : 'var(--emerald)'}"/><circle r="26" fill="none" style="stroke:rgb(var(--brand-rgb) / .2)"><animate attributeName="r" values="22;32;22" dur="${2.4 + i * 0.2}s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0;1" dur="${2.4 + i * 0.2}s" repeatCount="indefinite"/></circle><g transform="translate(-9,-9) scale(.75)" style="color:var(--emerald)">${I[STATIONS[i].icon]}</g></g>`).join('')}`;
       svg.querySelectorAll('g > g > svg').forEach((s) => { s.setAttribute('width', 24); s.setAttribute('height', 24); });
       root.querySelector('#stations').innerHTML = STATIONS.map((s) => `<div style="text-align:center;display:grid;gap:4px">
         <b style="font-size:13px">${s.name}</b><span class="num" style="font-size:13px;color:var(--emerald)" data-wip="${s.wip}">${fa(s.wip, 1)} کیلو</span>
@@ -279,33 +279,53 @@ function invoice() {
 function treasury() {
   return {
     html: `<section class="view">
-      ${head('THE VAULT', 'خزانه — <b>هر گرم، حسابرسی‌شده</b>', 'موجودی طلا، نقدینگی و چک‌ها با ارزش لحظه‌ای.')}
+      ${head('VAULT & INVENTORY', 'خزانه و انبار — <b>یک دفتر، هر گرم</b>', 'طلا، کالا، سفارش‌ها و مرجوعی‌ها در یک جا.', `<button class="btn" data-sfx data-toast="درخواست خرید برای ۳ قلم ارسال شد">${I.cart} سفارش خودکار کمبودها</button>`)}
+      <nav class="jump">${[['tw-gold', 'گردش طلا'], ['tw-codes', 'کد کالا'], ['tw-orders', 'سفارش و موجودی'], ['tw-stock', 'انبار و تولیدی‌ها'], ['tw-ret', 'مرجوعی و خرابی']].map(([id, l]) => `<a href="#" data-jump="${id}">${l}</a>`).join('')}</nav>
       <div class="grid">
         <div class="card gold c4 kpi"><div class="label">کل طلای خزانه</div><div class="val num gold-text"><span data-count="186.42" data-dec="2">۰</span><small>کیلوگرم</small></div><div class="delta">معادل <span class="num" id="tv"></span></div></div>
         <div class="card c4 kpi"><div class="label">نقدینگی حساب‌ها</div><div class="val num"><span data-count="48.6" data-dec="1">۰</span><small>میلیارد تومان</small></div><div class="delta"><span class="up">▲ ۴٫۲ میلیارد</span> واریز امروز</div></div>
         <div class="card c4 kpi"><div class="label">چک‌های در جریان</div><div class="val num"><span data-count="23">۰</span><small>فقره</small></div><div class="delta">مجموع <span class="num">۱۸٫۴ میلیارد</span> · سه فقره این هفته</div></div>
       </div>
-      <div class="grid mt">
+      <div class="grid mt" id="tw-gold">
         <div class="card c5"><div class="ch"><h3>ترکیب خزانه</h3></div><div id="d2"></div>
           <div class="kv" style="margin-top:16px">
-            <div><i style="background:#0a3f30"></i><span>محصول ساخته</span><b class="num">۸۲٫۱ کیلو</b></div>
-            <div><i style="background:#1f7a5e"></i><span>آب‌شده ۷۵۰</span><b class="num">۶۱٫۲ کیلو</b></div>
-            <div><i style="background:#b59457"></i><span>در جریان تولید</span><b class="num">۳۲٫۷ کیلو</b></div>
-            <div><i style="background:#0a1e35"></i><span>سکه و شمش</span><b class="num">۱۰٫۴ کیلو</b></div>
+            <div><i style="background:var(--emerald-deep)"></i><span>محصول ساخته</span><b class="num">۸۲٫۱ کیلو</b></div>
+            <div><i style="background:var(--emerald-mid)"></i><span>آب‌شده ۷۵۰</span><b class="num">۶۱٫۲ کیلو</b></div>
+            <div><i style="background:var(--champagne)"></i><span>در جریان تولید</span><b class="num">۳۲٫۷ کیلو</b></div>
+            <div><i style="background:var(--navy)"></i><span>سکه و شمش</span><b class="num">۱۰٫۴ کیلو</b></div>
           </div></div>
         <div class="card c7"><div class="ch"><h3>ورود و خروج امروز</h3>${chip('ok', 'تراز')}</div>
           <div class="scroll-x"><table class="tbl"><thead><tr><th>ساعت</th><th>شرح</th><th>نوع</th><th class="end">وزن</th></tr></thead><tbody>
             ${[['۰۸:۱۲', 'تحویل آب‌شده به ریخته‌گری', 'خروج', -4.2], ['۰۹:۴۰', 'ورود محصول از آبکاری', 'ورود', 2.41], ['۱۰:۵۵', 'فروش — گالری ارغوان', 'خروج', -0.482], ['۱۱:۲۰', 'خرید طلای آب‌شده — بانک', 'ورود', 5], ['۱۲:۰۵', 'برگشت از نمایندگی مشهد', 'ورود', 0.049], ['۱۳:۳۰', 'تحویل به تراش CNC', 'خروج', -1.8]].map(([h, t, k, w]) => `<tr><td class="num muted">${h}</td><td>${t}</td><td>${chip(w > 0 ? 'ok' : 'gold', k)}</td><td class="end num ${w > 0 ? 'up' : ''}"><span dir="ltr">${w > 0 ? '+' : '−'}${fa(Math.abs(w), 3)}</span> کیلو</td></tr>`).join('')}
           </tbody></table></div></div>
       </div>
-      <div class="card mt"><div class="ch"><h3>گردش خزانه بر اساس کد کالا <small>ورود، خروج و مرجوعی هر کد — امروز</small></h3><div class="tabs"><button class="on">همه مراحل</button><button>ریخته‌گری</button><button>ساخت</button><button>آماده فروش</button></div></div>
+      <div class="card mt" id="tw-codes"><div class="ch"><h3>گردش خزانه بر اساس کد کالا <small>ورود، خروج و مرجوعی هر کد — امروز</small></h3><div class="tabs"><button class="on">همه مراحل</button><button>ریخته‌گری</button><button>ساخت</button><button>آماده فروش</button></div></div>
         <div class="scroll-x"><table class="tbl"><thead><tr><th>کد کالا</th><th>شرح</th><th>مرحله</th><th>ورود</th><th>خروج</th><th>مرجوعی</th><th>مانده</th><th>وزن</th><th class="end">ارزش لحظه‌ای</th></tr></thead><tbody>
         ${CODES.map((c) => `<tr><td><span class="chip gold en" style="font-family:ui-monospace,monospace;letter-spacing:.04em">${c.c}</span></td><td>${c.n}</td><td class="muted">${c.st}</td><td class="num up">+${fa(c.in)}</td><td class="num">−${fa(c.out)}</td><td class="num" style="color:var(--warn)">${c.ret ? fa(c.ret) : '—'}</td><td class="num"><b>${fa(c.q)}</b></td><td class="num">${fa(c.kg, 2)} کیلو</td><td class="end num" data-kg="${c.kg}">${fa((c.kg * 1000 * live.g18) / 1e9, 2)} میلیارد</td></tr>`).join('')}
         </tbody></table></div></div>
+      <div class="card mt" id="tw-orders"><div class="ch"><h3>${I.alert.replace('<svg', '<svg width="16"')} تطبیق سفارش با موجودی <small>سفارش بیشتر از موجودی انبار = اطلاع فوری به مدیر</small></h3>${chip('crit', `${fa(ORDER_CHECK.filter((x) => x.o > x.st).length)} سفارش بیش از موجودی`)}</div>
+        <div>${ORDER_CHECK.map((x) => `<div class="ovs ${x.o > x.st ? 'over' : ''}">
+          <div class="ovs-t"><b>${x.who}</b><span class="muted">${x.n} · <span style="font-family:ui-monospace,monospace;font-size:11px" dir="ltr">${x.code}</span></span></div>
+          <div class="ovs-m"><div class="meter"><i style="width:${Math.min(100, (x.o / x.st) * 100)}%"></i></div><span class="num">${fa(x.o)} سفارش از ${fa(x.st)} موجود</span></div>
+          ${x.o > x.st ? chip('crit', `کسری ${fa(x.o - x.st)} عدد`) : chip('ok', 'پوشش کامل')}</div>`).join('')}</div></div>
+      <div class="grid mt" id="tw-stock">
+        <div class="card c7"><div class="ch"><h3>موجودی انبار</h3>${chip('warn', '۳ قلم زیر حد')}</div>
+          <div style="display:grid;gap:16px">${STOCK.map((s) => `<div style="display:grid;grid-template-columns:1fr auto;gap:8px 14px;align-items:center"><span style="font-size:13px">${s.n}</span><span class="num" style="font-size:12.5px">${s.q} ${chip(s.st, s.st === 'ok' ? 'کافی' : s.st === 'warn' ? 'رو به اتمام' : 'بحرانی')}</span><div class="meter" style="grid-column:span 2"><i style="width:${s.lvl}%;${s.st === 'crit' ? 'background:var(--crit)' : ''}"></i></div></div>`).join('')}</div></div>
+        <div class="card c5"><div class="ch"><h3>تولیدی‌های طرف قرارداد</h3></div>
+          <table class="tbl"><thead><tr><th>تولیدی</th><th>محصول</th><th class="end">تحویل به‌موقع</th></tr></thead><tbody>
+          ${MAKERS.map((m) => `<tr><td>${m.n}</td><td class="muted">${m.k}</td><td class="end num">${fa(m.on)}٪</td></tr>`).join('')}</tbody></table></div>
+      </div>
+      <div class="grid mt" id="tw-ret">
+        <div class="card c6"><div class="ch"><h3>${I.ret.replace('<svg', '<svg width="16"')} لیست مرجوعی‌ها</h3></div>
+          <table class="tbl"><thead><tr><th>کالا</th><th>از</th><th>علت</th><th class="end">وزن</th></tr></thead><tbody>${RETURNS.map((r) => `<tr><td>${r.n}</td><td class="muted">${r.from}</td><td>${chip('gold', r.why)}</td><td class="end num">${fa(r.g, 1)} گرم</td></tr>`).join('')}</tbody></table></div>
+        <div class="card c6"><div class="ch"><h3>${I.broken.replace('<svg', '<svg width="16"')} لیست خرابی‌ها</h3></div>
+          <table class="tbl"><thead><tr><th>مورد</th><th>ایستگاه</th><th>اقدام</th><th class="end">وزن</th></tr></thead><tbody>${DEFECTS.map((r) => `<tr><td>${r.n}</td><td class="muted">${r.st}</td><td>${chip('warn', r.a)}</td><td class="end num">${fa(r.g, 1)} گرم</td></tr>`).join('')}</tbody></table></div>
+      </div>
     </section>`,
     mount(root) {
       countUp(root);
-      donut(root.querySelector('#d2'), [{ l: 'محصول ساخته', v: 82.1, c: '#0a3f30' }, { l: 'آب‌شده', v: 61.2, c: '#1f7a5e' }, { l: 'در جریان تولید', v: 32.7, c: '#b59457' }, { l: 'سکه و شمش', v: 10.4, c: '#0a1e35' }], { size: 200, center: '۱۸۶٫۴' });
+      root.querySelector('.jump').addEventListener('click', (e) => { const a = e.target.closest('[data-jump]'); if (!a) return; e.preventDefault(); root.querySelector('#' + a.dataset.jump)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+      donut(root.querySelector('#d2'), [{ l: 'محصول ساخته', v: 82.1, c: 'var(--emerald-deep)' }, { l: 'آب‌شده', v: 61.2, c: 'var(--emerald-mid)' }, { l: 'در جریان تولید', v: 32.7, c: 'var(--champagne)' }, { l: 'سکه و شمش', v: 10.4, c: 'var(--navy)' }], { size: 200, center: '۱۸۶٫۴' });
       const set = () => {
         root.querySelector('#tv').textContent = `${fa((186420 * live.g18) / 1e9, 1)} میلیارد تومان`;
         root.querySelectorAll('[data-kg]').forEach((el) => { el.textContent = `${fa((+el.dataset.kg * 1000 * live.g18) / 1e9, 2)} میلیارد`; });
@@ -325,7 +345,7 @@ function accounting() {
       <div class="grid">
         ${kpi('درآمد ماه', 1.92, 'هزار میلیارد', '۱۱٪', sparkline(series(30, 50, 3, 0.06)), true, 2)}
         ${kpi('حاشیه سود ناخالص', 14.6, 'درصد', '۰٫۴٪', sparkline(series(30, 50, 2, 0.02)), true, 1)}
-        ${kpi('هزینه‌های جاری', 5.31, 'میلیارد', '۳٪', sparkline(series(30, 50, 2, 0.02), { color: '#b42318' }), false, 2)}
+        ${kpi('هزینه‌های جاری', 5.31, 'میلیارد', '۳٪', sparkline(series(30, 50, 2, 0.02), { color: 'var(--crit)' }), false, 2)}
         ${kpi('اسناد ثبت‌شده امروز', 412, 'سند', '۶۲', sparkline(series(30, 50, 4, 0.03)), true)}
       </div>
       <div class="grid mt">
@@ -336,33 +356,6 @@ function accounting() {
       </div>
     </section>`,
     mount(root) { countUp(root); },
-  };
-}
-
-// ---------------------------------------------------------------- warehouse
-function warehouse() {
-  return {
-    html: `<section class="view">
-      ${head('INVENTORY', 'انبار، تولیدی‌ها، <b>مرجوعی و خرابی</b>', 'کمبود را قبل از توقف کار خبر می‌دهد.', `<button class="btn" data-sfx data-toast="درخواست خرید برای ۳ قلم ارسال شد">${I.cart} سفارش خودکار کمبودها</button>`)}
-      <div class="card" style="margin-bottom:18px"><div class="ch"><h3>${I.alert.replace('<svg', '<svg width="16"')} تطبیق سفارش با موجودی <small>سفارش بیشتر از موجودی انبار = اطلاع فوری به مدیر</small></h3>${chip('crit', `${fa(ORDER_CHECK.filter((x) => x.o > x.st).length)} سفارش بیش از موجودی`)}</div>
-        <div>${ORDER_CHECK.map((x) => `<div class="ovs ${x.o > x.st ? 'over' : ''}">
-          <div class="ovs-t"><b>${x.who}</b><span class="muted">${x.n} · <span style="font-family:ui-monospace,monospace;font-size:11px" dir="ltr">${x.code}</span></span></div>
-          <div class="ovs-m"><div class="meter"><i style="width:${Math.min(100, (x.o / x.st) * 100)}%"></i></div><span class="num">${fa(x.o)} سفارش از ${fa(x.st)} موجود</span></div>
-          ${x.o > x.st ? chip('crit', `کسری ${fa(x.o - x.st)} عدد`) : chip('ok', 'پوشش کامل')}</div>`).join('')}</div></div>
-      <div class="grid">
-        <div class="card c7"><div class="ch"><h3>موجودی انبار</h3>${chip('warn', '۳ قلم زیر حد')}</div>
-          <div style="display:grid;gap:16px">${STOCK.map((s) => `<div style="display:grid;grid-template-columns:1fr auto;gap:8px 14px;align-items:center"><span style="font-size:13px">${s.n}</span><span class="num" style="font-size:12.5px">${s.q} ${chip(s.st, s.st === 'ok' ? 'کافی' : s.st === 'warn' ? 'رو به اتمام' : 'بحرانی')}</span><div class="meter" style="grid-column:span 2"><i style="width:${s.lvl}%;${s.st === 'crit' ? 'background:#b42318' : ''}"></i></div></div>`).join('')}</div></div>
-        <div class="card c5"><div class="ch"><h3>تولیدی‌های طرف قرارداد</h3></div>
-          <table class="tbl"><thead><tr><th>تولیدی</th><th>محصول</th><th class="end">تحویل به‌موقع</th></tr></thead><tbody>
-          ${MAKERS.map((m) => `<tr><td>${m.n}</td><td class="muted">${m.k}</td><td class="end num">${fa(m.on)}٪</td></tr>`).join('')}</tbody></table></div>
-      </div>
-      <div class="grid mt">
-        <div class="card c6"><div class="ch"><h3>${I.ret.replace('<svg', '<svg width="16"')} لیست مرجوعی‌ها</h3></div>
-          <table class="tbl"><thead><tr><th>کالا</th><th>از</th><th>علت</th><th class="end">وزن</th></tr></thead><tbody>${RETURNS.map((r) => `<tr><td>${r.n}</td><td class="muted">${r.from}</td><td>${chip('gold', r.why)}</td><td class="end num">${fa(r.g, 1)} گرم</td></tr>`).join('')}</tbody></table></div>
-        <div class="card c6"><div class="ch"><h3>${I.broken.replace('<svg', '<svg width="16"')} لیست خرابی‌ها</h3></div>
-          <table class="tbl"><thead><tr><th>مورد</th><th>ایستگاه</th><th>اقدام</th><th class="end">وزن</th></tr></thead><tbody>${DEFECTS.map((r) => `<tr><td>${r.n}</td><td class="muted">${r.st}</td><td>${chip('warn', r.a)}</td><td class="end num">${fa(r.g, 1)} گرم</td></tr>`).join('')}</tbody></table></div>
-      </div>
-    </section>`,
   };
 }
 
@@ -379,7 +372,7 @@ function people() {
         ${kpi('غذای امشب', 23, 'پرس', '۴ پرس', '', true)}
       </div>
       <div class="card mt shift">
-        <div class="ch"><h3>${I.clock.replace('<svg', '<svg width="16"')} شیفت امروز <small>ساعت کاری ۸ تا ۱۶ · دو ساعت اضافه‌کاری (تا ۱۸) = غذای پرسنلی</small></h3><div class="legend"><span><i style="background:#e6efeb;border:1px solid #1f7a5e"></i>ساعت کاری</span><span><i class="stripe"></i>اضافه‌کاری</span><span><i style="background:#b42318"></i>مشمول غذا</span></div></div>
+        <div class="ch"><h3>${I.clock.replace('<svg', '<svg width="16"')} شیفت امروز <small>ساعت کاری ۸ تا ۱۶ · دو ساعت اضافه‌کاری (تا ۱۸) = غذای پرسنلی</small></h3><div class="legend"><span><i style="background:var(--emerald-soft);border:1px solid var(--emerald-mid)"></i>ساعت کاری</span><span><i class="stripe"></i>اضافه‌کاری</span><span><i style="background:var(--crit)"></i>مشمول غذا</span></div></div>
         <div class="tl">
           <div class="tl-axis">${Array.from({ length: 9 }, (_, i) => `<span style="inset-inline-start:${(i * 2 / 16) * 100}%">${fa(6 + i * 2)}:۰۰</span>`).join('')}</div>
           <div class="tl-zone reg" style="inset-inline-start:${(2 / 16) * 100}%;width:${(8 / 16) * 100}%"><em>ساعت کاری</em></div>
@@ -418,7 +411,7 @@ function people() {
 
 // ---------------------------------------------------------------- calendar
 function calendar() {
-  const kc = { in: '#2f8f62', out: '#b42318', ship: '#b59457', gold: '#0a1e35' };
+  const kc = { in: 'var(--ok)', out: 'var(--crit)', ship: 'var(--champagne)', gold: 'var(--navy)' };
   const today = 10;
   return {
     html: `<section class="view">
@@ -539,4 +532,4 @@ function report() {
   };
 }
 
-export const VIEWS = { report, overview, agents, line, invoice, treasury, accounting, warehouse, people, calendar, market };
+export const VIEWS = { report, overview, agents, line, invoice, treasury, warehouse: treasury, accounting, people, calendar, market };
