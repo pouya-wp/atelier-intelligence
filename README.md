@@ -1,37 +1,68 @@
-# طلای عقیق — Atelier Intelligence (Demo)
+<div align="center">
 
-داشبورد ایجنت‌های هوش مصنوعی برای **طلای عقیق یزد** — نسخه دمو (فقط ظاهر، داده‌ها نمایشی است).
+# ✨ Atelier Intelligence
 
-## اجرا
+### Luxury Gold & Jewelry Atelier Autonomous Management Command Center
+
+[![Platform](https://img.shields.io/badge/Platform-Web%20%7C%20Cloud-black?style=flat-square&logo=vercel)](https://aghigh.vercel.app)
+[![Vite](https://img.shields.io/badge/Frontend-Vite%20%2B%20Tailwind-646CFF?style=flat-square&logo=vite)](https://vitejs.dev/)
+[![Three.js](https://img.shields.io/badge/3D-Three.js%20Studio%20HDRI-049EF4?style=flat-square&logo=threedotjs)](https://threejs.org/)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
+[![Author](https://img.shields.io/badge/Author-Pouya%20Sadeghpour-181717?style=flat-square&logo=github)](https://github.com/pouya-wp)
+
+<p align="center">
+  <b>Atelier Intelligence</b> is an ultra-luxury enterprise management dashboard crafted for high-end gold manufacturing ateliers. Featuring interactive 3D bullion and coin simulation with studio HDRI, a molten gold inspector sphere, 13 autonomous AI specialized agents, and dynamic gold-pegged financial accounting.
+</p>
+
+</div>
+
+---
+
+## ✨ Features
+
+- 🪙 **Interactive 3D Gold Bullion & Coins** — Studio HDRI metallic reflection shader with custom engraved brand stamps via Three.js.
+- 🔮 **Molten Gold Inspector Sphere** — Voice-reactive 3D orb with fluid shader dynamics for the automated auditor agent.
+- 🏛️ **Emerald & Gold Design System** — Deep imperial emerald (`#0E5A44`), midnight navy (`#0A1E35`), champagne gold (`#B59457`), and bespoke Persian typography (*Meem*).
+- 🤖 **13 Specialized AI Department Agents** — Production line monitoring, treasury reconciliation, payroll calculation, cost centers, and scrap loss analysis.
+- ⚖️ **Dynamic Gold-Pegged Accounting** — Instant conversion of transactions and promissory notes into real-time gold milligram equivalents.
+
+---
+
+## 🏗️ Architecture
+
+| Module | Responsibility | Stack |
+|:---|:---|:---|
+| `src/three/` | Realtime 3D gold shaders, studio lighting, coin rotation | Three.js, WebGL |
+| `src/agents/` | 13 Autonomous agent interfaces, telemetry, decision trees | Modern Vanilla JS / ES Modules |
+| `src/audio/` | Ambient atelier soundscapes and haptic interface tones | Web Audio API |
+| `src/styles.css` | Custom design tokens, emerald palette, curtain transitions | Tailwind CSS |
+
+---
+
+## 🚀 Quick Start
+
 ```bash
+# Clone the repository
+git clone https://github.com/pouya-wp/atelier-intelligence.git
+cd atelier-intelligence
+
+# Install dependencies
 npm install
-npm run dev      # توسعه
-npm run build    # خروجی استاتیک در dist/
+
+# Start local dev server
+npm run dev
 ```
-- برای رد شدن از انیمیشن ورود: `?open` به آدرس اضافه کنید (مثلاً `/?open#line`).
-- ورود: مهر طلایی را **نگه دارید** (یا Enter/Space).
-- بازرس ویژه (سخنگو): روی گوی طلایی بزنید یا `Space`.
-- موسیقی پس‌زمینه: فایل بی‌کلام را با نام `public/music/background.mp3` بگذارید؛ بعد از ورود آرام پخش می‌شود.
 
-## انتشار روی Vercel
-1. در Vercel گزینه **Add New → Project** را بزنید و ریپوی `pouya-wp/khaki` را Import کنید.
-2. تنظیمات خودکار از `vercel.json` خوانده می‌شود (Vite، خروجی `dist`) — فقط **Deploy** را بزنید.
-3. هر push روی همین برنچ خودکار دوباره دیپلوی می‌شود.
+Visit `http://localhost:5173/?open#line` to skip entrance animations during development.
 
-لینک مستقیم به یک صفحه بدون انیمیشن ورود: `https://<domain>/?open#line`
+---
 
-## چه چیزهایی دارد
-- سیستم طراحی «زمردی»: سبز مخملی سلطنتی + سفید، سرمه‌ای برند به‌عنوان رنگ دوم، شامپاینی فقط برای جزئیات
-- شمش و سکه سه‌بعدی (three.js) با HDRI استودیویی و لوگوی حک‌شده
-- گوی طلای مذاب برای بازرس ویژه + افکت‌های صوتی ملایم
-- صفحه ورود: لوگو و یک صفحه‌مدرج؛ با یک تقه باز می‌شود
-- تعویض پنل نقش‌ها (مدیر کل / حسابداری / انبار / منابع انسانی) با پرده طلایی
-- صفحات: اتاق فرمان، ۱۳ ایجنت، خط تولید و مراکز هزینه، فاکتور طلایی (تبدیل مبلغ به طلا)، خزانه (با کد کالا)،
-  حسابداری و هزینه‌ها (رایورز)، انبار/تولیدی/مرجوعی/خرابی، پرسنل و غذای اضافه‌کاری، سررسیدها
-  (با معادل طلایی لحظه‌ای هر پرداخت) و کارها، گزارش روزانه مدیریتی، بازار و اخبار
+## 📄 License
 
-## برند
-- فونت: **میم (Meem)** — `src/fonts/`
-- پالت: سبز زمردی `#0E5A44` (اصلی)، سرمه‌ای برند `#0A1E35` (دوم)، شامپاینی `#B59457` (جزئیات) روی زمینه سفید
-  (توکن‌ها در ابتدای `src/styles.css`)
-- لوگو: لوگوی رسمی در `src/icons.js`
+Distributed under the MIT License.
+
+---
+
+<div align="center">
+  <sub>Crafted with precision & passion by <b><a href="https://github.com/pouya-wp">Pouya Sadeghpour</a></b></sub>
+</div>
